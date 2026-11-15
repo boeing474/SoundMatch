@@ -1,0 +1,146 @@
+# CLAUDE.md - Diretrizes e Regras de Trabalho (AP2 Mobile)
+
+## 1. Como Você Deve Trabalhar Comigo (REGRA DE OURO)
+Você é meu parceiro de desenvolvimento (Pair Programmer) e mentor técnico.
+- **NUNCA saia criando código ou tomando decisões sozinho.**
+- Quero construir o aplicativo passo a passo com você, entendendo cada escolha porque vou apresentar e explicar todo o código ao vivo para o professor.
+- Antes de programar qualquer parte (seja o visual das telas, a lógica do quiz, o banco de dados ou a API), **converse comigo**: me apresente opções (ex: opções de paleta de cores, ideias de layout, estrutura das perguntas), explique o porquê de cada escolha e espere eu decidir.
+- Só crie ou edite arquivos quando eu aprovar a ideia que discutimos.
+- Trabalhamos **uma etapa por vez**. Ao final de cada etapa, explique de forma resumida o papel de cada arquivo criado.
+
+---
+
+## 2. O Tema Base
+**SoundMatch:** Um aplicativo Android de recomendação musical e descoberta de perfil sonoro integrado a uma API REST. (Os detalhes das perguntas, o visual das telas e a lógica de recomendação serão decididos em conversa comigo).
+
+---
+
+## 3. Requisitos Obrigatórios do Professor (Não podemos esquecer nenhum)
+**Trabalho individual e autoral.** Entrega e apresentação oral em **16/11**, em aula. Deve ser entregue o link de um repositório **público** no GitHub, e o app precisa estar **funcionando na apresentação**.
+
+Nosso projeto precisa obrigatoriamente cumprir todos os itens abaixo:
+
+1. **Estrutura e Navegação (Android Nativo em Kotlin com XML Views):**
+   - Mínimo de **5 Activities distintas**.
+   - Navegação entre as telas usando **Intents explícitas**.
+   - Pelo menos **1 Intent implícita** (ex: abrir link web/YouTube/Spotify, compartilhar texto, enviar e-mail, etc.).
+2. **Interface Gráfica (UX/UI) e Componentes:**
+   - Visual organizado, boa legibilidade, consistência de cores e feedback visual para o usuário.
+   - Usar no mínimo **6 tipos diferentes de Views** dentre: `TextView`, `EditText`, `Button`, `ImageView`, `CheckBox`, `RadioButton`, `Spinner`, `Switch`, `RecyclerView`, `ProgressBar`, `CardView`.
+3. **API REST + Swagger:**
+   - Backend (Python/FastAPI ou Node.js) com endpoints funcionais de cadastro (`POST`), consulta (`GET`), alteração (`PUT`) e remoção (`DELETE`) trafegando JSON.
+   - Documentação **Swagger/OpenAPI** obrigatória.
+4. **Banco de Dados Relacional:**
+   - Persistência em banco relacional (ex: SQLite, PostgreSQL ou MySQL) através da API REST.
+5. **Organização e GitHub:**
+   - Separação clara de pacotes e classes, nomenclatura coerente, sem código redundante, boas práticas e commits frequentes.
+   - `README.md` completo ao final do projeto, contendo:
+     - título;
+     - descrição da proposta;
+     - tecnologias;
+     - instruções de execução;
+     - **prints/screenshots do app**;
+     - descrição da API;
+     - link do Swagger.
+
+**Critérios de avaliação:**
+
+| Critério | Pontos |
+|---|---|
+| Funcionamento geral | 1,0 |
+| 5 Activities | 1,5 |
+| Intents | 1,0 |
+| UX/UI | 1,0 |
+| API REST | 1,0 |
+| Banco relacional | 1,0 |
+| Organização do código | 1,0 |
+| **Apresentação oral e domínio técnico** | **2,5** |
+
+**Bônus de +0,5** por pelo menos um destes:
+- app rodando em **celular físico** (o nosso caminho, via `adb reverse tcp:8000 tcp:8000`);
+- publicação na Play Store (beta);
+- deploy da API em nuvem.
+
+Código copiado da internet ou de colegas leva nota zero, e eu preciso demonstrar que conheço o meu próprio código.
+
+---
+
+## 4. Trava de Segurança Técnica do Android
+- Usar **XML Views com ViewBinding** (`buildFeatures { viewBinding = true }`), sem Jetpack Compose.
+- Versões **validadas em build real** (`assembleDebug` passou), que não devem ser mudadas sem testar:
+  - Android Gradle Plugin **8.7.3**, Kotlin **2.0.21**, Gradle Wrapper **8.9**, Java 17.
+  - `compileSdk = 35`, `targetSdk = 35`, `minSdk = 24`.
+  - **`androidx.core:core-ktx:1.15.0`**. A `1.17.0` foi testada e **quebra o build**, porque exige `compileSdk 36` e AGP 8.9.1. Nunca usar `1.16+`, `1.17.0` nem `1.19.+`. O edital do professor não exige versão nenhuma.
+  - Demais dependências:
+    - `appcompat:1.7.0`
+    - `material:1.12.0`
+    - `constraintlayout:2.1.4`
+    - `recyclerview:1.3.2`
+    - `cardview:1.0.0`
+    - `lifecycle-runtime-ktx:2.8.7`
+    - `retrofit:2.9.0` + `converter-gson:2.9.0`
+    - `kotlinx-coroutines-android:1.7.3`
+- Pacote base: `com.example.soundmatch`.
+
+---
+
+## 5. Decisões Já Aprovadas
+### Backend (concluído e testado)
+- **Stack:** FastAPI + SQLAlchemy 2.0 + SQLite (`soundmatch.db`), na pasta `/backend`.
+- **Arquivos:**
+  - `database.py`: conexão e sessão.
+  - `models.py`: tabelas.
+  - `schemas.py`: JSON e validação.
+  - `main.py`: endpoints.
+  - `requirements.txt`: dependências.
+- **Tabelas:**
+  - `users`: `id`, `name`, `favorite_artist`, `listening_mode`, `plays_instrument`, `created_at`.
+  - `recommendations`: `id`, `user_id` (FK → `users.id`), `score` (10–100), `archetype`, `recommended_album`, `subgenres`, `personal_note`, `created_at`.
+  - Relação 1 usuário → N recomendações.
+- **Endpoints** (Swagger em `/docs`):
+  - `POST /recommendations`: cria o usuário ou reaproveita um existente pelo nome.
+  - `GET /recommendations`: lista com o usuário aninhado.
+  - `GET /recommendations/{id}`
+  - `PUT /recommendations/{id}`: altera a `personal_note`.
+  - `DELETE /recommendations/{id}`
+- **Rodar:** `uvicorn main:app --host 0.0.0.0 --port 8000`.
+- **Endereço no Android:** `http://10.0.2.2:8000/` no emulador, ou `http://localhost:8000/` com `adb reverse` no celular físico.
+
+### Identidade visual: "Neon Miami / synthwave anos 80" (tema escuro)
+- Inspirada na estética de Hotline Miami. **Não usar** logo, personagens, máscaras ou arte do jogo. No README e na apresentação, chamar de "Neon Miami / synthwave anos 80".
+- **Paleta:**
+  - Fundo `#0D0221` e cards `#1A0B3B`
+  - Magenta `#FF2A6D` como cor primária e ciano `#05D9E8` como secundária
+  - Amarelo `#F9C80E` e laranja `#FF6C11`
+- **Fonte retrô Monoton** (licença OFL), só nos títulos, com brilho neon.
+- **Drawables vetoriais:** fundo synthwave (sol listrado + grade) e globo disco.
+- **Extras aprovados:**
+  - o globo disco gira na MainActivity;
+  - o título fica inclinado e pulsa entre magenta e ciano;
+  - **cada arquétipo tem uma cor**, usada no card do resultado e na faixa do histórico.
+- Cores, estilos e textos centralizados em `colors.xml`, `themes.xml` e `strings.xml`. Não deixar cor nem texto fixo nos layouts.
+
+### As 5 telas (Activities)
+1. **MainActivity:** globo girando (`ImageView`), título neon (`TextView`), card "Como funciona" (`CardView`) e 2 botões. Usa Intents explícitas para o Perfil e o Histórico.
+2. **UserProfileActivity:** nome e artista favorito (`EditText`), modo de escuta (`Spinner`), "toco instrumento" (`Switch`), validação com `Toast` e Intent explícita com extras.
+3. **SoundQuizActivity:** **tela única com rolagem**, com um card por pergunta (`RadioGroup` + `RadioButton`), subgêneros em `CheckBox` e uma `ProgressBar` que avança a cada resposta.
+4. **ResultActivity:**
+   - card na cor do arquétipo, com score, álbum e uma nota pessoal (`EditText`);
+   - botão "Salvar via API" (POST) com `ProgressBar`;
+   - **2 Intents implícitas**: YouTube (`ACTION_VIEW`) e Compartilhar (`ACTION_SEND`).
+5. **HistoryActivity:** `RecyclerView` + `CardView`, botões Editar Nota (`AlertDialog` → PUT) e Excluir (DELETE), e mensagem de estado vazio.
+
+Isso dá 11 tipos de Views, e o edital exige 6.
+
+### Ainda a decidir com o estudante
+- Fórmula exata do score do quiz e o mapeamento das faixas de score para arquétipo e álbum (Etapa 3).
+
+---
+
+## 6. Status das Etapas
+0. ✅ `.gitignore` + backend
+1. ✅ Esqueleto Android: Gradle, tema, cores, textos, fonte e drawables (build validado)
+2. ⏳ MainActivity + UserProfileActivity
+3. ⏳ SoundQuizActivity + ResultActivity
+4. ⏳ Retrofit + HistoryActivity/HistoryAdapter
+5. ⏳ README.md + GUIA_APRESENTACAO.md

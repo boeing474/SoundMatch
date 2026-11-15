@@ -1,0 +1,23 @@
+# ===== Python / Backend =====
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.db
+
+# ===== Android / Gradle =====
+.gradle/
+build/
+local.properties
+*.apk
+*.aab
+captures/
+
+# ===== IDEs =====
+.idea/
+*.iml
+.vscode/
+
+# ===== Sistema =====
+.DS_Store
+Thumbs.db
