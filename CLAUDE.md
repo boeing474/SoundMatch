@@ -7,6 +7,7 @@ Você é meu parceiro de desenvolvimento (Pair Programmer) e mentor técnico.
 - Antes de programar qualquer parte (seja o visual das telas, a lógica do quiz, o banco de dados ou a API), **converse comigo**: me apresente opções (ex: opções de paleta de cores, ideias de layout, estrutura das perguntas), explique o porquê de cada escolha e espere eu decidir.
 - Só crie ou edite arquivos quando eu aprovar a ideia que discutimos.
 - Trabalhamos **uma etapa por vez**. Ao final de cada etapa, explique de forma resumida o papel de cada arquivo criado.
+- **Commits:** um commit ao final de cada etapa aprovada, com mensagem em português. **Nunca** adicionar `Co-Authored-By: Claude` nem qualquer linha de atribuição ao Claude/IA nas mensagens de commit ou PR.
 
 ---
 
