@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Paleta "Neon Miami / synthwave anos 80". Trocar aqui muda o app inteiro. -->
+<resources>
+    <!-- Fundos -->
+    <color name="night_bg">#0D0221</color>        <!-- fundo das telas -->
+    <color name="night_card">#1A0B3B</color>      <!-- fundo dos cards -->
+    <color name="night_stripe">#2A0A4A</color>    <!-- detalhes escuros (listras do sol) -->
+
+    <!-- Neon -->
+    <color name="neon_magenta">#FF2A6D</color>    <!-- cor primária -->
+    <color name="neon_cyan">#05D9E8</color>       <!-- cor secundária -->
+    <color name="sunset_yellow">#F9C80E</color>
+    <color name="sunset_orange">#FF6C11</color>
+    <color name="neon_cyan_soft">#6605D9E8</color> <!-- ciano 40% (bordas dos cards) -->
+
+    <!-- Texto -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B8A9D9</color>
+    <color name="title_glow_text">#FFE3EE</color> <!-- branco rosado do título neon -->
+
+    <!-- Cor de cada Arquétipo Sonoro (card do resultado e faixa do histórico) -->
+    <color name="archetype_blues">#FF6C11</color>   <!-- Vintage Blues & Classic Rock -->
+    <color name="archetype_hard">#FF2A6D</color>    <!-- Hard Rock & Heavy Riffs -->
+    <color name="archetype_funk">#F9C80E</color>    <!-- Groove & Funk Rock Alternativo -->
+    <color name="archetype_prog">#05D9E8</color>    <!-- Explorador Progressivo & Conceitual -->
+</resources>

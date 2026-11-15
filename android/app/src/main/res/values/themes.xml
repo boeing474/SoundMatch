@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ===== Tema global do app (aplicado no AndroidManifest) ===== -->
+    <style name="Theme.SoundMatch" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/neon_magenta</item>
+        <item name="colorOnPrimary">@color/text_primary</item>
+        <item name="colorSecondary">@color/neon_cyan</item>
+        <item name="colorOnSecondary">@color/night_bg</item>
+        <item name="colorSurface">@color/night_card</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="android:colorBackground">@color/night_bg</item>
+        <item name="android:windowBackground">@color/night_bg</item>
+        <item name="android:statusBarColor">@color/night_bg</item>
+        <item name="android:navigationBarColor">@color/night_bg</item>
+        <!-- Cor de CheckBox, RadioButton, Switch e cursor do EditText -->
+        <item name="colorAccent">@color/neon_cyan</item>
+    </style>
+
+    <!-- ===== Título neon: fonte retrô Monoton + brilho (sombra colorida) ===== -->
+    <style name="Widget.SoundMatch.NeonTitle" parent="Widget.AppCompat.TextView">
+        <item name="android:fontFamily">@font/monoton_regular</item>
+        <item name="android:textSize">38sp</item>
+        <item name="android:textColor">@color/title_glow_text</item>
+        <item name="android:shadowColor">@color/neon_magenta</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">0</item>
+        <item name="android:shadowRadius">18</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <!-- Título menor das telas internas (mesma fonte, menos destaque) -->
+    <style name="Widget.SoundMatch.ScreenTitle" parent="Widget.SoundMatch.NeonTitle">
+        <item name="android:textSize">24sp</item>
+        <item name="android:shadowColor">@color/neon_cyan</item>
+        <item name="android:shadowRadius">12</item>
+    </style>
+
+    <!-- Textos comuns (fonte padrão, para manter a leitura fácil) -->
+    <style name="Widget.SoundMatch.Body" parent="Widget.AppCompat.TextView">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+
+    <style name="Widget.SoundMatch.Caption" parent="Widget.AppCompat.TextView">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/text_secondary</item>
+    </style>
+
+    <!-- ===== Botões ===== -->
+    <!-- Primário: preenchido em magenta -->
+    <style name="Widget.SoundMatch.Button.Primary" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@color/neon_magenta</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textStyle">bold</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="android:minHeight">56dp</item>
+    </style>
+
+    <!-- Secundário: só contorno ciano -->
+    <style name="Widget.SoundMatch.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="strokeColor">@color/neon_cyan</item>
+        <item name="android:textColor">@color/neon_cyan</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="android:minHeight">56dp</item>
+    </style>
+
+    <!-- ===== Card com borda neon (MaterialCardView é uma subclasse de CardView) ===== -->
+    <style name="Widget.SoundMatch.Card" parent="Widget.Material3.CardView.Outlined">
+        <item name="cardBackgroundColor">@color/night_card</item>
+        <item name="cardCornerRadius">16dp</item>
+        <item name="strokeColor">@color/neon_cyan_soft</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="contentPadding">16dp</item>
+    </style>
+
+</resources>

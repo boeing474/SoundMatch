@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SoundMatch</string>
+
+    <!-- ===== MainActivity ===== -->
+    <string name="main_title">SoundMatch</string>
+    <string name="main_subtitle">Descubra seu perfil sonoro</string>
+    <string name="main_how_title">Como funciona</string>
+    <string name="main_how_step1">1. Conte quem você é como ouvinte</string>
+    <string name="main_how_step2">2. Responda ao quiz sonoro</string>
+    <string name="main_how_step3">3. Receba um álbum clássico feito pra você</string>
+    <string name="btn_discover">Descobrir Meu Som</string>
+    <string name="btn_history">Histórico Salvo na API</string>
+    <string name="cd_disco_ball">Globo espelhado girando</string>
+
+    <!-- ===== UserProfileActivity ===== -->
+    <string name="profile_title">Seu Perfil</string>
+    <string name="profile_step">Passo 1 de 2</string>
+    <string name="hint_name">Nome do ouvinte</string>
+    <string name="hint_artist">Banda/Artista favorito atual</string>
+    <string name="label_listening_mode">Como você costuma ouvir música?</string>
+    <string name="switch_instrument">Toco algum instrumento musical</string>
+    <string name="btn_go_quiz">Ir para o Quiz</string>
+    <string name="toast_fill_fields">Preencha seu nome e seu artista favorito</string>
+
+    <string-array name="listening_modes">
+        <item>Fone de Ouvido</item>
+        <item>Caixa de Som/Vinil</item>
+        <item>No Carro/Transporte</item>
+        <item>Enquanto Estuda/Codifica</item>
+    </string-array>
+
+    <!-- ===== SoundQuizActivity ===== -->
+    <string name="quiz_title">Quiz Sonoro</string>
+    <string name="quiz_step">Passo 2 de 2</string>
+
+    <string name="q1_title">1. Qual elemento mais te prende numa música?</string>
+    <string name="q1_opt_guitar">Riffs de Guitarra</string>
+    <string name="q1_opt_drums">Peso da Bateria</string>
+    <string name="q1_opt_bass">Linha de Baixo</string>
+    <string name="q1_opt_keys">Atmosfera e Teclados</string>
+
+    <string name="q2_title">2. Qual energia você prefere?</string>
+    <string name="q2_opt_raw">Crua e Direta</string>
+    <string name="q2_opt_heavy">Pesada e Intensa</string>
+    <string name="q2_opt_groove">Dançante e Groove</string>
+    <string name="q2_opt_psy">Psicodélica e Conceitual</string>
+
+    <string name="q3_title">3. Duração ideal de uma faixa?</string>
+    <string name="q3_opt_short">3 min</string>
+    <string name="q3_opt_medium">5 min</string>
+    <string name="q3_opt_long">+7 min épica</string>
+
+    <string name="subgenres_title">Subgêneros que você curte</string>
+    <string name="sub_blues">Blues Rock</string>
+    <string name="sub_hard">Hard Rock</string>
+    <string name="sub_prog">Prog Rock</string>
+    <string name="sub_funk">Funk/Alternative</string>
+
+    <string name="btn_see_result">Ver Meu Resultado</string>
+    <string name="toast_answer_all">Responda às 3 perguntas</string>
+
+    <!-- ===== ResultActivity ===== -->
+    <string name="result_title">Seu Som</string>
+    <string name="result_score_label">Score</string>
+    <string name="result_album_label">Álbum recomendado</string>
+    <string name="hint_personal_note">Sua nota pessoal sobre o álbum</string>
+    <string name="btn_save_api">Salvar no Banco via API</string>
+    <string name="btn_youtube">Ouvir / Buscar Álbum no YouTube</string>
+    <string name="btn_share">Compartilhar Meu Perfil Sonoro</string>
+    <string name="toast_saved">Recomendação salva na API!</string>
+    <string name="toast_api_error">Erro ao conectar com a API. Ela está rodando?</string>
+    <string name="share_chooser">Compartilhar via</string>
+
+    <!-- ===== HistoryActivity ===== -->
+    <string name="history_title">Histórico</string>
+    <string name="history_empty">Nenhum registro ainda.\nFaça o quiz e salve seu resultado!</string>
+    <string name="btn_edit_note">Editar Nota</string>
+    <string name="btn_delete">Excluir</string>
+    <string name="dialog_edit_title">Editar nota pessoal</string>
+    <string name="dialog_save">Salvar</string>
+    <string name="dialog_cancel">Cancelar</string>
+    <string name="toast_updated">Nota atualizada!</string>
+    <string name="toast_deleted">Registro excluído!</string>
+</resources>
