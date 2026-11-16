@@ -22,6 +22,7 @@
     <string name="switch_instrument">Toco algum instrumento musical</string>
     <string name="btn_go_quiz">Ir para o Quiz</string>
     <string name="toast_fill_fields">Preencha seu nome e seu artista favorito</string>
+    <string name="error_required">Campo obrigatório</string>
 
     <string-array name="listening_modes">
         <item>Fone de Ouvido</item>

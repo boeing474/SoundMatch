@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Passo 1: perfil do ouvinte (nome, artista favorito, modo de escuta e se toca instrumento) -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true"
+    tools:context=".ui.UserProfileActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="32dp">
+
+        <!-- Faixa decorativa synthwave -->
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:importantForAccessibility="no"
+            android:scaleType="centerCrop"
+            android:src="@drawable/bg_synthwave" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp">
+
+            <TextView
+                style="@style/Widget.SoundMatch.ScreenTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/profile_title" />
+
+            <TextView
+                style="@style/Widget.SoundMatch.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:text="@string/profile_step" />
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.SoundMatch.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- REQUISITO: EditText (TextInputEditText é subclasse de EditText) -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilName"
+                        style="@style/Widget.SoundMatch.TextInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_name">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etName"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textPersonName|textCapWords"
+                            android:maxLength="100" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilArtist"
+                        style="@style/Widget.SoundMatch.TextInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:hint="@string/hint_artist">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etArtist"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textCapWords"
+                            android:maxLength="100" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <TextView
+                        style="@style/Widget.SoundMatch.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:labelFor="@id/spinnerListeningMode"
+                        android:text="@string/label_listening_mode" />
+
+                    <!-- REQUISITO: Spinner (opções vêm do string-array listening_modes) -->
+                    <Spinner
+                        android:id="@+id/spinnerListeningMode"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/bg_spinner"
+                        android:popupBackground="@color/night_card"
+                        android:spinnerMode="dropdown" />
+
+                    <!-- REQUISITO: Switch (MaterialSwitch é o Switch do Material Design 3) -->
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/switchInstrument"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:minHeight="48dp"
+                        android:text="@string/switch_instrument"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        app:thumbTint="@color/switch_thumb"
+                        app:trackTint="@color/switch_track" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <Button
+                android:id="@+id/btnGoQuiz"
+                style="@style/Widget.SoundMatch.Button.Primary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="@string/btn_go_quiz" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

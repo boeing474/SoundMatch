@@ -65,6 +65,17 @@
         <item name="android:minHeight">56dp</item>
     </style>
 
+    <!-- ===== Campo de texto com contorno neon (TextInputLayout) ===== -->
+    <style name="Widget.SoundMatch.TextInput" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/text_input_stroke</item>
+        <item name="hintTextColor">@color/neon_cyan</item>
+        <item name="android:textColorHint">@color/text_secondary</item>
+        <item name="boxCornerRadiusTopStart">10dp</item>
+        <item name="boxCornerRadiusTopEnd">10dp</item>
+        <item name="boxCornerRadiusBottomStart">10dp</item>
+        <item name="boxCornerRadiusBottomEnd">10dp</item>
+    </style>
+
     <!-- ===== Card com borda neon (MaterialCardView é uma subclasse de CardView) ===== -->
     <style name="Widget.SoundMatch.Card" parent="Widget.Material3.CardView.Outlined">
         <item name="cardBackgroundColor">@color/night_card</item>

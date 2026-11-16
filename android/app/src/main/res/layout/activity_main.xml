@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tela inicial: vitrine do app (globo disco girando + título neon + 2 botões de navegação) -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true"
+    tools:context=".ui.MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="32dp">
+
+        <!-- Cabeçalho: pôr do sol synthwave ao fundo e o globo disco por cima -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="290dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="217dp"
+                android:layout_gravity="bottom"
+                android:importantForAccessibility="no"
+                android:scaleType="centerCrop"
+                android:src="@drawable/bg_synthwave" />
+
+            <!-- REQUISITO: ImageView (gira em loop via ObjectAnimator na MainActivity) -->
+            <ImageView
+                android:id="@+id/imgDiscoBall"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="14dp"
+                android:contentDescription="@string/cd_disco_ball"
+                android:src="@drawable/ic_disco_ball" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp">
+
+            <!-- REQUISITO: TextView (título neon com a fonte Monoton, inclinado) -->
+            <!-- autoSize: a fonte Monoton é larga, então o tamanho se ajusta à largura da tela -->
+            <TextView
+                android:id="@+id/tvTitle"
+                style="@style/Widget.SoundMatch.NeonTitle"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_marginTop="8dp"
+                android:maxLines="1"
+                android:rotation="-4"
+                android:text="@string/main_title"
+                app:autoSizeMaxTextSize="36sp"
+                app:autoSizeMinTextSize="18sp"
+                app:autoSizeTextType="uniform" />
+
+            <TextView
+                style="@style/Widget.SoundMatch.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:text="@string/main_subtitle"
+                android:textSize="16sp" />
+
+            <!-- REQUISITO: CardView (MaterialCardView é subclasse de CardView) -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.SoundMatch.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/main_how_title"
+                        android:textColor="@color/neon_cyan"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        style="@style/Widget.SoundMatch.Body"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="@string/main_how_step1" />
+
+                    <TextView
+                        style="@style/Widget.SoundMatch.Body"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/main_how_step2" />
+
+                    <TextView
+                        style="@style/Widget.SoundMatch.Body"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/main_how_step3" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- REQUISITO: Button (2 botões de navegação) -->
+            <Button
+                android:id="@+id/btnDiscover"
+                style="@style/Widget.SoundMatch.Button.Primary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="@string/btn_discover" />
+
+            <Button
+                android:id="@+id/btnHistory"
+                style="@style/Widget.SoundMatch.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/btn_history" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

@@ -16,7 +16,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SoundMatch">
 
-        <!-- As 5 Activities serão registradas aqui nas próximas etapas. -->
+        <!-- Tela inicial (LAUNCHER = ícone que abre o app) -->
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.UserProfileActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.MainActivity" />
 
     </application>
 
