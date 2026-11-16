@@ -133,7 +133,13 @@ Código copiado da internet ou de colegas leva nota zero, e eu preciso demonstra
 
 Isso dá 11 tipos de Views, e o edital exige 6.
 
+### Mockup visual (aguardando revisão do estudante)
+- Canvas com as 5 telas no claude.ai (privado, só o estudante acessa): https://claude.ai/artifact/KByessN86rhHbGwmUw6df8
+- A Etapa 2 começa revisando este mockup. Os XMLs devem seguir o visual aprovado nele.
+
 ### Ainda a decidir com o estudante
+- Ajustes no mockup (se houver).
+- Etapa 2: layout (ScrollView + LinearLayout ou ConstraintLayout), pacotes (`ui/`, `adapter/`, `network/`, `model/`, `logic/`) e estilo dos campos (TextInputLayout neon ou EditText simples).
 - Fórmula exata do score do quiz e o mapeamento das faixas de score para arquétipo e álbum (Etapa 3).
 
 ---
