@@ -32,11 +32,21 @@
         <item name="android:gravity">center</item>
     </style>
 
-    <!-- Título menor das telas internas (mesma fonte, menos destaque) -->
-    <style name="Widget.SoundMatch.ScreenTitle" parent="Widget.SoundMatch.NeonTitle">
-        <item name="android:textSize">24sp</item>
-        <item name="android:shadowColor">@color/neon_cyan</item>
-        <item name="android:shadowRadius">12</item>
+    <!-- Título das telas internas: a Monoton fica só no logo da tela inicial -->
+    <style name="Widget.SoundMatch.ScreenTitle" parent="Widget.AppCompat.TextView">
+        <item name="android:fontFamily">sans-serif-black</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:gravity">start</item>
+    </style>
+
+    <!-- Linha fina magenta -> ciano embaixo dos títulos (lembra o horizonte da tela inicial) -->
+    <style name="Widget.SoundMatch.HorizonLine" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">2dp</item>
+        <item name="android:layout_marginTop">14dp</item>
+        <item name="android:background">@drawable/line_horizon</item>
+        <item name="android:importantForAccessibility">no</item>
     </style>
 
     <!-- Textos comuns (fonte padrão, para manter a leitura fácil) -->
@@ -150,12 +160,12 @@
         <item name="android:layout_marginBottom">4dp</item>
     </style>
 
-    <!-- ===== Card com borda neon (MaterialCardView é uma subclasse de CardView) ===== -->
-    <style name="Widget.SoundMatch.Card" parent="Widget.Material3.CardView.Outlined">
+    <!-- ===== Card sem contorno: o fundo roxo já separa do fundo da tela ===== -->
+    <!-- (MaterialCardView é uma subclasse de CardView) -->
+    <style name="Widget.SoundMatch.Card" parent="Widget.Material3.CardView.Filled">
         <item name="cardBackgroundColor">@color/night_card</item>
         <item name="cardCornerRadius">16dp</item>
-        <item name="strokeColor">@color/neon_cyan_soft</item>
-        <item name="strokeWidth">1dp</item>
+        <item name="cardElevation">0dp</item>
         <item name="contentPadding">16dp</item>
     </style>
 

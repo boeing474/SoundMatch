@@ -22,6 +22,8 @@
             android:layout_marginTop="20dp"
             android:text="@string/result_title" />
 
+        <View style="@style/Widget.SoundMatch.HorizonLine" />
+
         <!-- Capa em destaque, com contorno na cor do perfil (pintado no Kotlin).
              Começa com o vinil e troca pela capa quando a busca no iTunes termina. -->
         <com.google.android.material.card.MaterialCardView

@@ -19,6 +19,7 @@
         style="@style/Widget.SoundMatch.ScreenTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
         android:layout_marginTop="20dp"
         android:text="@string/history_title" />
 
@@ -26,10 +27,14 @@
         android:id="@+id/tvHistoryCount"
         style="@style/Widget.SoundMatch.Caption"
         android:layout_width="match_parent"
+        android:layout_marginHorizontal="24dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:gravity="center"
-        tools:text="3 registros salvos na API" />
+        tools:text="3 músicas salvas" />
+
+    <View
+        style="@style/Widget.SoundMatch.HorizonLine"
+        android:layout_marginHorizontal="24dp" />
 
     <FrameLayout
         android:layout_width="match_parent"

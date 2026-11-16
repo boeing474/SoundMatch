@@ -11,7 +11,8 @@
     <color name="neon_cyan">#05D9E8</color>       <!-- cor secundária -->
     <color name="sunset_yellow">#F9C80E</color>
     <color name="sunset_orange">#FF6C11</color>
-    <color name="neon_cyan_soft">#6605D9E8</color> <!-- ciano 40% (bordas dos cards) -->
+    <color name="neon_cyan_soft">#6605D9E8</color> <!-- ciano 40% (contorno dos campos) -->
+    <color name="stroke_subtle">#3B2A78</color>   <!-- contorno discreto (chip não selecionado) -->
     <color name="neon_magenta_disabled">#5A2140</color> <!-- botão primário desabilitado -->
 
     <!-- Texto -->
