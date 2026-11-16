@@ -41,11 +41,11 @@ class Recommendation(Base):
     # Chave estrangeira: cada recomendação pertence a um usuário
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
 
-    score: Mapped[int] = mapped_column(Integer, nullable=False)
-    archetype: Mapped[str] = mapped_column(String(100), nullable=False)
-    recommended_song: Mapped[str] = mapped_column(String(150), nullable=False)  # ex.: "Give It Away"
-    song_artist: Mapped[str] = mapped_column(String(100), nullable=False)       # ex.: "Red Hot Chili Peppers"
-    subgenres: Mapped[str] = mapped_column(String(200), default="")  # ex.: "Blues Rock, Hard Rock"
+    score: Mapped[int] = mapped_column(Integer, nullable=False)  # % de match (10 a 100)
+    archetype: Mapped[str] = mapped_column(String(100), nullable=False)  # perfil, ex.: "Pop & K-pop"
+    recommended_song: Mapped[str] = mapped_column(String(150), nullable=False)  # ex.: "Espresso"
+    song_artist: Mapped[str] = mapped_column(String(100), nullable=False)       # ex.: "Sabrina Carpenter"
+    subgenres: Mapped[str] = mapped_column(String(200), default="")  # outros estilos, ex.: "Eletrônica"
     liked: Mapped[bool] = mapped_column(Boolean, nullable=False)  # Curti / Não curti
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 

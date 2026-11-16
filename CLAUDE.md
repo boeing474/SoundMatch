@@ -166,8 +166,10 @@ Código copiado da internet ou de colegas leva nota zero, e eu preciso demonstra
 ### Ainda a decidir com o estudante (próximos passos, nesta ordem)
 1. **Perguntas do quiz: o estudante ainda acha genéricas.** Ideia escolhida por ele: a **1ª pergunta usa músicas reais do artista favorito** ("Qual dessas do BTS você mais ouve?"; a mesma busca do iTunes com `limit=25` filtrada pelo artista devolve as mais conhecidas, com ano e gênero). Ele quer que **a música escolhida influencie a recomendação, mas NÃO pelo ano**. Também **não gostou** da proposta "O que mais te prende em Dynamite? voz/batida/guitarra/baixo/teclados". Ainda é preciso propor outra forma, e conversar antes de programar.
 2. **Design:** o estudante sente que o design ainda não chegou no que ele quer. Trabalhar **uma tela por vez**, com print (`adb screencap`) e opções visuais antes de mexer.
-3. Atualizar o README e o `GUIA_APRESENTACAO.md` para a lógica de gêneros, votação, % de match, perfil em passos e Views sem Spinner/Switch. **Hoje eles ainda descrevem a versão de rock com score.**
-4. Commit (tudo desde `8e620ae` está **sem commit**: Curti/Não curti, perfil em passos, gêneros). Depois: screenshots em `docs/screenshots/`, apagar o `LEIA-ME.txt`, push só com confirmação e conferir se o repositório está público.
+3. ✅ README e `GUIA_APRESENTACAO.md` atualizados para gêneros/votação/% de match (16/11), com 6 prints em `docs/screenshots/` tirados no celular. `LEIA-ME.txt` apagado.
+4. ✅ Commit da reforma (`1c45160`) e da documentação. **Falta: push (só com confirmação) e conferir se o repositório está público.**
+5. Mockup do novo Perfil (botões fixos embaixo, sol + grade no rodapé subindo a cada passo, frase que usa a resposta anterior: "Prazer, Pedro."): https://claude.ai/artifact/B7KUviGeVDxj1Vw9NfRrFj (passos 1–3 prontos, falta o 4). Retomar depois da entrega.
+6. Notado e não corrigido: o quiz mostra "Passo 2 de 2" (o perfil agora tem 4 passos); no Resultado, "outros estilos" pode repetir o próprio perfil vencedor.
 - Adiado: Top 3 músicas favoritas, swipe estilo Tinder.
 
 ## 6. Status das Etapas
@@ -176,5 +178,5 @@ Código copiado da internet ou de colegas leva nota zero, e eu preciso demonstra
 2. ✅ MainActivity + UserProfileActivity
 3. ✅ Lógica de recomendação + SoundQuizActivity + ResultActivity + testes
 4. ✅ Retrofit (POST/GET/PUT/DELETE) + HistoryActivity/HistoryAdapter com AlertDialog
-5. ✅ README.md + GUIA_APRESENTACAO.md (desatualizados após 16/11, ver "Ainda a decidir")
-6. 🔄 Reforma de 16/11: gêneros + votação + % de match + perfil em passos + Curti/Não curti. **Build e testes passando e app instalado no celular, mas sem commit.** Faltam as perguntas do quiz, o design, a documentação e o commit.
+5. ✅ README.md + GUIA_APRESENTACAO.md (atualizados em 16/11)
+6. ✅ Reforma de 16/11 (gêneros + votação + % de match + perfil em passos + Curti/Não curti) com commit, build e testes passando. Pendentes: push, perguntas do quiz e design.

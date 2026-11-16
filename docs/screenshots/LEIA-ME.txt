@@ -1,2 +1,0 @@
-Salve aqui os prints do app tirados no emulador:
-01-main.png, 02-perfil.png, 03-quiz.png, 04-resultado.png, 05-historico.png

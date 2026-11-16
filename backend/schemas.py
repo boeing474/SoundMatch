@@ -30,11 +30,11 @@ class RecommendationCreate(BaseModel):
     plays_instrument: bool = Field(False, examples=[True])
 
     # Dados da recomendação (tabela recommendations)
-    score: int = Field(..., ge=10, le=100, examples=[72])
-    archetype: str = Field(..., examples=["Groove & Funk Rock Alternativo"])
-    recommended_song: str = Field(..., min_length=1, max_length=150, examples=["Give It Away"])
-    song_artist: str = Field(..., min_length=1, max_length=100, examples=["Red Hot Chili Peppers"])
-    subgenres: str = Field("", examples=["Hard Rock, Funk/Alternative"])
+    score: int = Field(..., ge=10, le=100, examples=[71])
+    archetype: str = Field(..., examples=["Rock & Alternativo"])
+    recommended_song: str = Field(..., min_length=1, max_length=150, examples=["Paranoid Android"])
+    song_artist: str = Field(..., min_length=1, max_length=100, examples=["Radiohead"])
+    subgenres: str = Field("", examples=["Eletrônica"])
     liked: bool = Field(..., examples=[True])
 
 
