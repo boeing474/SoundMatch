@@ -9,9 +9,6 @@ import com.example.soundmatch.R
 import com.example.soundmatch.databinding.ActivityUserProfileBinding
 import com.example.soundmatch.model.UserProfile
 
-/**
- * Passo 1: coleta o perfil do ouvinte e valida os campos obrigatórios.
- */
 class UserProfileActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityUserProfileBinding
@@ -25,7 +22,6 @@ class UserProfileActivity : AppCompatActivity() {
         binding.btnGoQuiz.setOnClickListener { onGoQuizClicked() }
     }
 
-    /** Preenche o Spinner com as opções do string-array "listening_modes". */
     private fun setupListeningModeSpinner() {
         val adapter = ArrayAdapter.createFromResource(
             this,
@@ -40,7 +36,6 @@ class UserProfileActivity : AppCompatActivity() {
         val name = binding.etName.text?.toString()?.trim().orEmpty()
         val artist = binding.etArtist.text?.toString()?.trim().orEmpty()
 
-        // Feedback visual: o campo vazio fica em destaque com a mensagem de erro.
         binding.tilName.error = if (name.isEmpty()) getString(R.string.error_required) else null
         binding.tilArtist.error = if (artist.isEmpty()) getString(R.string.error_required) else null
 
@@ -59,7 +54,6 @@ class UserProfileActivity : AppCompatActivity() {
     }
 
     private fun openQuiz(profile: UserProfile) {
-        // REQUISITO: Intent Explícita -> SoundQuizActivity, levando o perfil com putExtra
         val intent = Intent(this, SoundQuizActivity::class.java)
             .putExtra(SoundQuizActivity.EXTRA_PROFILE, profile)
         startActivity(intent)

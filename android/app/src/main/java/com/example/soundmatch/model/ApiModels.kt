@@ -2,12 +2,8 @@ package com.example.soundmatch.model
 
 import com.google.gson.annotations.SerializedName
 
-/*
- * Classes que espelham o JSON da API FastAPI (convertidas automaticamente pelo Gson).
- * @SerializedName liga o nome em snake_case do JSON ao nome em camelCase do Kotlin.
- */
+// JSON da nossa API. @SerializedName liga o snake_case do Python ao camelCase do Kotlin.
 
-/** Corpo do POST /recommendations. */
 data class RecommendationRequest(
     val name: String,
     @SerializedName("favorite_artist") val favoriteArtist: String,
@@ -21,7 +17,6 @@ data class RecommendationRequest(
     @SerializedName("personal_note") val personalNote: String
 ) {
     companion object {
-        /** Monta o corpo do POST a partir do resultado do quiz + nota digitada. */
         fun from(result: SoundResult, personalNote: String) = RecommendationRequest(
             name = result.profile.name,
             favoriteArtist = result.profile.favoriteArtist,
@@ -37,12 +32,10 @@ data class RecommendationRequest(
     }
 }
 
-/** Corpo do PUT /recommendations/{id}: só a nota pessoal é editável. */
 data class NoteUpdateRequest(
     @SerializedName("personal_note") val personalNote: String
 )
 
-/** Usuário que vem aninhado em cada recomendação (tabela users). */
 data class UserResponse(
     val id: Int,
     val name: String,
@@ -51,7 +44,6 @@ data class UserResponse(
     @SerializedName("plays_instrument") val playsInstrument: Boolean
 )
 
-/** Recomendação retornada pela API (tabela recommendations + usuário). */
 data class RecommendationResponse(
     val id: Int,
     @SerializedName("user_id") val userId: Int,

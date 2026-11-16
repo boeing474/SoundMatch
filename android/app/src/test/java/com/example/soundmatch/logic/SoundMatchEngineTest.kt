@@ -10,7 +10,6 @@ import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/** Testes da regra de negócio (rodam no PC, sem emulador: botão ▶ ao lado da classe). */
 class SoundMatchEngineTest {
 
     private val profile = UserProfile(
@@ -22,19 +21,19 @@ class SoundMatchEngineTest {
 
     @Test
     fun `respostas mais raiz geram o score minimo`() {
-        val answers = QuizAnswers(element = 0, energy = 0, duration = 0, subgenres = listOf(Subgenre.BLUES_ROCK))
+        val answers = QuizAnswers(playlist = 0, concert = 0, longTrack = 0, subgenres = listOf(Subgenre.BLUES_ROCK))
         assertEquals(10, SoundMatchEngine.calculateScore(answers))
     }
 
     @Test
     fun `respostas mais experimentais geram o score maximo`() {
-        val answers = QuizAnswers(element = 3, energy = 3, duration = 2, subgenres = listOf(Subgenre.PROG_ROCK))
+        val answers = QuizAnswers(playlist = 3, concert = 3, longTrack = 2, subgenres = listOf(Subgenre.PROG_ROCK))
         assertEquals(100, SoundMatchEngine.calculateScore(answers))
     }
 
     @Test
-    fun `exemplo do baixo e groove cai no perfil Funk`() {
-        // 2 (baixo) + 2 (dançante) + 1,5 (5 min) + 1,5 (média Hard=1, Funk=2) = 7 -> 10 + 7/12 * 90 = 62,5 -> 63
+    fun `quem dança e curte groove cai no perfil Funk`() {
+        // 2 (groove) + 2 (dançando) + 1,5 (dá uma chance) + 1,5 (média Hard=1, Funk=2) = 7 -> 10 + 7/12 * 90 = 62,5 -> 63
         val answers = QuizAnswers(2, 2, 1, listOf(Subgenre.HARD_ROCK, Subgenre.FUNK_ALTERNATIVE))
         val score = SoundMatchEngine.calculateScore(answers)
         assertEquals(63, score)

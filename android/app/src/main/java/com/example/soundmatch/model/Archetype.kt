@@ -3,15 +3,7 @@ package com.example.soundmatch.model
 import androidx.annotation.ColorRes
 import com.example.soundmatch.R
 
-/**
- * Os 4 Arquétipos Sonoros (perfis) do SoundMatch, definidos pela faixa de score.
- *
- * @property title      nome exibido e salvo na API.
- * @property highlight  descrição curta do perfil.
- * @property focus      elemento musical para o usuário prestar atenção (usado se ele toca instrumento).
- * @property colorRes   cor do perfil na interface (card do resultado e faixa do histórico).
- * @property scoreRange faixa de score que leva a este perfil.
- */
+// Os 4 perfis sonoros. "focus" só aparece na explicação para quem toca instrumento.
 enum class Archetype(
     val title: String,
     val highlight: String,
@@ -49,13 +41,12 @@ enum class Archetype(
     );
 
     companion object {
-        /** Retorna o perfil correspondente ao score (valores fora de 10..100 são ajustados). */
         fun fromScore(score: Int): Archetype {
             val safeScore = score.coerceIn(VINTAGE_BLUES.scoreRange.first, PROG_EXPLORER.scoreRange.last)
             return entries.first { safeScore in it.scoreRange }
         }
 
-        /** Converte o título salvo na API de volta para o perfil (null se não reconhecer). */
+        // O histórico só recebe o título da API; daqui sai a cor do card.
         fun fromTitle(title: String): Archetype? = entries.firstOrNull { it.title == title }
     }
 }

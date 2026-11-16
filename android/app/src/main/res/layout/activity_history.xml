@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Histórico: lista os registros salvos no banco (GET /recommendations) -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -38,7 +37,6 @@
         android:layout_marginTop="16dp"
         android:layout_weight="1">
 
-        <!-- REQUISITO: RecyclerView (cada item é um CardView, ver item_recommendation.xml) -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerHistory"
             android:layout_width="match_parent"
@@ -49,7 +47,6 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_recommendation" />
 
-        <!-- REQUISITO: ProgressBar (enquanto busca os dados na API) -->
         <ProgressBar
             android:id="@+id/progressHistory"
             android:layout_width="48dp"
@@ -58,7 +55,7 @@
             android:indeterminateTint="@color/neon_cyan"
             android:visibility="gone" />
 
-        <!-- Estado vazio (ou erro de conexão) -->
+        <!-- Mensagem de lista vazia ou de erro de conexão -->
         <TextView
             android:id="@+id/tvEmpty"
             style="@style/Widget.SoundMatch.Caption"

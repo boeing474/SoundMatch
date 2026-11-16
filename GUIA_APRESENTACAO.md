@@ -18,7 +18,8 @@ A apresentação oral e o domínio técnico valem **2,5 pontos**. Este guia traz
   uvicorn main:app --host 0.0.0.0 --port 8000
   ```
 - [ ] Abrir http://localhost:8000/docs no navegador (Swagger), para mostrar depois.
-- [ ] Abrir o emulador e rodar o app. No celular físico (bônus), rodar `adb reverse tcp:8000 tcp:8000` e trocar a `BASE_URL`.
+- [ ] Ligar o celular no cabo (Depuração USB ativa) e rodar `adb reverse tcp:8000 tcp:8000`. Sem isso, o app não alcança a API. Se o cabo desconectar, rodar de novo.
+- [ ] Celular com internet (Wi-Fi ou 4G), para carregar a capa do álbum.
 - [ ] Fazer **um** cadastro de teste antes, para o histórico não aparecer vazio.
 
 ---
@@ -26,7 +27,7 @@ A apresentação oral e o domínio técnico valem **2,5 pontos**. Este guia traz
 ## 2. Roteiro da demonstração (5–7 min)
 
 1. **Tela inicial**
-   - Mostrar a identidade visual: o globo gira (`ObjectAnimator`) e o título pulsa (`ValueAnimator`).
+   - Mostrar a identidade visual: o disco de vinil gira (`ObjectAnimator`) e o título pulsa (`ValueAnimator`).
    - Tocar em **"Descobrir Meu Som"** → *Intent explícita*.
 2. **Perfil**
    - Tentar avançar com um campo vazio: o campo fica em erro e aparece um `Toast` (**feedback visual**).
@@ -38,13 +39,14 @@ A apresentação oral e o domínio técnico valem **2,5 pontos**. Este guia traz
 4. **Resultado**
    - Mostrar o card na cor do perfil, o score e a música.
    - Mostrar o card **"Por que essa música?"** (processamento dos dados).
-   - Tocar em **"Ouvir no YouTube"** → *Intent implícita `ACTION_VIEW`*.
+   - Mostrar a capa do álbum, que veio da **iTunes Search API** (uma API externa, chamada com o mesmo Retrofit).
+   - Tocar em **"YouTube"** ou **"Spotify"** → *Intent implícita `ACTION_VIEW`*. O Spotify abre direto no app; se ele não estiver instalado, abre no navegador.
    - Tocar em **"Compartilhar"** → *Intent implícita `ACTION_SEND`*.
-   - Escrever uma nota e tocar em **"Salvar no Banco via API"**: aparece a `ProgressBar` e depois o `Toast` de sucesso (**POST**).
+   - Escrever uma nota e tocar em **"Salvar nas Minhas Descobertas"**: aparece a `ProgressBar` e depois o `Toast` de sucesso (**POST**).
 5. **Swagger**
    - Mostrar o `GET /recommendations` no navegador com o registro que acabou de ser salvo, o que prova a persistência no banco.
 6. **Histórico**
-   - Voltar ao início e abrir o Histórico (**GET**).
+   - Voltar ao início e abrir **"Minhas Descobertas"** (**GET**).
    - **Editar Nota** no `AlertDialog` (**PUT**).
    - **Excluir**, com confirmação (**DELETE**).
 7. **Código**
@@ -55,17 +57,18 @@ A apresentação oral e o domínio técnico valem **2,5 pontos**. Este guia traz
 
 ## 3. Onde está cada requisito
 
-Para achar rápido, procure por `REQUISITO` no Android Studio (Ctrl+Shift+F).
+Para achar rápido no Android Studio: Ctrl+Shift+F (busca no projeto) ou Ctrl+N (abrir classe).
 
 | Requisito | Arquivo |
 |---|---|
 | 5 Activities | `ui/MainActivity.kt`, `UserProfileActivity.kt`, `SoundQuizActivity.kt`, `ResultActivity.kt`, `HistoryActivity.kt` (registradas no `AndroidManifest.xml`) |
 | Intent explícita | `MainActivity.setupNavigation()`, `UserProfileActivity.openQuiz()`, `SoundQuizActivity.showResult()` |
-| Intent implícita | `ResultActivity.openYoutube()` (`ACTION_VIEW`) e `shareProfile()` (`ACTION_SEND`) |
-| Views | layouts em `res/layout/` (comentários `REQUISITO`) |
+| Intent implícita | `ResultActivity.openYoutube()` e `openSpotify()` (`ACTION_VIEW`), `shareProfile()` (`ACTION_SEND`) |
+| Views | `TextView`/`ImageView`/`CardView`/`Button`: `activity_main.xml` · `EditText`/`Spinner`/`Switch`: `activity_user_profile.xml` · `RadioButton`/`CheckBox`/`ProgressBar`: `activity_sound_quiz.xml` · `RecyclerView`: `activity_history.xml` |
 | Feedback visual | erro no campo + `Toast` (Perfil), botão desabilitado (Quiz), `ProgressBar` + `Toast` (Resultado e Histórico) |
 | API REST + Swagger | `backend/main.py` (os `summary` e `tags` aparecem no `/docs`) |
-| CRUD Retrofit | `network/SoundMatchApi.kt` + chamadas em `ResultActivity` e `HistoryActivity` |
+| CRUD Retrofit | `network/SoundMatchApi.kt` + chamadas em `ResultActivity.saveRecommendation()` e `HistoryActivity` |
+| API externa (extra) | `network/ITunesApi.kt` + `ResultActivity.loadAlbumCover()` |
 | Banco relacional | `backend/models.py` (`ForeignKey("users.id")` + `relationship`) |
 | Organização | pacotes `ui`, `adapter`, `network`, `model`, `logic` |
 
@@ -78,7 +81,7 @@ Para achar rápido, procure por `REQUISITO` no Android Studio (Ctrl+Shift+F).
    │  RecommendationRequest.from(result, nota)      → objeto Kotlin
    ▼
 [Retrofit] SoundMatchApi.createRecommendation()      → Gson converte em JSON
-   │  POST http://10.0.2.2:8000/recommendations
+   │  POST http://localhost:8000/recommendations   (adb reverse leva até o PC)
    ▼
 [FastAPI] main.py create_recommendation()
    │  schemas.RecommendationCreate valida o JSON (ex.: score 10–100)
@@ -101,7 +104,7 @@ Resposta 201 com o JSON salvo → Retrofit converte em RecommendationResponse �
 | `ui/MainActivity` | Tela inicial: animações e navegação para o Perfil e o Histórico |
 | `ui/UserProfileActivity` | Coleta e valida o perfil e envia o `UserProfile` para o quiz |
 | `ui/SoundQuizActivity` | Lê as respostas, controla a ProgressBar e chama o `SoundMatchEngine` |
-| `ui/ResultActivity` | Exibe o resultado, faz o POST na API e dispara as Intents implícitas |
+| `ui/ResultActivity` | Exibe o resultado, busca a capa no iTunes, faz o POST na API e dispara as Intents implícitas |
 | `ui/HistoryActivity` | GET, PUT (AlertDialog) e DELETE (com confirmação) |
 | `adapter/HistoryAdapter` | Transforma cada registro da API em um card do RecyclerView (`ListAdapter` + `DiffUtil`) |
 | `network/SoundMatchApi` | Interface Retrofit: um método por endpoint |
@@ -121,7 +124,7 @@ Resposta 201 com o JSON salvo → Retrofit converte em RecommendationResponse �
 | `values/themes.xml` | Tema e estilos reutilizáveis: títulos, botões, cards, campos |
 | `values/strings.xml` | Todos os textos (facilita traduzir e evita texto fixo no código) |
 | `font/monoton_regular.ttf` | Fonte retrô dos títulos |
-| `drawable/` | Vetores: fundo synthwave, globo disco, ícone do app |
+| `drawable/` | Vetores: fundo synthwave, disco de vinil, ícone do app |
 | `xml/network_security_config.xml` | Libera HTTP só para os endereços locais da API |
 
 ### Backend
@@ -137,8 +140,14 @@ Resposta 201 com o JSON salvo → Retrofit converte em RecommendationResponse �
 
 ## 6. Perguntas prováveis (e respostas)
 
-**Por que `10.0.2.2` e não `localhost`?**
-No emulador, `localhost` é o próprio emulador. `10.0.2.2` é o endereço especial que aponta para o computador. No celular físico, o `adb reverse` faz a porta 8000 do celular apontar para a do PC.
+**Como o celular acessa uma API que roda no PC usando `localhost`?**
+No celular, `localhost` é o próprio celular. O `adb reverse tcp:8000 tcp:8000` cria um túnel pelo cabo USB: o que chega na porta 8000 do celular vai para a porta 8000 do PC, onde a API está. No emulador daria para usar `10.0.2.2`, um endereço especial que aponta para o computador.
+
+**De onde vem a capa do álbum?**
+Da iTunes Search API, uma API pública da Apple. Uso o mesmo Retrofit com outra `baseUrl` (`RetrofitClient.itunes`). A imagem é baixada em `Dispatchers.IO`, porque o Android não permite usar a rede na thread da tela. Se der erro (sem internet), o app mantém o disco de vinil.
+
+**Como o botão do Spotify funciona?**
+Ele tenta abrir `spotify:search:<música>`, que só o app do Spotify entende. Se o app não estiver instalado, o Android lança `ActivityNotFoundException`, e eu abro a versão web (`open.spotify.com/search/...`).
 
 **Por que precisou do `network_security_config.xml`?**
 Desde o Android 9, HTTP sem criptografia é bloqueado por padrão. A configuração libera HTTP apenas para os endereços locais da API.

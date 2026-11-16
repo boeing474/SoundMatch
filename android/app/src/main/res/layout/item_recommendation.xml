@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Um item do histórico. REQUISITO: CardView (faixa lateral na cor do perfil sonoro) -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -14,7 +13,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <!-- Faixa colorida: a cor vem do arquétipo (definida no HistoryAdapter) -->
+        <!-- A cor da faixa é definida no HistoryAdapter, de acordo com o perfil -->
         <View
             android:id="@+id/viewStripe"
             android:layout_width="6dp"

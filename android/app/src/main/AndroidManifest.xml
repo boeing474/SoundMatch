@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Permissão para acessar a API REST pela rede -->
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!--
-        networkSecurityConfig: libera HTTP (sem HTTPS) apenas para os endereços
-        locais da API (10.0.2.2 no emulador / localhost via adb reverse).
-    -->
+    <!-- Nossa API roda em HTTP (sem HTTPS); o network_security_config libera só os endereços locais -->
     <application
         android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
@@ -16,7 +12,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SoundMatch">
 
-        <!-- Tela inicial (LAUNCHER = ícone que abre o app) -->
         <activity
             android:name=".ui.MainActivity"
             android:exported="true">

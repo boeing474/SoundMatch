@@ -7,10 +7,7 @@ import com.example.soundmatch.model.Subgenre.FUNK_ALTERNATIVE
 import com.example.soundmatch.model.Subgenre.HARD_ROCK
 import com.example.soundmatch.model.Subgenre.PROG_ROCK
 
-/**
- * Catálogo de músicas por Arquétipo Sonoro.
- * Cada música tem os subgêneros a que pertence, usados para personalizar a escolha.
- */
+// 5 músicas por perfil. Os subgêneros de cada uma servem para desempatar a escolha.
 object SongCatalog {
 
     private val songs: Map<Archetype, List<Song>> = mapOf(

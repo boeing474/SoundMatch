@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Tela inicial: vitrine do app (globo disco girando + título neon + 2 botões de navegação) -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -15,7 +14,6 @@
         android:orientation="vertical"
         android:paddingBottom="32dp">
 
-        <!-- Cabeçalho: pôr do sol synthwave ao fundo e o globo disco por cima -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="290dp">
@@ -28,15 +26,14 @@
                 android:scaleType="centerCrop"
                 android:src="@drawable/bg_synthwave" />
 
-            <!-- REQUISITO: ImageView (gira em loop via ObjectAnimator na MainActivity) -->
             <ImageView
-                android:id="@+id/imgDiscoBall"
+                android:id="@+id/imgVinyl"
                 android:layout_width="140dp"
                 android:layout_height="140dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="14dp"
-                android:contentDescription="@string/cd_disco_ball"
-                android:src="@drawable/ic_disco_ball" />
+                android:contentDescription="@string/cd_vinyl"
+                android:src="@drawable/ic_vinyl" />
         </FrameLayout>
 
         <LinearLayout
@@ -45,8 +42,7 @@
             android:orientation="vertical"
             android:paddingHorizontal="24dp">
 
-            <!-- REQUISITO: TextView (título neon com a fonte Monoton, inclinado) -->
-            <!-- autoSize: a fonte Monoton é larga, então o tamanho se ajusta à largura da tela -->
+            <!-- A Monoton é uma fonte larga: o autoSize diminui o texto em telas estreitas -->
             <TextView
                 android:id="@+id/tvTitle"
                 style="@style/Widget.SoundMatch.NeonTitle"
@@ -69,7 +65,7 @@
                 android:text="@string/main_subtitle"
                 android:textSize="16sp" />
 
-            <!-- REQUISITO: CardView (MaterialCardView é subclasse de CardView) -->
+            <!-- MaterialCardView é uma subclasse de CardView -->
             <com.google.android.material.card.MaterialCardView
                 style="@style/Widget.SoundMatch.Card"
                 android:layout_width="match_parent"
@@ -112,7 +108,6 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- REQUISITO: Button (2 botões de navegação) -->
             <Button
                 android:id="@+id/btnDiscover"
                 style="@style/Widget.SoundMatch.Button.Primary"

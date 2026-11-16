@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Passo 2: quiz em uma tela com rolagem. Um card por pergunta. -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -42,7 +41,6 @@
                 android:gravity="center"
                 android:text="@string/quiz_step" />
 
-            <!-- REQUISITO: ProgressBar (avança a cada pergunta respondida: 0 a 3) -->
             <ProgressBar
                 android:id="@+id/progressQuiz"
                 style="?android:attr/progressBarStyleHorizontal"
@@ -64,7 +62,6 @@
                 android:textSize="12sp"
                 tools:text="0 de 3 respondidas" />
 
-            <!-- Pergunta 1. REQUISITO: RadioButton (dentro de um RadioGroup = só uma opção) -->
             <com.google.android.material.card.MaterialCardView
                 style="@style/Widget.SoundMatch.Card"
                 android:layout_width="match_parent"
@@ -82,9 +79,9 @@
                         android:layout_height="wrap_content"
                         android:text="@string/q1_title" />
 
-                    <!-- A ORDEM das opções importa: o índice (0 a 3) é o peso no score -->
+                    <!-- Não mudar a ordem das opções: a posição de cada uma é o peso no score -->
                     <RadioGroup
-                        android:id="@+id/rgElement"
+                        android:id="@+id/rgPlaylist"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
@@ -92,30 +89,29 @@
                             style="@style/Widget.SoundMatch.RadioButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/q1_opt_guitar" />
+                            android:text="@string/q1_opt_blues" />
 
                         <RadioButton
                             style="@style/Widget.SoundMatch.RadioButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/q1_opt_drums" />
+                            android:text="@string/q1_opt_riff" />
 
                         <RadioButton
                             style="@style/Widget.SoundMatch.RadioButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/q1_opt_bass" />
+                            android:text="@string/q1_opt_groove" />
 
                         <RadioButton
                             style="@style/Widget.SoundMatch.RadioButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/q1_opt_keys" />
+                            android:text="@string/q1_opt_journey" />
                     </RadioGroup>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Pergunta 2 -->
             <com.google.android.material.card.MaterialCardView
                 style="@style/Widget.SoundMatch.Card"
                 android:layout_width="match_parent"
@@ -134,7 +130,7 @@
                         android:text="@string/q2_title" />
 
                     <RadioGroup
-                        android:id="@+id/rgEnergy"
+                        android:id="@+id/rgConcert"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
@@ -142,30 +138,29 @@
                             style="@style/Widget.SoundMatch.RadioButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/q2_opt_raw" />
+                            android:text="@string/q2_opt_front" />
 
                         <RadioButton
                             style="@style/Widget.SoundMatch.RadioButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/q2_opt_heavy" />
+                            android:text="@string/q2_opt_mosh" />
 
                         <RadioButton
                             style="@style/Widget.SoundMatch.RadioButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/q2_opt_groove" />
+                            android:text="@string/q2_opt_dance" />
 
                         <RadioButton
                             style="@style/Widget.SoundMatch.RadioButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/q2_opt_psy" />
+                            android:text="@string/q2_opt_focus" />
                     </RadioGroup>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Pergunta 3 -->
             <com.google.android.material.card.MaterialCardView
                 style="@style/Widget.SoundMatch.Card"
                 android:layout_width="match_parent"
@@ -184,7 +179,7 @@
                         android:text="@string/q3_title" />
 
                     <RadioGroup
-                        android:id="@+id/rgDuration"
+                        android:id="@+id/rgLongTrack"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
@@ -192,24 +187,23 @@
                             style="@style/Widget.SoundMatch.RadioButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/q3_opt_short" />
+                            android:text="@string/q3_opt_skip" />
 
                         <RadioButton
                             style="@style/Widget.SoundMatch.RadioButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/q3_opt_medium" />
+                            android:text="@string/q3_opt_try" />
 
                         <RadioButton
                             style="@style/Widget.SoundMatch.RadioButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/q3_opt_long" />
+                            android:text="@string/q3_opt_stay" />
                     </RadioGroup>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Subgêneros. REQUISITO: CheckBox (pode marcar vários) -->
             <com.google.android.material.card.MaterialCardView
                 style="@style/Widget.SoundMatch.Card"
                 android:layout_width="match_parent"
@@ -257,7 +251,6 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Fica desabilitado até as 3 perguntas serem respondidas -->
             <Button
                 android:id="@+id/btnSeeResult"
                 style="@style/Widget.SoundMatch.Button.Primary"

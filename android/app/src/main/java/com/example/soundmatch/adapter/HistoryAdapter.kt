@@ -15,16 +15,12 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
 
-/**
- * Liga a lista de recomendações (vinda da API) aos cards do RecyclerView.
- * Os cliques de "Editar Nota" e "Excluir" são repassados para a HistoryActivity.
- */
+// Os cliques de editar e excluir só são repassados: quem chama a API é a HistoryActivity.
 class HistoryAdapter(
     private val onEditNote: (RecommendationResponse) -> Unit,
     private val onDelete: (RecommendationResponse) -> Unit
 ) : ListAdapter<RecommendationResponse, HistoryAdapter.ViewHolder>(DiffCallback) {
 
-    /** Guarda as Views de um card para serem reaproveitadas na rolagem. */
     class ViewHolder(val binding: ItemRecommendationBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -54,14 +50,14 @@ class HistoryAdapter(
         }
     }
 
-    /** Diz ao RecyclerView o que mudou entre a lista antiga e a nova (anima só o necessário). */
+    // Compara a lista antiga com a nova para o RecyclerView atualizar só os cards que mudaram.
     object DiffCallback : DiffUtil.ItemCallback<RecommendationResponse>() {
         override fun areItemsTheSame(old: RecommendationResponse, new: RecommendationResponse) = old.id == new.id
         override fun areContentsTheSame(old: RecommendationResponse, new: RecommendationResponse) = old == new
     }
 
     private companion object {
-        // A API grava a data em UTC ("2026-11-15T22:42:10.123456"); mostramos no fuso do aparelho.
+        // A API grava em UTC ("2026-11-15T22:42:10.123456"); aqui vira o horário local.
         val API_DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).apply {
             timeZone = TimeZone.getTimeZone("UTC")
         }

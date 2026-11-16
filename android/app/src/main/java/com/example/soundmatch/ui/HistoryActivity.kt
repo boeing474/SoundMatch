@@ -18,10 +18,6 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
-/**
- * Histórico salvo no banco. Usa 3 operações do CRUD via Retrofit:
- * GET (listar), PUT (editar nota) e DELETE (excluir).
- */
 class HistoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHistoryBinding
@@ -38,13 +34,13 @@ class HistoryActivity : AppCompatActivity() {
         binding.recyclerHistory.adapter = adapter
     }
 
-    // Recarrega sempre que a tela aparece, para refletir o que está no banco.
+    // Recarrega toda vez que a tela aparece.
     override fun onStart() {
         super.onStart()
         loadHistory()
     }
 
-    /** REQUISITO: CRUD Retrofit (GET /recommendations). */
+    // GET /recommendations
     private fun loadHistory() {
         lifecycleScope.launch {
             binding.progressHistory.visibility = View.VISIBLE
@@ -65,7 +61,6 @@ class HistoryActivity : AppCompatActivity() {
         }
     }
 
-    /** REQUISITO: AlertDialog com EditText para editar a nota pessoal. */
     private fun showEditNoteDialog(item: RecommendationResponse) {
         val dialogBinding = DialogEditNoteBinding.inflate(layoutInflater)
         dialogBinding.etDialogNote.setText(item.personalNote)
@@ -81,7 +76,7 @@ class HistoryActivity : AppCompatActivity() {
             .show()
     }
 
-    /** REQUISITO: CRUD Retrofit (PUT /recommendations/{id}). */
+    // PUT /recommendations/{id}
     private fun updateNote(id: Int, note: String) {
         lifecycleScope.launch {
             try {
@@ -89,14 +84,13 @@ class HistoryActivity : AppCompatActivity() {
                 Toast.makeText(this@HistoryActivity, R.string.toast_updated, Toast.LENGTH_SHORT).show()
                 loadHistory()
             } catch (e: IOException) {
-                showApiError()
+                showConnectionError()
             } catch (e: HttpException) {
-                showApiError()
+                showConnectionError()
             }
         }
     }
 
-    /** Pede confirmação antes de apagar (ação que não pode ser desfeita). */
     private fun confirmDelete(item: RecommendationResponse) {
         MaterialAlertDialogBuilder(this)
             .setTitle(R.string.dialog_delete_title)
@@ -106,7 +100,7 @@ class HistoryActivity : AppCompatActivity() {
             .show()
     }
 
-    /** REQUISITO: CRUD Retrofit (DELETE /recommendations/{id}). */
+    // DELETE /recommendations/{id}
     private fun deleteRecommendation(id: Int) {
         lifecycleScope.launch {
             try {
@@ -115,10 +109,10 @@ class HistoryActivity : AppCompatActivity() {
                     Toast.makeText(this@HistoryActivity, R.string.toast_deleted, Toast.LENGTH_SHORT).show()
                     loadHistory()
                 } else {
-                    showApiError()
+                    showConnectionError()
                 }
             } catch (e: IOException) {
-                showApiError()
+                showConnectionError()
             }
         }
     }
@@ -134,7 +128,7 @@ class HistoryActivity : AppCompatActivity() {
         showMessage(R.string.history_load_error)
     }
 
-    private fun showApiError() {
-        Toast.makeText(this, R.string.toast_api_error, Toast.LENGTH_LONG).show()
+    private fun showConnectionError() {
+        Toast.makeText(this, R.string.toast_connection_error, Toast.LENGTH_LONG).show()
     }
 }

@@ -115,21 +115,21 @@ Código copiado da internet ou de colegas leva nota zero, e eu preciso demonstra
   - Magenta `#FF2A6D` como cor primária e ciano `#05D9E8` como secundária
   - Amarelo `#F9C80E` e laranja `#FF6C11`
 - **Fonte retrô Monoton** (licença OFL), só nos títulos, com brilho neon.
-- **Drawables vetoriais:** fundo synthwave (sol listrado + grade) e globo disco.
+- **Drawables vetoriais:** fundo synthwave (sol listrado + grade) e disco de vinil (substituiu o globo disco em 16/11).
 - **Extras aprovados:**
-  - o globo disco gira na MainActivity;
+  - o disco de vinil gira na MainActivity (3 s por volta);
   - o título fica inclinado e pulsa entre magenta e ciano;
   - **cada arquétipo tem uma cor**, usada no card do resultado e na faixa do histórico.
 - Cores, estilos e textos centralizados em `colors.xml`, `themes.xml` e `strings.xml`. Não deixar cor nem texto fixo nos layouts.
 
 ### As 5 telas (Activities)
-1. **MainActivity:** globo girando (`ImageView`), título neon (`TextView`), card "Como funciona" (`CardView`) e 2 botões. Usa Intents explícitas para o Perfil e o Histórico.
+1. **MainActivity:** disco de vinil girando (`ImageView`), título neon (`TextView`), card "Como funciona" (`CardView`) e 2 botões ("Descobrir Meu Som" e "Minhas Descobertas"). Usa Intents explícitas para o Perfil e o Histórico.
 2. **UserProfileActivity:** nome e artista favorito (`EditText`), modo de escuta (`Spinner`), "toco instrumento" (`Switch`), validação com `Toast` e Intent explícita com extras.
 3. **SoundQuizActivity:** **tela única com rolagem**, com um card por pergunta (`RadioGroup` + `RadioButton`), subgêneros em `CheckBox` e uma `ProgressBar` que avança a cada resposta.
 4. **ResultActivity:**
-   - card na cor do arquétipo, com score, a música recomendada, a explicação do porquê e uma nota pessoal (`EditText`);
-   - botão "Salvar via API" (POST) com `ProgressBar`;
-   - **2 Intents implícitas**: YouTube (`ACTION_VIEW`) e Compartilhar (`ACTION_SEND`).
+   - card na cor do arquétipo, com score, a música recomendada, **capa e nome do álbum** (iTunes Search API, com o vinil como reserva), a explicação do porquê e uma nota pessoal (`EditText`);
+   - botão "Salvar nas Minhas Descobertas" (POST) com `ProgressBar`;
+   - **Intents implícitas**: YouTube e Spotify (`ACTION_VIEW`; o Spotify tenta `spotify:search:` e cai no web) e Compartilhar (`ACTION_SEND`).
 5. **HistoryActivity:** `RecyclerView` + `CardView`, botões Editar Nota (`AlertDialog` → PUT) e Excluir (DELETE), e mensagem de estado vazio.
 
 Isso dá 11 tipos de Views, e o edital exige 6.
@@ -144,9 +144,9 @@ Isso dá 11 tipos de Views, e o edital exige 6.
 ### Lógica de recomendação (`logic/SoundMatchEngine.kt` + `logic/SongCatalog.kt`)
 1. **Score:**
    - Cada pergunta vale de 0 a 3 pontos, pelo índice da opção, ordenadas do mais "raiz" ao mais "experimental":
-     - Elemento: Guitarra 0, Bateria 1, Baixo 2, Teclados 3
-     - Energia: Crua 0, Pesada 1, Dançante 2, Psicodélica 3
-     - Duração: 3 min 0, 5 min 1,5, +7 min 3
+     - Playlist de viagem (`playlist`): Blues de estrada 0, Riff pesado 1, Groove 2, Faixa longa e viajante 3
+     - No show (`concert`): Na grade 0, Roda punk 1, Dançando no fundo 2, Prestando atenção nos detalhes 3
+     - Música de 10 min (`longTrack`): Pula 0, Dá uma chance 1,5, Fica até o fim 3
    - Subgêneros: média dos pesos marcados (Blues 0, Hard 1, Funk 2, Prog 3). Se nenhum estiver marcado, vale 1,5.
    - Fórmula: `score = 10 + (soma / 12) × 90`, arredondado e limitado a 10–100.
 2. **Perfil sonoro (`model/Archetype.kt`):**
@@ -175,8 +175,16 @@ Isso dá 11 tipos de Views, e o edital exige 6.
 - **Layouts:** ScrollView + LinearLayout. Campos com `TextInputLayout` neon (`Widget.SoundMatch.TextInput`).
 - **Dados entre telas:** `UserProfile` e `SoundResult` são `Serializable`, lidos com `IntentCompat.getSerializableExtra`. As chaves (`EXTRA_*`) ficam no `companion object` da Activity que recebe.
 
+### Ajustes de 16/11 (pedidos pelo estudante)
+- **Textos de tela sem jargão técnico:** nada de "API" ou "Banco" para o usuário. O histórico se chama "Minhas Descobertas".
+- **Comentários curtos e naturais:** sem marcações `REQUISITO:` e sem KDoc óbvio. O mapa de onde está cada requisito fica no `GUIA_APRESENTACAO.md`.
+- **API externa:** `network/ITunesApi.kt` + `model/ITunesModels.kt`. O `RetrofitClient` tem `api` (a nossa) e `itunes`. A imagem é baixada sem biblioteca nova (`URL.openStream` em `Dispatchers.IO`).
+- **App rodando no celular físico** (Galaxy S23 FE) com `BASE_URL = http://localhost:8000/` + `adb reverse`.
+- **Ambiente:** o projeto Android é aberto no Android Studio (Windows) a partir de uma **cópia** em `C:\Users\pedro\AndroidStudioProjects\SoundMatch`. Depois de editar no WSL, sincronizar com `rsync -a --delete --exclude build --exclude .gradle --exclude .idea --exclude local.properties android/ /mnt/c/Users/pedro/AndroidStudioProjects/SoundMatch/`. O Gradle JDK é o temurin-17 (o Java 25 do AS não roda o Gradle 8.9). O backend roda no WSL (venv com Python 3.14).
+
 ### Ainda a decidir com o estudante
-- Ajustes visuais (frontend): fontes do logo e do texto, contraste do botão magenta e outros ajustes do mockup. Ficou combinado discutir **depois** da lógica.
+- **Top 3 músicas favoritas** no perfil: adiado para depois da apresentação, porque mexe no backend e no banco.
+- Ajustes visuais restantes do mockup (fontes, contraste do botão magenta).
 
 ---
 

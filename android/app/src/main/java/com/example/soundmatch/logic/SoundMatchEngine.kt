@@ -8,29 +8,22 @@ import com.example.soundmatch.model.Subgenre
 import com.example.soundmatch.model.UserProfile
 import kotlin.math.roundToInt
 
-/**
- * Processamento dos dados do SoundMatch (regra de negócio, sem nada de tela).
- *
- * 1. calculateScore: transforma as respostas do quiz em um score de 10 a 100.
- * 2. Archetype.fromScore: o score define o perfil sonoro.
- * 3. pickSong: escolhe uma música do perfil que combine com o gosto do usuário.
- * 4. buildReason: explica para o usuário o porquê da recomendação.
- */
+// Regra de negócio do app, sem nada de Android (por isso dá para testar com JUnit puro).
+// Fluxo: respostas -> score -> perfil -> música -> explicação.
 object SoundMatchEngine {
 
     const val MIN_SCORE = 10
     const val MAX_SCORE = 100
 
-    /** Pesos da duração da faixa: 3 min = 0, 5 min = 1,5, +7 min = 3. */
-    private val DURATION_WEIGHTS = listOf(0.0, 1.5, 3.0)
+    // A pergunta da música longa só tem 3 opções, então os pesos são 0, 1,5 e 3.
+    private val LONG_TRACK_WEIGHTS = listOf(0.0, 1.5, 3.0)
 
-    /** Peso usado quando o usuário não marca nenhum subgênero (meio da escala 0..3). */
+    // Sem subgênero marcado, usamos o meio da escala.
     private const val NEUTRAL_SUBGENRE_WEIGHT = 1.5
 
-    /** Soma máxima possível: elemento (3) + energia (3) + duração (3) + subgêneros (3). */
+    // 3 perguntas + subgêneros, cada um valendo até 3 pontos.
     private const val MAX_RAW_POINTS = 12.0
 
-    /** Executa o fluxo completo e devolve o resultado pronto para a tela. */
     fun recommend(profile: UserProfile, answers: QuizAnswers): SoundResult {
         val score = calculateScore(answers)
         val archetype = Archetype.fromScore(score)
@@ -39,15 +32,12 @@ object SoundMatchEngine {
         return SoundResult(profile, score, archetype, song, reason, answers.subgenres)
     }
 
-    /**
-     * Cada resposta vale de 0 a 3 pontos (do mais "raiz" ao mais "experimental").
-     * Os subgêneros entram pela média dos pesos marcados.
-     * A soma (0..12) é convertida proporcionalmente para a escala 10..100.
-     */
+    // Cada resposta vale de 0 (mais "raiz") a 3 (mais "experimental").
+    // A soma vai de 0 a 12 e é convertida para a escala de 10 a 100.
     fun calculateScore(answers: QuizAnswers): Int {
-        require(answers.element in 0..3) { "element inválido: ${answers.element}" }
-        require(answers.energy in 0..3) { "energy inválido: ${answers.energy}" }
-        require(answers.duration in DURATION_WEIGHTS.indices) { "duration inválido: ${answers.duration}" }
+        require(answers.playlist in 0..3) { "playlist inválido: ${answers.playlist}" }
+        require(answers.concert in 0..3) { "concert inválido: ${answers.concert}" }
+        require(answers.longTrack in LONG_TRACK_WEIGHTS.indices) { "longTrack inválido: ${answers.longTrack}" }
 
         val subgenreWeight = if (answers.subgenres.isEmpty()) {
             NEUTRAL_SUBGENRE_WEIGHT
@@ -55,21 +45,16 @@ object SoundMatchEngine {
             answers.subgenres.map { it.weight }.average()
         }
 
-        val rawPoints = answers.element + answers.energy +
-            DURATION_WEIGHTS[answers.duration] + subgenreWeight
+        val rawPoints = answers.playlist + answers.concert +
+            LONG_TRACK_WEIGHTS[answers.longTrack] + subgenreWeight
 
         val score = MIN_SCORE + rawPoints / MAX_RAW_POINTS * (MAX_SCORE - MIN_SCORE)
         return score.roundToInt().coerceIn(MIN_SCORE, MAX_SCORE)
     }
 
-    /**
-     * Escolhe a música recomendada dentro do perfil:
-     * - descarta músicas do artista favorito (a ideia é DESCOBRIR algo novo);
-     * - prioriza as músicas com mais subgêneros em comum com os marcados;
-     * - entre as empatadas, a escolha varia com o nome e o score, então pessoas
-     *   diferentes recebem descobertas diferentes, mas o resultado é sempre o mesmo
-     *   para as mesmas respostas.
-     */
+    // Tira o artista favorito (a ideia é descobrir algo novo) e fica com as músicas que
+    // têm mais subgêneros em comum. No empate, nome + score escolhem uma: assim pessoas
+    // diferentes recebem músicas diferentes, mas as mesmas respostas dão sempre o mesmo resultado.
     fun pickSong(
         archetype: Archetype,
         profile: UserProfile,
@@ -88,7 +73,6 @@ object SoundMatchEngine {
         return bestSongs[index]
     }
 
-    /** Monta o texto explicando a recomendação. */
     fun buildReason(
         profile: UserProfile,
         archetype: Archetype,
@@ -114,7 +98,7 @@ object SoundMatchEngine {
     private fun matchCount(song: Song, likedSubgenres: List<Subgenre>): Int =
         song.subgenres.count { it in likedSubgenres }
 
-    /** Compara artistas ignorando maiúsculas/espaços ("ac/dc" == "AC/DC"). */
+    // "ac/dc" e "AC/DC " contam como o mesmo artista.
     private fun isSameArtist(songArtist: String, favoriteArtist: String): Boolean {
         val a = songArtist.trim().lowercase()
         val b = favoriteArtist.trim().lowercase()

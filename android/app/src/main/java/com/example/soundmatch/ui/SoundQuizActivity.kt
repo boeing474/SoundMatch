@@ -13,17 +13,13 @@ import com.example.soundmatch.model.QuizAnswers
 import com.example.soundmatch.model.Subgenre
 import com.example.soundmatch.model.UserProfile
 
-/**
- * Passo 2: quiz sonoro. Coleta as respostas, chama a lógica (SoundMatchEngine)
- * e envia o resultado para a ResultActivity.
- */
 class SoundQuizActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySoundQuizBinding
     private lateinit var profile: UserProfile
 
     private val questionGroups: List<RadioGroup> by lazy {
-        listOf(binding.rgElement, binding.rgEnergy, binding.rgDuration)
+        listOf(binding.rgPlaylist, binding.rgConcert, binding.rgLongTrack)
     }
 
     private val subgenreChecks by lazy {
@@ -40,7 +36,6 @@ class SoundQuizActivity : AppCompatActivity() {
         binding = ActivitySoundQuizBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Recebe o perfil enviado pela UserProfileActivity (sem perfil, não há quiz).
         profile = IntentCompat.getSerializableExtra(intent, EXTRA_PROFILE, UserProfile::class.java)
             ?: run { finish(); return }
 
@@ -51,7 +46,6 @@ class SoundQuizActivity : AppCompatActivity() {
         updateProgress()
     }
 
-    /** Atualiza a ProgressBar e só habilita o botão quando as 3 perguntas têm resposta. */
     private fun updateProgress() {
         val answered = questionGroups.count { it.checkedRadioButtonId != View.NO_ID }
         val allAnswered = answered == questionGroups.size
@@ -64,20 +58,19 @@ class SoundQuizActivity : AppCompatActivity() {
 
     private fun showResult() {
         val answers = QuizAnswers(
-            element = selectedIndex(binding.rgElement),
-            energy = selectedIndex(binding.rgEnergy),
-            duration = selectedIndex(binding.rgDuration),
+            playlist = selectedIndex(binding.rgPlaylist),
+            concert = selectedIndex(binding.rgConcert),
+            longTrack = selectedIndex(binding.rgLongTrack),
             subgenres = subgenreChecks.filterKeys { it.isChecked }.values.toList()
         )
         val result = SoundMatchEngine.recommend(profile, answers)
 
-        // REQUISITO: Intent Explícita -> ResultActivity, levando o resultado como extra
         val intent = Intent(this, ResultActivity::class.java)
             .putExtra(ResultActivity.EXTRA_RESULT, result)
         startActivity(intent)
     }
 
-    /** Posição (0, 1, 2...) do RadioButton marcado dentro do grupo, ou -1 se nenhum. */
+    // A posição da opção marcada (0, 1, 2...) é o peso dela no score.
     private fun selectedIndex(group: RadioGroup): Int =
         group.indexOfChild(group.findViewById<View>(group.checkedRadioButtonId))
 

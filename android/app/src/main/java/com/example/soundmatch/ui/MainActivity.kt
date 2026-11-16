@@ -13,10 +13,6 @@ import androidx.core.content.ContextCompat
 import com.example.soundmatch.R
 import com.example.soundmatch.databinding.ActivityMainBinding
 
-/**
- * Tela inicial do SoundMatch.
- * Mostra a identidade visual (globo girando + título neon pulsando) e leva às outras telas.
- */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -29,7 +25,7 @@ class MainActivity : AppCompatActivity() {
         setupNavigation()
     }
 
-    // As animações rodam só enquanto a tela está visível (economiza bateria).
+    // Animações só rodam com a tela visível, para não gastar bateria.
     override fun onStart() {
         super.onStart()
         startAnimations()
@@ -41,25 +37,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupNavigation() {
-        // REQUISITO: Intent Explícita -> UserProfileActivity
         binding.btnDiscover.setOnClickListener {
             startActivity(Intent(this, UserProfileActivity::class.java))
         }
-        // REQUISITO: Intent Explícita -> HistoryActivity
         binding.btnHistory.setOnClickListener {
             startActivity(Intent(this, HistoryActivity::class.java))
         }
     }
 
     private fun startAnimations() {
-        // Globo disco girando 360° a cada 8 segundos, sem parar.
-        val spin = ObjectAnimator.ofFloat(binding.imgDiscoBall, View.ROTATION, 0f, 360f).apply {
+        val spin = ObjectAnimator.ofFloat(binding.imgVinyl, View.ROTATION, 0f, 360f).apply {
             duration = SPIN_DURATION_MS
             repeatCount = ValueAnimator.INFINITE
             interpolator = LinearInterpolator()
         }
 
-        // Brilho do título alternando entre magenta e ciano (efeito letreiro neon).
+        // Brilho do título alternando entre magenta e ciano, como um letreiro neon.
         val magenta = ContextCompat.getColor(this, R.color.neon_magenta)
         val cyan = ContextCompat.getColor(this, R.color.neon_cyan)
         val glowRadius = GLOW_RADIUS_DP * resources.displayMetrics.density
@@ -82,7 +75,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private companion object {
-        const val SPIN_DURATION_MS = 8_000L
+        const val SPIN_DURATION_MS = 3_000L
         const val PULSE_DURATION_MS = 1_600L
         const val GLOW_RADIUS_DP = 10f
     }
