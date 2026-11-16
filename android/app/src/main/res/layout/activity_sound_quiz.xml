@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Passo 2: quiz em uma tela com rolagem. Um card por pergunta. -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true"
+    tools:context=".ui.SoundQuizActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="32dp">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:importantForAccessibility="no"
+            android:scaleType="centerCrop"
+            android:src="@drawable/bg_synthwave" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp">
+
+            <TextView
+                style="@style/Widget.SoundMatch.ScreenTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/quiz_title" />
+
+            <TextView
+                style="@style/Widget.SoundMatch.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:text="@string/quiz_step" />
+
+            <!-- REQUISITO: ProgressBar (avança a cada pergunta respondida: 0 a 3) -->
+            <ProgressBar
+                android:id="@+id/progressQuiz"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:layout_marginTop="20dp"
+                android:max="3"
+                android:progress="0"
+                android:progressBackgroundTint="@color/night_card"
+                android:progressTint="@color/neon_magenta" />
+
+            <TextView
+                android:id="@+id/tvProgress"
+                style="@style/Widget.SoundMatch.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="end"
+                android:textSize="12sp"
+                tools:text="0 de 3 respondidas" />
+
+            <!-- Pergunta 1. REQUISITO: RadioButton (dentro de um RadioGroup = só uma opção) -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.SoundMatch.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/Widget.SoundMatch.QuestionTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/q1_title" />
+
+                    <!-- A ORDEM das opções importa: o índice (0 a 3) é o peso no score -->
+                    <RadioGroup
+                        android:id="@+id/rgElement"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <RadioButton
+                            style="@style/Widget.SoundMatch.RadioButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/q1_opt_guitar" />
+
+                        <RadioButton
+                            style="@style/Widget.SoundMatch.RadioButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/q1_opt_drums" />
+
+                        <RadioButton
+                            style="@style/Widget.SoundMatch.RadioButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/q1_opt_bass" />
+
+                        <RadioButton
+                            style="@style/Widget.SoundMatch.RadioButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/q1_opt_keys" />
+                    </RadioGroup>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Pergunta 2 -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.SoundMatch.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/Widget.SoundMatch.QuestionTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/q2_title" />
+
+                    <RadioGroup
+                        android:id="@+id/rgEnergy"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <RadioButton
+                            style="@style/Widget.SoundMatch.RadioButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/q2_opt_raw" />
+
+                        <RadioButton
+                            style="@style/Widget.SoundMatch.RadioButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/q2_opt_heavy" />
+
+                        <RadioButton
+                            style="@style/Widget.SoundMatch.RadioButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/q2_opt_groove" />
+
+                        <RadioButton
+                            style="@style/Widget.SoundMatch.RadioButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/q2_opt_psy" />
+                    </RadioGroup>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Pergunta 3 -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.SoundMatch.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/Widget.SoundMatch.QuestionTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/q3_title" />
+
+                    <RadioGroup
+                        android:id="@+id/rgDuration"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <RadioButton
+                            style="@style/Widget.SoundMatch.RadioButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/q3_opt_short" />
+
+                        <RadioButton
+                            style="@style/Widget.SoundMatch.RadioButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/q3_opt_medium" />
+
+                        <RadioButton
+                            style="@style/Widget.SoundMatch.RadioButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/q3_opt_long" />
+                    </RadioGroup>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Subgêneros. REQUISITO: CheckBox (pode marcar vários) -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.SoundMatch.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/Widget.SoundMatch.QuestionTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/subgenres_title" />
+
+                    <CheckBox
+                        android:id="@+id/cbBlues"
+                        style="@style/Widget.SoundMatch.CheckBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sub_blues" />
+
+                    <CheckBox
+                        android:id="@+id/cbHard"
+                        style="@style/Widget.SoundMatch.CheckBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sub_hard" />
+
+                    <CheckBox
+                        android:id="@+id/cbFunk"
+                        style="@style/Widget.SoundMatch.CheckBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sub_funk" />
+
+                    <CheckBox
+                        android:id="@+id/cbProg"
+                        style="@style/Widget.SoundMatch.CheckBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sub_prog" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Fica desabilitado até as 3 perguntas serem respondidas -->
+            <Button
+                android:id="@+id/btnSeeResult"
+                style="@style/Widget.SoundMatch.Button.Primary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:enabled="false"
+                android:text="@string/btn_see_result" />
+
+            <TextView
+                android:id="@+id/tvQuizHint"
+                style="@style/Widget.SoundMatch.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="@string/quiz_hint_answer_all" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

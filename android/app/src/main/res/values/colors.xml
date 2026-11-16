@@ -12,11 +12,14 @@
     <color name="sunset_yellow">#F9C80E</color>
     <color name="sunset_orange">#FF6C11</color>
     <color name="neon_cyan_soft">#6605D9E8</color> <!-- ciano 40% (bordas dos cards) -->
+    <color name="neon_magenta_disabled">#5A2140</color> <!-- botão primário desabilitado -->
 
     <!-- Texto -->
     <color name="text_primary">#FFFFFF</color>
     <color name="text_secondary">#B8A9D9</color>
     <color name="title_glow_text">#FFE3EE</color> <!-- branco rosado do título neon -->
+    <color name="text_disabled">#C9A3B8</color>
+    <color name="text_on_archetype">#0D0221</color> <!-- texto escuro sobre a cor do arquétipo -->
 
     <!-- Cor de cada Arquétipo Sonoro (card do resultado e faixa do histórico) -->
     <color name="archetype_blues">#FF6C11</color>   <!-- Vintage Blues & Classic Rock -->

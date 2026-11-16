@@ -58,20 +58,28 @@
     <string name="sub_prog">Prog Rock</string>
     <string name="sub_funk">Funk/Alternative</string>
 
-    <string name="btn_see_result">Ver Meu Resultado</string>
-    <string name="toast_answer_all">Responda às 3 perguntas</string>
+    <string name="btn_see_result">Ver Minha Música</string>
+    <string name="quiz_hint_answer_all">Responda às 3 perguntas para continuar</string>
+    <string name="quiz_progress">%1$d de %2$d respondidas</string>
 
     <!-- ===== ResultActivity ===== -->
-    <string name="result_title">Seu Som</string>
+    <string name="result_title">Sua Descoberta</string>
+    <string name="result_header_label">SEU PERFIL SONORO</string>
     <string name="result_score_label">Score</string>
-    <string name="result_album_label">Álbum recomendado</string>
-    <string name="hint_personal_note">Sua nota pessoal sobre o álbum</string>
+    <string name="result_score_suffix">/100</string>
+    <string name="result_song_label">MÚSICA RECOMENDADA</string>
+    <string name="result_reason_label">Por que essa música?</string>
+    <string name="result_no_subgenres">Nenhum subgênero marcado</string>
+    <string name="hint_personal_note">Sua nota pessoal sobre a música</string>
     <string name="btn_save_api">Salvar no Banco via API</string>
-    <string name="btn_youtube">Ouvir / Buscar Álbum no YouTube</string>
+    <string name="btn_saved">Salvo na API ✓</string>
+    <string name="btn_youtube">Ouvir no YouTube</string>
     <string name="btn_share">Compartilhar Meu Perfil Sonoro</string>
     <string name="toast_saved">Recomendação salva na API!</string>
     <string name="toast_api_error">Erro ao conectar com a API. Ela está rodando?</string>
+    <string name="toast_no_app">Nenhum app disponível para abrir</string>
     <string name="share_chooser">Compartilhar via</string>
+    <string name="share_text">%1$s fez o quiz do SoundMatch! Perfil sonoro: %2$s (score %3$d/100). Descoberta musical: %4$s</string>
 
     <!-- ===== HistoryActivity ===== -->
     <string name="history_title">Histórico</string>

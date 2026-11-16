@@ -78,7 +78,8 @@ def create_recommendation(payload: schemas.RecommendationCreate, db: Session = D
         user=user,
         score=payload.score,
         archetype=payload.archetype,
-        recommended_album=payload.recommended_album,
+        recommended_song=payload.recommended_song,
+        song_artist=payload.song_artist,
         subgenres=payload.subgenres,
         personal_note=payload.personal_note,
     )

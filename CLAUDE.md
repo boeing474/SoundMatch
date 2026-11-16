@@ -96,7 +96,8 @@ Código copiado da internet ou de colegas leva nota zero, e eu preciso demonstra
   - `requirements.txt`: dependências.
 - **Tabelas:**
   - `users`: `id`, `name`, `favorite_artist`, `listening_mode`, `plays_instrument`, `created_at`.
-  - `recommendations`: `id`, `user_id` (FK → `users.id`), `score` (10–100), `archetype`, `recommended_album`, `subgenres`, `personal_note`, `created_at`.
+  - `recommendations`: `id`, `user_id` (FK → `users.id`), `score` (10–100), `archetype`, `recommended_song`, `song_artist`, `subgenres`, `personal_note`, `created_at`.
+  - Se existir um `soundmatch.db` antigo (com `recommended_album`), apague-o. A API recria o banco ao iniciar.
   - Relação 1 usuário → N recomendações.
 - **Endpoints** (Swagger em `/docs`):
   - `POST /recommendations`: cria o usuário ou reaproveita um existente pelo nome.
@@ -126,7 +127,7 @@ Código copiado da internet ou de colegas leva nota zero, e eu preciso demonstra
 2. **UserProfileActivity:** nome e artista favorito (`EditText`), modo de escuta (`Spinner`), "toco instrumento" (`Switch`), validação com `Toast` e Intent explícita com extras.
 3. **SoundQuizActivity:** **tela única com rolagem**, com um card por pergunta (`RadioGroup` + `RadioButton`), subgêneros em `CheckBox` e uma `ProgressBar` que avança a cada resposta.
 4. **ResultActivity:**
-   - card na cor do arquétipo, com score, álbum e uma nota pessoal (`EditText`);
+   - card na cor do arquétipo, com score, a música recomendada, a explicação do porquê e uma nota pessoal (`EditText`);
    - botão "Salvar via API" (POST) com `ProgressBar`;
    - **2 Intents implícitas**: YouTube (`ACTION_VIEW`) e Compartilhar (`ACTION_SEND`).
 5. **HistoryActivity:** `RecyclerView` + `CardView`, botões Editar Nota (`AlertDialog` → PUT) e Excluir (DELETE), e mensagem de estado vazio.
@@ -137,17 +138,52 @@ Isso dá 11 tipos de Views, e o edital exige 6.
 - Canvas com as 5 telas no claude.ai (privado, só o estudante acessa): https://claude.ai/artifact/KByessN86rhHbGwmUw6df8
 - A Etapa 2 começa revisando este mockup. Os XMLs devem seguir o visual aprovado nele.
 
+### Finalidade do app (decidida pelo estudante)
+**Recomendar uma MÚSICA nova** com base no gosto do usuário e nas respostas do quiz, em vez de um álbum fixo.
+
+### Lógica de recomendação (`logic/SoundMatchEngine.kt` + `logic/SongCatalog.kt`)
+1. **Score:**
+   - Cada pergunta vale de 0 a 3 pontos, pelo índice da opção, ordenadas do mais "raiz" ao mais "experimental":
+     - Elemento: Guitarra 0, Bateria 1, Baixo 2, Teclados 3
+     - Energia: Crua 0, Pesada 1, Dançante 2, Psicodélica 3
+     - Duração: 3 min 0, 5 min 1,5, +7 min 3
+   - Subgêneros: média dos pesos marcados (Blues 0, Hard 1, Funk 2, Prog 3). Se nenhum estiver marcado, vale 1,5.
+   - Fórmula: `score = 10 + (soma / 12) × 90`, arredondado e limitado a 10–100.
+2. **Perfil sonoro (`model/Archetype.kt`):**
+
+   | Score | Perfil |
+   |---|---|
+   | 10–35 | Vintage Blues & Classic Rock |
+   | 36–60 | Hard Rock & Heavy Riffs |
+   | 61–80 | Groove & Funk Rock Alternativo |
+   | 81–100 | Explorador Progressivo & Conceitual |
+
+3. **Música:** cada perfil tem 5 músicas no catálogo, marcadas por subgênero. A escolha:
+   - **exclui o artista favorito** (a ideia é descobrir algo novo);
+   - **prioriza** as músicas com mais subgêneros marcados em comum;
+   - desempata de forma determinística (nome + score).
+4. **Explicação:** um texto com o porquê da recomendação. Se o usuário toca instrumento, ganha uma dica do que prestar atenção.
+5. **Testes unitários:** `app/src/test/.../logic/SoundMatchEngineTest.kt` (JUnit 4).
+
+### Estrutura do código (decidida com a delegação do estudante)
+- **Pacotes** em `com.example.soundmatch`:
+  - `ui/`: Activities
+  - `adapter/`: RecyclerView
+  - `network/`: Retrofit
+  - `model/`: dados
+  - `logic/`: regra de negócio, sem Android
+- **Layouts:** ScrollView + LinearLayout. Campos com `TextInputLayout` neon (`Widget.SoundMatch.TextInput`).
+- **Dados entre telas:** `UserProfile` e `SoundResult` são `Serializable`, lidos com `IntentCompat.getSerializableExtra`. As chaves (`EXTRA_*`) ficam no `companion object` da Activity que recebe.
+
 ### Ainda a decidir com o estudante
-- Ajustes no mockup (se houver).
-- Etapa 2: layout (ScrollView + LinearLayout ou ConstraintLayout), pacotes (`ui/`, `adapter/`, `network/`, `model/`, `logic/`) e estilo dos campos (TextInputLayout neon ou EditText simples).
-- Fórmula exata do score do quiz e o mapeamento das faixas de score para arquétipo e álbum (Etapa 3).
+- Ajustes visuais (frontend): fontes do logo e do texto, contraste do botão magenta e outros ajustes do mockup. Ficou combinado discutir **depois** da lógica.
 
 ---
 
 ## 6. Status das Etapas
 0. ✅ `.gitignore` + backend
 1. ✅ Esqueleto Android: Gradle, tema, cores, textos, fonte e drawables (build validado)
-2. ⏳ MainActivity + UserProfileActivity
-3. ⏳ SoundQuizActivity + ResultActivity
+2. ✅ MainActivity + UserProfileActivity
+3. ✅ Lógica de recomendação de música + SoundQuizActivity + ResultActivity (YouTube/Compartilhar) + testes
 4. ⏳ Retrofit + HistoryActivity/HistoryAdapter
 5. ⏳ README.md + GUIA_APRESENTACAO.md

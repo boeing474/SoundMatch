@@ -1,5 +1,6 @@
 package com.example.soundmatch.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Toast
@@ -58,6 +59,9 @@ class UserProfileActivity : AppCompatActivity() {
     }
 
     private fun openQuiz(profile: UserProfile) {
-        // Etapa 3: abre a SoundQuizActivity levando o perfil via Intent explícita.
+        // REQUISITO: Intent Explícita -> SoundQuizActivity, levando o perfil com putExtra
+        val intent = Intent(this, SoundQuizActivity::class.java)
+            .putExtra(SoundQuizActivity.EXTRA_PROFILE, profile)
+        startActivity(intent)
     }
 }

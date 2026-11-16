@@ -57,4 +57,7 @@ dependencies {
     // Rede: Retrofit + conversor JSON (Gson) para consumir a API FastAPI
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // Testes unitários da regra de negócio (pacote logic)
+    testImplementation("junit:junit:4.13.2")
 }

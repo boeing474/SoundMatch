@@ -32,7 +32,8 @@ class RecommendationCreate(BaseModel):
     # Dados da recomendação (tabela recommendations)
     score: int = Field(..., ge=10, le=100, examples=[72])
     archetype: str = Field(..., examples=["Groove & Funk Rock Alternativo"])
-    recommended_album: str = Field(..., examples=["Blood Sugar Sex Magik – Red Hot Chili Peppers"])
+    recommended_song: str = Field(..., min_length=1, max_length=150, examples=["Give It Away"])
+    song_artist: str = Field(..., min_length=1, max_length=100, examples=["Red Hot Chili Peppers"])
     subgenres: str = Field("", examples=["Hard Rock, Funk/Alternative"])
     personal_note: str = Field("", max_length=500, examples=["Curti muito o baixo do Flea!"])
 
@@ -50,7 +51,8 @@ class RecommendationOut(BaseModel):
     user_id: int
     score: int
     archetype: str
-    recommended_album: str
+    recommended_song: str
+    song_artist: str
     subgenres: str
     personal_note: str
     created_at: datetime

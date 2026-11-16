@@ -43,7 +43,8 @@ class Recommendation(Base):
 
     score: Mapped[int] = mapped_column(Integer, nullable=False)
     archetype: Mapped[str] = mapped_column(String(100), nullable=False)
-    recommended_album: Mapped[str] = mapped_column(String(150), nullable=False)
+    recommended_song: Mapped[str] = mapped_column(String(150), nullable=False)  # ex.: "Give It Away"
+    song_artist: Mapped[str] = mapped_column(String(100), nullable=False)       # ex.: "Red Hot Chili Peppers"
     subgenres: Mapped[str] = mapped_column(String(200), default="")  # ex.: "Blues Rock, Hard Rock"
     personal_note: Mapped[str] = mapped_column(String(500), default="")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
