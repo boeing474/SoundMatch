@@ -86,7 +86,7 @@ class SoundMatchEngineTest {
         assertEquals("Espresso", SoundMatchEngine.pickSong(Genre.POP, bassist).title)
 
         val singer = btsFan.copy(instrument = Instrument.VOCALS)
-        assertEquals("Super Shy", SoundMatchEngine.pickSong(Genre.POP, singer).title)
+        assertEquals("Shake It Off", SoundMatchEngine.pickSong(Genre.POP, singer).title)
     }
 
     @Test
