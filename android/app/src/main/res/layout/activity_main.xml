@@ -14,26 +14,38 @@
         android:orientation="vertical"
         android:paddingBottom="32dp">
 
+        <!-- Céu, vinil e chão em camadas: o chão é desenhado por cima e esconde a metade de baixo
+             do vinil, que parece nascer no horizonte. fitXY mantém o horizonte sempre a 65% da
+             altura da imagem (130 de 200), então dá para posicionar o vinil com margem fixa. -->
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="290dp">
+            android:layout_height="250dp">
 
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="217dp"
                 android:layout_gravity="bottom"
                 android:importantForAccessibility="no"
-                android:scaleType="centerCrop"
-                android:src="@drawable/bg_synthwave" />
+                android:scaleType="fitXY"
+                android:src="@drawable/synth_sky" />
 
+            <!-- Horizonte: 33dp (topo da imagem) + 141dp (65% de 217) = 174dp. Vinil de 176dp: 174 - 88 = 86 -->
             <ImageView
                 android:id="@+id/imgVinyl"
-                android:layout_width="140dp"
-                android:layout_height="140dp"
+                android:layout_width="176dp"
+                android:layout_height="176dp"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="86dp"
                 android:contentDescription="@string/cd_vinyl"
                 android:src="@drawable/ic_vinyl" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="217dp"
+                android:layout_gravity="bottom"
+                android:importantForAccessibility="no"
+                android:scaleType="fitXY"
+                android:src="@drawable/synth_ground" />
         </FrameLayout>
 
         <LinearLayout
@@ -65,55 +77,12 @@
                 android:text="@string/main_subtitle"
                 android:textSize="16sp" />
 
-            <!-- MaterialCardView é uma subclasse de CardView -->
-            <com.google.android.material.card.MaterialCardView
-                style="@style/Widget.SoundMatch.Card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/main_how_title"
-                        android:textColor="@color/neon_cyan"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        style="@style/Widget.SoundMatch.Body"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="@string/main_how_step1" />
-
-                    <TextView
-                        style="@style/Widget.SoundMatch.Body"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="@string/main_how_step2" />
-
-                    <TextView
-                        style="@style/Widget.SoundMatch.Body"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="@string/main_how_step3" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
             <Button
                 android:id="@+id/btnDiscover"
                 style="@style/Widget.SoundMatch.Button.Primary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="40dp"
                 android:text="@string/btn_discover" />
 
             <Button

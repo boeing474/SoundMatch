@@ -38,7 +38,7 @@ class Recommendation(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 
-    # REQUISITO: Chave estrangeira que liga a recomendação ao usuário (users.id)
+    # Chave estrangeira: cada recomendação pertence a um usuário
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
 
     score: Mapped[int] = mapped_column(Integer, nullable=False)
@@ -46,7 +46,7 @@ class Recommendation(Base):
     recommended_song: Mapped[str] = mapped_column(String(150), nullable=False)  # ex.: "Give It Away"
     song_artist: Mapped[str] = mapped_column(String(100), nullable=False)       # ex.: "Red Hot Chili Peppers"
     subgenres: Mapped[str] = mapped_column(String(200), default="")  # ex.: "Blues Rock, Hard Rock"
-    personal_note: Mapped[str] = mapped_column(String(500), default="")
+    liked: Mapped[bool] = mapped_column(Boolean, nullable=False)  # Curti / Não curti
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
     # Lado "N" da relação: acessa o usuário dono da recomendação (recommendation.user).

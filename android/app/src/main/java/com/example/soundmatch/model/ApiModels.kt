@@ -3,6 +3,8 @@ package com.example.soundmatch.model
 import com.google.gson.annotations.SerializedName
 
 // JSON da nossa API. @SerializedName liga o snake_case do Python ao camelCase do Kotlin.
+// Os nomes das colunas ficaram da primeira versão: "archetype" guarda o perfil (ex.: "Pop & K-pop"),
+// "score" guarda o % de match e "subgenres" os outros estilos marcados.
 
 data class RecommendationRequest(
     val name: String,
@@ -14,26 +16,26 @@ data class RecommendationRequest(
     @SerializedName("recommended_song") val recommendedSong: String,
     @SerializedName("song_artist") val songArtist: String,
     val subgenres: String,
-    @SerializedName("personal_note") val personalNote: String
+    val liked: Boolean
 ) {
     companion object {
-        fun from(result: SoundResult, personalNote: String) = RecommendationRequest(
+        fun from(result: SoundResult, liked: Boolean) = RecommendationRequest(
             name = result.profile.name,
             favoriteArtist = result.profile.favoriteArtist,
-            listeningMode = result.profile.listeningMode,
+            listeningMode = result.profile.situation.label,
             playsInstrument = result.profile.playsInstrument,
-            score = result.score,
-            archetype = result.archetype.title,
+            score = result.match,
+            archetype = result.genre.title,
             recommendedSong = result.song.title,
             songArtist = result.song.artist,
-            subgenres = result.subgenresLabel,
-            personalNote = personalNote
+            subgenres = result.likedGenresLabel,
+            liked = liked
         )
     }
 }
 
-data class NoteUpdateRequest(
-    @SerializedName("personal_note") val personalNote: String
+data class RatingUpdateRequest(
+    val liked: Boolean
 )
 
 data class UserResponse(
@@ -52,7 +54,7 @@ data class RecommendationResponse(
     @SerializedName("recommended_song") val recommendedSong: String,
     @SerializedName("song_artist") val songArtist: String,
     val subgenres: String,
-    @SerializedName("personal_note") val personalNote: String,
+    val liked: Boolean,
     @SerializedName("created_at") val createdAt: String,
     val user: UserResponse
 )

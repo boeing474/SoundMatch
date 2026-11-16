@@ -31,23 +31,24 @@ A apresentação oral e o domínio técnico valem **2,5 pontos**. Este guia traz
    - Tocar em **"Descobrir Meu Som"** → *Intent explícita*.
 2. **Perfil**
    - Tentar avançar com um campo vazio: o campo fica em erro e aparece um `Toast` (**feedback visual**).
-   - Preencher os campos e mostrar o `Spinner` e o `Switch`.
+   - Escolher a situação nos chips (o `Chip` é subclasse de `CheckBox`) e ligar o `Switch`: aparece o `Spinner` de instrumento.
    - Avançar → *Intent explícita com `putExtra`* levando o `UserProfile`.
 3. **Quiz**
+   - Mostrar que as perguntas citam o perfil: a situação na 1ª e o artista favorito na 2ª.
    - Responder uma pergunta por vez: a `ProgressBar` avança.
    - O botão só habilita quando as 3 perguntas têm resposta.
 4. **Resultado**
-   - Mostrar o card na cor do perfil, o score e a música.
+   - Mostrar a capa em destaque (contorno na cor do perfil), o score e o texto que explica que ele vai de raiz a experimental.
    - Mostrar o card **"Por que essa música?"** (processamento dos dados).
    - Mostrar a capa do álbum, que veio da **iTunes Search API** (uma API externa, chamada com o mesmo Retrofit).
    - Tocar em **"YouTube"** ou **"Spotify"** → *Intent implícita `ACTION_VIEW`*. O Spotify abre direto no app; se ele não estiver instalado, abre no navegador.
    - Tocar em **"Compartilhar"** → *Intent implícita `ACTION_SEND`*.
-   - Escrever uma nota e tocar em **"Salvar nas Minhas Descobertas"**: aparece a `ProgressBar` e depois o `Toast` de sucesso (**POST**).
+   - Tocar em **"Curti"**: aparece a `ProgressBar` e depois "Salva em Minhas Descobertas como Curti" (**POST**).
 5. **Swagger**
    - Mostrar o `GET /recommendations` no navegador com o registro que acabou de ser salvo, o que prova a persistência no banco.
 6. **Histórico**
    - Voltar ao início e abrir **"Minhas Descobertas"** (**GET**).
-   - **Editar Nota** no `AlertDialog` (**PUT**).
+   - **Mudar para Não curti** (**PUT**).
    - **Excluir**, com confirmação (**DELETE**).
 7. **Código**
    - Abrir `SoundMatchEngine.kt` e explicar a fórmula.
@@ -64,7 +65,7 @@ Para achar rápido no Android Studio: Ctrl+Shift+F (busca no projeto) ou Ctrl+N 
 | 5 Activities | `ui/MainActivity.kt`, `UserProfileActivity.kt`, `SoundQuizActivity.kt`, `ResultActivity.kt`, `HistoryActivity.kt` (registradas no `AndroidManifest.xml`) |
 | Intent explícita | `MainActivity.setupNavigation()`, `UserProfileActivity.openQuiz()`, `SoundQuizActivity.showResult()` |
 | Intent implícita | `ResultActivity.openYoutube()` e `openSpotify()` (`ACTION_VIEW`), `shareProfile()` (`ACTION_SEND`) |
-| Views | `TextView`/`ImageView`/`CardView`/`Button`: `activity_main.xml` · `EditText`/`Spinner`/`Switch`: `activity_user_profile.xml` · `RadioButton`/`CheckBox`/`ProgressBar`: `activity_sound_quiz.xml` · `RecyclerView`: `activity_history.xml` |
+| Views | `TextView`/`ImageView`/`Button`: `activity_main.xml` · `EditText`/`Spinner`/`Switch`/`Chip` (subclasse de CheckBox): `activity_user_profile.xml` · `RadioButton`/`CheckBox`/`ProgressBar`/`CardView`: `activity_sound_quiz.xml` · `RecyclerView`: `activity_history.xml` |
 | Feedback visual | erro no campo + `Toast` (Perfil), botão desabilitado (Quiz), `ProgressBar` + `Toast` (Resultado e Histórico) |
 | API REST + Swagger | `backend/main.py` (os `summary` e `tags` aparecem no `/docs`) |
 | CRUD Retrofit | `network/SoundMatchApi.kt` + chamadas em `ResultActivity.saveRecommendation()` e `HistoryActivity` |
@@ -78,7 +79,7 @@ Para achar rápido no Android Studio: Ctrl+Shift+F (busca no projeto) ou Ctrl+N 
 
 ```
 [Tela] ResultActivity
-   │  RecommendationRequest.from(result, nota)      → objeto Kotlin
+   │  RecommendationRequest.from(result, liked)     → objeto Kotlin
    ▼
 [Retrofit] SoundMatchApi.createRecommendation()      → Gson converte em JSON
    │  POST http://localhost:8000/recommendations   (adb reverse leva até o PC)
@@ -105,12 +106,13 @@ Resposta 201 com o JSON salvo → Retrofit converte em RecommendationResponse �
 | `ui/UserProfileActivity` | Coleta e valida o perfil e envia o `UserProfile` para o quiz |
 | `ui/SoundQuizActivity` | Lê as respostas, controla a ProgressBar e chama o `SoundMatchEngine` |
 | `ui/ResultActivity` | Exibe o resultado, busca a capa no iTunes, faz o POST na API e dispara as Intents implícitas |
-| `ui/HistoryActivity` | GET, PUT (AlertDialog) e DELETE (com confirmação) |
+| `ui/HistoryActivity` | GET, PUT (muda a avaliação) e DELETE (com confirmação em AlertDialog) |
 | `adapter/HistoryAdapter` | Transforma cada registro da API em um card do RecyclerView (`ListAdapter` + `DiffUtil`) |
 | `network/SoundMatchApi` | Interface Retrofit: um método por endpoint |
 | `network/RetrofitClient` | Instância única do Retrofit com a `BASE_URL` |
 | `model/UserProfile`, `SoundResult` | Dados que passam entre as telas (`Serializable`) |
 | `model/Archetype` | Os 4 perfis: título, descrição, cor e faixa de score |
+| `model/Situation`, `Instrument` | Situação (com o peso no score) e instrumento do perfil |
 | `model/Subgenre`, `Song`, `QuizAnswers` | Dados do quiz e do catálogo |
 | `model/ApiModels` | Espelho do JSON da API (`@SerializedName`) |
 | `logic/SoundMatchEngine` | **Regra de negócio**: score, perfil, escolha da música e explicação |
@@ -124,7 +126,7 @@ Resposta 201 com o JSON salvo → Retrofit converte em RecommendationResponse �
 | `values/themes.xml` | Tema e estilos reutilizáveis: títulos, botões, cards, campos |
 | `values/strings.xml` | Todos os textos (facilita traduzir e evita texto fixo no código) |
 | `font/monoton_regular.ttf` | Fonte retrô dos títulos |
-| `drawable/` | Vetores: fundo synthwave, disco de vinil, ícone do app |
+| `drawable/` | Vetores: fundo synthwave em camadas (céu, sol, chão), disco de vinil, logos do Spotify e do YouTube (Simple Icons, CC0), ícone do app |
 | `xml/network_security_config.xml` | Libera HTTP só para os endereços locais da API |
 
 ### Backend

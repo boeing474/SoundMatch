@@ -2,14 +2,15 @@ package com.example.soundmatch.model
 
 import java.io.Serializable
 
+// match: de 10 a 100, quanto dos votos foi para o gênero vencedor.
 data class SoundResult(
     val profile: UserProfile,
-    val score: Int,
-    val archetype: Archetype,
+    val match: Int,
+    val genre: Genre,
     val song: Song,
     val reason: String,
-    val subgenres: List<Subgenre>
+    val likedGenres: List<Genre>
 ) : Serializable {
 
-    val subgenresLabel: String get() = subgenres.joinToString(", ") { it.label }
+    val likedGenresLabel: String get() = likedGenres.joinToString(", ") { it.title }
 }

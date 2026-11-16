@@ -26,7 +26,7 @@ class RecommendationCreate(BaseModel):
     # Dados do usuário (tabela users)
     name: str = Field(..., min_length=1, max_length=100, examples=["Pedro"])
     favorite_artist: str = Field(..., min_length=1, max_length=100, examples=["Arctic Monkeys"])
-    listening_mode: str = Field(..., examples=["Fone de Ouvido"])
+    listening_mode: str = Field(..., examples=["Academia"])
     plays_instrument: bool = Field(False, examples=[True])
 
     # Dados da recomendação (tabela recommendations)
@@ -35,12 +35,12 @@ class RecommendationCreate(BaseModel):
     recommended_song: str = Field(..., min_length=1, max_length=150, examples=["Give It Away"])
     song_artist: str = Field(..., min_length=1, max_length=100, examples=["Red Hot Chili Peppers"])
     subgenres: str = Field("", examples=["Hard Rock, Funk/Alternative"])
-    personal_note: str = Field("", max_length=500, examples=["Curti muito o baixo do Flea!"])
+    liked: bool = Field(..., examples=[True])
 
 
 class RecommendationUpdate(BaseModel):
-    """Corpo do PUT /recommendations/{id}: apenas a nota pessoal é editável."""
-    personal_note: str = Field(..., max_length=500, examples=["Ouvi de novo, virou meu favorito."])
+    """Corpo do PUT /recommendations/{id}: a pessoa pode mudar de ideia sobre a música."""
+    liked: bool = Field(..., examples=[False])
 
 
 class RecommendationOut(BaseModel):
@@ -54,6 +54,6 @@ class RecommendationOut(BaseModel):
     recommended_song: str
     song_artist: str
     subgenres: str
-    personal_note: str
+    liked: bool
     created_at: datetime
     user: UserOut

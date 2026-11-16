@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Camada do sol listrado -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="360dp"
+    android:height="200dp"
+    android:viewportWidth="360"
+    android:viewportHeight="200">
+
+    <!-- Sol: meio círculo com gradiente amarelo até magenta -->
+    <path android:pathData="M115,130 A65,65 0 0,1 245,130 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="0" android:startY="65"
+                android:endX="0" android:endY="130">
+                <item android:offset="0" android:color="#FFF9C80E" />
+                <item android:offset="0.55" android:color="#FFFF6C11" />
+                <item android:offset="1" android:color="#FFFF2A6D" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Listras horizontais "cortando" o sol (marca registrada do synthwave) -->
+    <!-- (trapézios recortados no formato do sol, para não vazar para o céu) -->
+    <path android:fillColor="#FF2A0A4A" android:pathData="M122.3,100 L237.7,100 L239.1,103 L120.9,103 Z" />
+    <path android:fillColor="#FF2A0A4A" android:pathData="M118.2,110 L241.8,110 L243,114 L117,114 Z" />
+    <path android:fillColor="#FF2A0A4A" android:pathData="M115.9,119 L244.1,119 L244.7,124 L115.3,124 Z" />
+</vector>

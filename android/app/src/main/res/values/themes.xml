@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- ===== Tema global do app (aplicado no AndroidManifest) ===== -->
     <style name="Theme.SoundMatch" parent="Theme.Material3.Dark.NoActionBar">
@@ -15,6 +15,9 @@
         <item name="android:navigationBarColor">@color/night_bg</item>
         <!-- Cor de CheckBox, RadioButton, Switch e cursor do EditText -->
         <item name="colorAccent">@color/neon_cyan</item>
+        <!-- No Android 15+ o app passa a desenhar por baixo da barra de status (edge-to-edge).
+             Desligamos isso para o topo das telas não ficar escondido. -->
+        <item name="android:windowOptOutEdgeToEdgeEnforcement" tools:targetApi="35">true</item>
     </style>
 
     <!-- ===== Título neon: fonte retrô Monoton + brilho (sombra colorida) ===== -->
@@ -102,6 +105,41 @@
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">15sp</item>
         <item name="android:minHeight">48dp</item>
+    </style>
+
+    <!-- Chip de escolha única (situação do perfil). O Chip do Material é uma subclasse de CheckBox -->
+    <style name="Widget.SoundMatch.Chip" parent="Widget.Material3.Chip.Filter">
+        <item name="chipBackgroundColor">@color/chip_bg</item>
+        <item name="chipStrokeColor">@color/chip_stroke</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="android:textColor">@color/chip_text</item>
+        <item name="checkedIconVisible">false</item>
+        <item name="chipMinHeight">48dp</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <!-- Pergunta grande do perfil (uma por tela) -->
+    <style name="Widget.SoundMatch.ProfileQuestion" parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">26sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginTop">28dp</item>
+    </style>
+
+    <!-- Botão redondo só com ícone (YouTube / Spotify): contorno neon, logo branco -->
+    <style name="Widget.SoundMatch.Button.Icon" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="strokeColor">@color/neon_cyan</item>
+        <item name="strokeWidth">2dp</item>
+        <item name="cornerRadius">32dp</item>
+        <item name="iconTint">@color/text_primary</item>
+        <item name="iconSize">28dp</item>
+        <item name="iconPadding">0dp</item>
+        <item name="iconGravity">textStart</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:minHeight">0dp</item>
     </style>
 
     <!-- Título de cada pergunta dentro do card -->

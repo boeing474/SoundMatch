@@ -18,7 +18,7 @@
             android:id="@+id/viewStripe"
             android:layout_width="6dp"
             android:layout_height="match_parent"
-            tools:background="@color/archetype_funk" />
+            tools:background="@color/genre_pop" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -58,7 +58,7 @@
                 android:layout_marginTop="6dp"
                 android:textColor="@color/text_primary"
                 android:textSize="16sp"
-                tools:text="Superstition – Stevie Wonder" />
+                tools:text="Super Shy – NewJeans" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -67,31 +67,31 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/tvArchetype"
+                    android:id="@+id/tvGenre"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:textSize="13sp"
-                    tools:text="Groove &amp; Funk Rock Alternativo" />
+                    tools:text="Pop &amp; K-pop" />
 
                 <TextView
-                    android:id="@+id/tvScore"
+                    android:id="@+id/tvMatch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="13sp"
                     android:textStyle="bold"
-                    tools:text="63/100" />
+                    tools:text="67% de match" />
             </LinearLayout>
 
             <TextView
-                android:id="@+id/tvNote"
-                style="@style/Widget.SoundMatch.Caption"
+                android:id="@+id/tvRating"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:textSize="13sp"
-                android:textStyle="italic"
-                tools:text="Curti muito o groove!" />
+                android:textStyle="bold"
+                tools:text="Curtiu"
+                tools:textColor="@color/neon_cyan" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -100,11 +100,11 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/btnEditNote"
+                    android:id="@+id/btnToggleRating"
                     style="@style/Widget.SoundMatch.Button.Small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/btn_edit_note" />
+                    tools:text="@string/btn_mark_disliked" />
 
                 <Button
                     android:id="@+id/btnDelete"

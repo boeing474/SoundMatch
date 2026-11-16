@@ -1,9 +1,10 @@
 package com.example.soundmatch.model
 
-// Guarda a posição da opção escolhida em cada pergunta (0 = mais "raiz").
+// Cada pergunta tem uma opção por gênero, na ordem do enum Genre.
+// Por isso a resposta já é guardada como o gênero escolhido.
 data class QuizAnswers(
-    val playlist: Int,
-    val concert: Int,
-    val longTrack: Int,
-    val subgenres: List<Subgenre>
+    val songPick: Genre,
+    val artistPick: Genre,
+    val albumPick: Genre,
+    val likedGenres: List<Genre>
 )

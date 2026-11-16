@@ -1,93 +1,125 @@
 package com.example.soundmatch.logic
 
-import com.example.soundmatch.model.Archetype
+import com.example.soundmatch.model.Genre
+import com.example.soundmatch.model.Instrument
 import com.example.soundmatch.model.QuizAnswers
-import com.example.soundmatch.model.Subgenre
+import com.example.soundmatch.model.Situation
 import com.example.soundmatch.model.UserProfile
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class SoundMatchEngineTest {
 
-    private val profile = UserProfile(
+    private val btsFan = UserProfile(
         name = "Ana",
-        favoriteArtist = "Arctic Monkeys",
-        listeningMode = "Fone de Ouvido",
-        playsInstrument = false
+        favoriteArtist = "BTS",
+        situation = Situation.GYM,
+        instrument = null,
+        artistGenre = Genre.POP
     )
 
+    private fun answers(vararg picks: Genre, liked: List<Genre> = emptyList()) =
+        QuizAnswers(picks[0], picks[1], picks[2], liked)
+
     @Test
-    fun `respostas mais raiz geram o score minimo`() {
-        val answers = QuizAnswers(playlist = 0, concert = 0, longTrack = 0, subgenres = listOf(Subgenre.BLUES_ROCK))
-        assertEquals(10, SoundMatchEngine.calculateScore(answers))
+    fun `fa de BTS que responde pop cai em Pop com 100 por cento`() {
+        val result = SoundMatchEngine.recommend(btsFan, answers(Genre.POP, Genre.POP, Genre.POP))
+        assertEquals(Genre.POP, result.genre)
+        assertEquals(100, result.match)
     }
 
     @Test
-    fun `respostas mais experimentais geram o score maximo`() {
-        val answers = QuizAnswers(playlist = 3, concert = 3, longTrack = 2, subgenres = listOf(Subgenre.PROG_ROCK))
-        assertEquals(100, SoundMatchEngine.calculateScore(answers))
+    fun `artista favorito vale 3 votos`() {
+        val votes = SoundMatchEngine.countVotes(btsFan, answers(Genre.ROCK, Genre.ROCK, Genre.HIPHOP))
+        assertEquals(3, votes[Genre.POP])
+        assertEquals(2, votes[Genre.ROCK])
+        assertEquals(1, votes[Genre.HIPHOP])
     }
 
     @Test
-    fun `quem dança e curte groove cai no perfil Funk`() {
-        // 2 (groove) + 2 (dançando) + 1,5 (dá uma chance) + 1,5 (média Hard=1, Funk=2) = 7 -> 10 + 7/12 * 90 = 62,5 -> 63
-        val answers = QuizAnswers(2, 2, 1, listOf(Subgenre.HARD_ROCK, Subgenre.FUNK_ALTERNATIVE))
-        val score = SoundMatchEngine.calculateScore(answers)
-        assertEquals(63, score)
-        assertEquals(Archetype.GROOVE_FUNK, Archetype.fromScore(score))
+    fun `respostas e estilos marcados podem vencer o artista favorito`() {
+        // Pop: 3 (artista). Rock: 3 respostas + 1 estilo marcado = 4.
+        val result = SoundMatchEngine.recommend(
+            btsFan,
+            answers(Genre.ROCK, Genre.ROCK, Genre.ROCK, liked = listOf(Genre.ROCK))
+        )
+        assertEquals(Genre.ROCK, result.genre)
+        assertEquals(57, result.match) // 4 de 7 votos
     }
 
     @Test
-    fun `sem subgenero marcado usa peso neutro`() {
-        // 0 + 0 + 0 + 1,5 = 1,5 -> 10 + 1,5/12 * 90 = 21,25 -> 21
-        assertEquals(21, SoundMatchEngine.calculateScore(QuizAnswers(0, 0, 0, emptyList())))
+    fun `no empate ganha o genero do artista favorito`() {
+        // Pop: 3 (artista). Eletrônica: 3 respostas. Empate 3 x 3.
+        val result = SoundMatchEngine.recommend(btsFan, answers(Genre.ELECTRONIC, Genre.ELECTRONIC, Genre.ELECTRONIC))
+        assertEquals(Genre.POP, result.genre)
+        assertEquals(50, result.match)
     }
 
     @Test
-    fun `limites das faixas de score`() {
-        assertEquals(Archetype.VINTAGE_BLUES, Archetype.fromScore(35))
-        assertEquals(Archetype.HARD_ROCK, Archetype.fromScore(36))
-        assertEquals(Archetype.HARD_ROCK, Archetype.fromScore(60))
-        assertEquals(Archetype.GROOVE_FUNK, Archetype.fromScore(61))
-        assertEquals(Archetype.GROOVE_FUNK, Archetype.fromScore(80))
-        assertEquals(Archetype.PROG_EXPLORER, Archetype.fromScore(81))
-        assertEquals(Archetype.VINTAGE_BLUES, Archetype.fromScore(-5))
-        assertEquals(Archetype.PROG_EXPLORER, Archetype.fromScore(150))
+    fun `sem o genero do artista vale so o quiz`() {
+        val offline = btsFan.copy(artistGenre = null)
+        val result = SoundMatchEngine.recommend(offline, answers(Genre.BRAZILIAN, Genre.BRAZILIAN, Genre.POP))
+        assertEquals(Genre.BRAZILIAN, result.genre)
+        assertEquals(67, result.match) // 2 de 3 votos
     }
 
     @Test
-    fun `nunca recomenda o artista favorito do usuario`() {
-        val fan = profile.copy(favoriteArtist = "red hot chili peppers")
-        for (score in 61..80) {
-            val song = SoundMatchEngine.pickSong(Archetype.GROOVE_FUNK, fan, emptyList(), score)
-            assertNotEquals("Red Hot Chili Peppers", song.artist)
-        }
+    fun `match nunca fica abaixo de 10`() {
+        val votes = Genre.entries.associateWith { 0 }
+        assertEquals(10, SoundMatchEngine.matchPercent(votes, Genre.POP))
     }
 
     @Test
-    fun `prioriza musica com o subgenero marcado`() {
-        // No perfil Hard Rock, só "Smoke on the Water" também é Prog Rock.
-        val song = SoundMatchEngine.pickSong(Archetype.HARD_ROCK, profile, listOf(Subgenre.PROG_ROCK), 50)
-        assertEquals("Smoke on the Water", song.title)
+    fun `nunca recomenda o artista favorito`() {
+        val queenFan = btsFan.copy(favoriteArtist = "queen", artistGenre = Genre.ROCK, instrument = Instrument.BASS)
+        val song = SoundMatchEngine.pickSong(Genre.ROCK, queenFan)
+        // Queen seria a música de baixo do Rock, mas é o artista favorito: sai outra.
+        assertFalse(song.artist.contains("Queen"))
     }
 
     @Test
-    fun `mesmas respostas geram sempre a mesma recomendacao`() {
-        val answers = QuizAnswers(1, 1, 1, listOf(Subgenre.HARD_ROCK))
-        assertEquals(SoundMatchEngine.recommend(profile, answers), SoundMatchEngine.recommend(profile, answers))
+    fun `quem toca recebe a musica em que seu instrumento se destaca`() {
+        val bassist = btsFan.copy(instrument = Instrument.BASS)
+        assertEquals("Espresso", SoundMatchEngine.pickSong(Genre.POP, bassist).title)
+
+        val singer = btsFan.copy(instrument = Instrument.VOCALS)
+        assertEquals("Super Shy", SoundMatchEngine.pickSong(Genre.POP, singer).title)
     }
 
     @Test
-    fun `explicacao menciona o instrumento so para quem toca`() {
-        val answers = QuizAnswers(2, 2, 1, listOf(Subgenre.FUNK_ALTERNATIVE))
-        val musician = SoundMatchEngine.recommend(profile.copy(playsInstrument = true), answers)
-        val listener = SoundMatchEngine.recommend(profile, answers)
+    fun `a mesma pessoa sempre recebe a mesma musica`() {
+        val first = SoundMatchEngine.pickSong(Genre.HIPHOP, btsFan)
+        val second = SoundMatchEngine.pickSong(Genre.HIPHOP, btsFan)
+        assertEquals(first, second)
+    }
 
-        assertTrue(musician.reason.contains("toca um instrumento"))
-        assertFalse(listener.reason.contains("toca um instrumento"))
-        assertTrue(listener.reason.contains("Arctic Monkeys"))
+    @Test
+    fun `explicacao cita nome, artista e instrumento`() {
+        val bassist = btsFan.copy(instrument = Instrument.BASS)
+        val result = SoundMatchEngine.recommend(bassist, answers(Genre.POP, Genre.POP, Genre.POP))
+        assertTrue(result.reason.contains("Ana"))
+        assertTrue(result.reason.contains("BTS"))
+        assertTrue(result.reason.contains("Você toca baixo"))
+    }
+
+    @Test
+    fun `genero do iTunes vira o perfil certo`() {
+        assertEquals(Genre.POP, Genre.fromITunes("K-pop"))
+        assertEquals(Genre.ROCK, Genre.fromITunes("Metal"))
+        assertEquals(Genre.HIPHOP, Genre.fromITunes("Hip-Hop/Rap"))
+        assertEquals(Genre.ELECTRONIC, Genre.fromITunes("Dance"))
+        assertEquals(Genre.BRAZILIAN, Genre.fromITunes("Sertanejo"))
+        assertEquals(Genre.BRAZILIAN, Genre.fromITunes("Pop Brasileiro"))
+        assertNull(Genre.fromITunes("Reggae"))
+    }
+
+    @Test
+    fun `nome do artista vem com a grafia oficial`() {
+        assertEquals("BTS", ArtistName.clean("bts", "BTS"))
+        assertEquals("LUDMILLA", ArtistName.clean("ludmilla", "LUDMILLA & Caio Luccas"))
+        assertEquals("Jorge & Mateus", ArtistName.clean("jorge e mateus", "Jorge & Mateus"))
     }
 }

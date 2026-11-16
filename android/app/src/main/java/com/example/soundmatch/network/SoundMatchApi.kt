@@ -1,6 +1,6 @@
 package com.example.soundmatch.network
 
-import com.example.soundmatch.model.NoteUpdateRequest
+import com.example.soundmatch.model.RatingUpdateRequest
 import com.example.soundmatch.model.RecommendationRequest
 import com.example.soundmatch.model.RecommendationResponse
 import retrofit2.Response
@@ -21,7 +21,7 @@ interface SoundMatchApi {
     suspend fun listRecommendations(): List<RecommendationResponse>
 
     @PUT("recommendations/{id}")
-    suspend fun updateNote(@Path("id") id: Int, @Body request: NoteUpdateRequest): RecommendationResponse
+    suspend fun updateRating(@Path("id") id: Int, @Body request: RatingUpdateRequest): RecommendationResponse
 
     // A API responde 204 (sem corpo), por isso Response<Unit>.
     @DELETE("recommendations/{id}")

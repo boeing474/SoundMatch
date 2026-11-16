@@ -2,12 +2,12 @@
 
 Aplicativo Android nativo (Kotlin + XML Views) integrado a uma **API REST em FastAPI** com **banco de dados relacional SQLite**.
 
-O usuário informa seu perfil de ouvinte e responde a um quiz sobre preferências musicais (situações do dia a dia, como a playlist de uma viagem, o lugar num show e a paciência com músicas longas, além dos subgêneros favoritos). O app calcula um **score de 10 a 100**, classifica o usuário em um dos **4 Perfis Sonoros** e **recomenda uma música nova**:
+O usuário conta como ouve música (artista favorito, em que situação ouve e se toca algum instrumento) e responde a um quiz com músicas e discos reais. As perguntas citam o que ele contou no perfil. O app calcula um **score de 10 a 100** (de "raiz" a "experimental"), classifica o usuário em um dos **4 Perfis Sonoros** e **recomenda um clássico do rock**:
 - nunca do artista que ele já ouve;
-- priorizando os subgêneros que ele curte;
-- com uma explicação do porquê da escolha.
+- priorizando os subgêneros que ele curte e, no desempate, músicas em que o instrumento dele se destaca;
+- com a capa do álbum e uma explicação do porquê da escolha.
 
-O resultado pode ser salvo no banco via API. Depois, pelo histórico, dá para consultar, editar a nota pessoal ou excluir o registro.
+A pessoa responde "Curti" ou "Não curti", e a música é salva no banco via API. Em "Minhas Descobertas" dá para consultar, mudar a avaliação ou excluir.
 
 > Projeto da **Avaliação Parcial 2 (AP2) – Desenvolvimento Mobile**.
 
@@ -24,11 +24,11 @@ MainActivity ──► UserProfileActivity ──► SoundQuizActivity ──►
 
 | # | Activity | O que faz | Views principais |
 |---|---|---|---|
-| 1 | `MainActivity` | Tela inicial com o disco de vinil girando e o título neon pulsando | ImageView, TextView, CardView, Button |
-| 2 | `UserProfileActivity` | Coleta o nome, o artista favorito, o modo de escuta e se a pessoa toca instrumento. Valida os campos | EditText, Spinner, Switch, Button |
-| 3 | `SoundQuizActivity` | Quiz com 3 perguntas e subgêneros. A barra de progresso avança a cada resposta | ProgressBar, RadioButton, CheckBox, CardView |
-| 4 | `ResultActivity` | Mostra o perfil sonoro, o score e a música recomendada com a capa do álbum e a explicação. Salva na API, abre no YouTube ou no Spotify e compartilha | CardView, EditText, ProgressBar, Button |
-| 5 | `HistoryActivity` | Lista os registros do banco. Permite editar a nota (AlertDialog) e excluir | RecyclerView, CardView, ProgressBar |
+| 1 | `MainActivity` | Tela inicial: o disco de vinil nasce no horizonte e gira, e o título neon pulsa | ImageView, TextView, Button |
+| 2 | `UserProfileActivity` | Coleta o nome, o artista favorito, a situação em que a pessoa mais ouve música (chips) e o instrumento (o Switch revela o Spinner). Valida os campos | EditText, Spinner, Switch, Button |
+| 3 | `SoundQuizActivity` | 3 perguntas personalizadas com o perfil (música para a situação, o que prende no artista favorito, disco preferido) e subgêneros. A barra de progresso avança a cada resposta | ProgressBar, RadioButton, CheckBox, CardView |
+| 4 | `ResultActivity` | Tela de "tocando agora": capa do álbum em destaque, música, perfil sonoro, score e explicação. Curti / Não curti salva na API; abre no Spotify ou no YouTube e compartilha | CardView, ImageView, ProgressBar, Button |
+| 5 | `HistoryActivity` | Lista as descobertas salvas. Permite mudar a avaliação (PUT) e excluir, com confirmação em AlertDialog | RecyclerView, CardView, ProgressBar |
 
 **11 tipos de Views usados** (o edital exige 6): TextView, EditText, Button, ImageView, CheckBox, RadioButton, Spinner, Switch, RecyclerView, ProgressBar e CardView.
 
@@ -120,7 +120,7 @@ Base: `http://localhost:8000`. Documentação interativa em **[/docs](http://loc
 | `POST` | `/recommendations` | Cria o usuário, ou reaproveita um existente pelo nome, e salva a recomendação | ResultActivity |
 | `GET` | `/recommendations` | Lista todas as recomendações com o usuário aninhado | HistoryActivity |
 | `GET` | `/recommendations/{id}` | Busca uma recomendação | Swagger |
-| `PUT` | `/recommendations/{id}` | Atualiza a nota pessoal | HistoryActivity (AlertDialog) |
+| `PUT` | `/recommendations/{id}` | Muda a avaliação (curti / não curti) | HistoryActivity |
 | `DELETE` | `/recommendations/{id}` | Remove a recomendação (resposta 204) | HistoryActivity |
 
 **Exemplo de `POST /recommendations`:**
@@ -129,14 +129,14 @@ Base: `http://localhost:8000`. Documentação interativa em **[/docs](http://loc
 {
   "name": "Ana",
   "favorite_artist": "Arctic Monkeys",
-  "listening_mode": "Fone de Ouvido",
+  "listening_mode": "Academia",
   "plays_instrument": true,
   "score": 63,
   "archetype": "Groove & Funk Rock Alternativo",
   "recommended_song": "Superstition",
   "song_artist": "Stevie Wonder",
   "subgenres": "Hard Rock, Funk/Alternative",
-  "personal_note": "Que groove!"
+  "liked": true
 }
 ```
 
@@ -155,7 +155,7 @@ users (1) ────────< (N) recommendations
   name                    user_id FK → users.id
   favorite_artist         score, archetype
   listening_mode          recommended_song, song_artist
-  plays_instrument        subgenres, personal_note
+  plays_instrument        subgenres, liked
   created_at              created_at
 ```
 
@@ -163,10 +163,11 @@ users (1) ────────< (N) recommendations
 
 ## 🧠 Lógica de recomendação
 
-1. **Score:**
-   - cada resposta vale de 0 a 3 pontos, da opção mais "raiz" à mais "experimental";
+1. **Score** (não é nota: mede de "raiz" a "experimental"):
+   - cada resposta do quiz vale de 0 a 3 pontos, pela posição da opção;
    - os subgêneros marcados entram pela média dos pesos;
-   - a soma (0–12) vira a escala 10–100: `score = 10 + soma/12 × 90`.
+   - a situação do perfil também vale de 0 a 3 (Relaxando em casa 0, Academia 1, Na rua 1,5, Festa 2, Estudando 3);
+   - a soma (0–15) vira a escala 10–100: `score = 10 + soma/15 × 90`.
 2. **Perfil sonoro:**
 
    | Score | Perfil |
@@ -176,11 +177,11 @@ users (1) ────────< (N) recommendations
    | 61–80 | Groove & Funk Rock Alternativo |
    | 81–100 | Explorador Progressivo & Conceitual |
 
-3. **Música:** cada perfil tem um catálogo de músicas marcadas por subgênero. O app:
+3. **Música:** cada perfil tem 5 músicas, marcadas por subgênero e pelo instrumento em destaque. O app:
    - **exclui o artista favorito**, para garantir uma descoberta;
-   - **prioriza os subgêneros marcados**;
-   - desempata de forma determinística.
-4. **Explicação:** o app mostra por que a música foi escolhida. Para quem toca instrumento, ainda dá uma dica do que prestar atenção.
+   - calcula a afinidade: 2 pontos por subgênero em comum e 1 se o instrumento da pessoa é o destaque da música;
+   - desempata de forma determinística (nome + score).
+4. **Explicação:** cita o nome, a situação, os subgêneros e o artista da pessoa. Para quem toca, diz em que prestar atenção na música.
 
 O código fica em `logic/SoundMatchEngine.kt` e é coberto por testes unitários.
 

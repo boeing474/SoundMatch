@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Camada do céu (o horizonte fica em y=130) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="360dp"
+    android:height="200dp"
+    android:viewportWidth="360"
+    android:viewportHeight="200">
+
+    <!-- Céu: roxo-noite no topo até magenta no horizonte -->
+    <path android:pathData="M0,0 H360 V130 H0 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="0" android:startY="0"
+                android:endX="0" android:endY="130">
+                <item android:offset="0" android:color="#FF0D0221" />
+                <item android:offset="0.6" android:color="#FF3A0B5E" />
+                <item android:offset="1" android:color="#FFB0105F" />
+            </gradient>
+        </aapt:attr>
+    </path>
+</vector>

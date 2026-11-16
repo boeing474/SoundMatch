@@ -74,14 +74,15 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/tvQuestion1"
                         style="@style/Widget.SoundMatch.QuestionTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/q1_title" />
+                        tools:text="@string/q1_title" />
 
-                    <!-- Não mudar a ordem das opções: a posição de cada uma é o peso no score -->
+                    <!-- Não mudar a ordem das opções: a posição de cada uma é o gênero do voto (ordem do enum Genre) -->
                     <RadioGroup
-                        android:id="@+id/rgPlaylist"
+                        android:id="@+id/rgSongPick"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
@@ -89,25 +90,140 @@
                             style="@style/Widget.SoundMatch.RadioButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/q1_opt_blues" />
+                            android:text="@string/q1_opt_0" />
 
                         <RadioButton
                             style="@style/Widget.SoundMatch.RadioButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/q1_opt_riff" />
+                            android:text="@string/q1_opt_1" />
 
                         <RadioButton
                             style="@style/Widget.SoundMatch.RadioButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/q1_opt_groove" />
+                            android:text="@string/q1_opt_2" />
 
                         <RadioButton
                             style="@style/Widget.SoundMatch.RadioButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/q1_opt_journey" />
+                            android:text="@string/q1_opt_3" />
+                        <RadioButton
+                            style="@style/Widget.SoundMatch.RadioButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/q1_opt_4" />
+                    </RadioGroup>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.SoundMatch.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvQuestion2"
+                        style="@style/Widget.SoundMatch.QuestionTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="@string/q2_title" />
+
+                    <RadioGroup
+                        android:id="@+id/rgArtistPick"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <RadioButton
+                            style="@style/Widget.SoundMatch.RadioButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/q2_opt_0" />
+
+                        <RadioButton
+                            style="@style/Widget.SoundMatch.RadioButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/q2_opt_1" />
+
+                        <RadioButton
+                            style="@style/Widget.SoundMatch.RadioButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/q2_opt_2" />
+
+                        <RadioButton
+                            style="@style/Widget.SoundMatch.RadioButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/q2_opt_3" />
+                        <RadioButton
+                            style="@style/Widget.SoundMatch.RadioButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/q2_opt_4" />
+                    </RadioGroup>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.SoundMatch.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvQuestion3"
+                        style="@style/Widget.SoundMatch.QuestionTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="@string/q3_title" />
+
+                    <RadioGroup
+                        android:id="@+id/rgAlbumPick"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <RadioButton
+                            style="@style/Widget.SoundMatch.RadioButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/q3_opt_0" />
+
+                        <RadioButton
+                            style="@style/Widget.SoundMatch.RadioButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/q3_opt_1" />
+
+                        <RadioButton
+                            style="@style/Widget.SoundMatch.RadioButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/q3_opt_2" />
+
+                        <RadioButton
+                            style="@style/Widget.SoundMatch.RadioButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/q3_opt_3" />
+                        <RadioButton
+                            style="@style/Widget.SoundMatch.RadioButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/q3_opt_4" />
                     </RadioGroup>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -127,127 +243,42 @@
                         style="@style/Widget.SoundMatch.QuestionTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/q2_title" />
-
-                    <RadioGroup
-                        android:id="@+id/rgConcert"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <RadioButton
-                            style="@style/Widget.SoundMatch.RadioButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/q2_opt_front" />
-
-                        <RadioButton
-                            style="@style/Widget.SoundMatch.RadioButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/q2_opt_mosh" />
-
-                        <RadioButton
-                            style="@style/Widget.SoundMatch.RadioButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/q2_opt_dance" />
-
-                        <RadioButton
-                            style="@style/Widget.SoundMatch.RadioButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/q2_opt_focus" />
-                    </RadioGroup>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                style="@style/Widget.SoundMatch.Card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        style="@style/Widget.SoundMatch.QuestionTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/q3_title" />
-
-                    <RadioGroup
-                        android:id="@+id/rgLongTrack"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <RadioButton
-                            style="@style/Widget.SoundMatch.RadioButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/q3_opt_skip" />
-
-                        <RadioButton
-                            style="@style/Widget.SoundMatch.RadioButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/q3_opt_try" />
-
-                        <RadioButton
-                            style="@style/Widget.SoundMatch.RadioButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/q3_opt_stay" />
-                    </RadioGroup>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                style="@style/Widget.SoundMatch.Card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        style="@style/Widget.SoundMatch.QuestionTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/subgenres_title" />
+                        android:text="@string/styles_title" />
 
                     <CheckBox
-                        android:id="@+id/cbBlues"
+                        android:id="@+id/cbPop"
                         style="@style/Widget.SoundMatch.CheckBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/sub_blues" />
+                        android:text="@string/style_pop" />
 
                     <CheckBox
-                        android:id="@+id/cbHard"
+                        android:id="@+id/cbRock"
                         style="@style/Widget.SoundMatch.CheckBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/sub_hard" />
+                        android:text="@string/style_rock" />
 
                     <CheckBox
-                        android:id="@+id/cbFunk"
+                        android:id="@+id/cbHiphop"
                         style="@style/Widget.SoundMatch.CheckBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/sub_funk" />
+                        android:text="@string/style_hiphop" />
 
                     <CheckBox
-                        android:id="@+id/cbProg"
+                        android:id="@+id/cbElectronic"
                         style="@style/Widget.SoundMatch.CheckBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/sub_prog" />
+                        android:text="@string/style_electronic" />
+
+                    <CheckBox
+                        android:id="@+id/cbBrazilian"
+                        style="@style/Widget.SoundMatch.CheckBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/style_brazilian" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

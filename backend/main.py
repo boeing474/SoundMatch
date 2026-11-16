@@ -44,7 +44,6 @@ def root():
     return {"status": "ok", "docs": "/docs"}
 
 
-# REQUISITO: CRUD - CREATE
 @app.post(
     "/recommendations",
     response_model=schemas.RecommendationOut,
@@ -81,7 +80,7 @@ def create_recommendation(payload: schemas.RecommendationCreate, db: Session = D
         recommended_song=payload.recommended_song,
         song_artist=payload.song_artist,
         subgenres=payload.subgenres,
-        personal_note=payload.personal_note,
+        liked=payload.liked,
     )
     db.add(rec)
     db.commit()
@@ -89,7 +88,6 @@ def create_recommendation(payload: schemas.RecommendationCreate, db: Session = D
     return rec
 
 
-# REQUISITO: CRUD - READ (lista)
 @app.get(
     "/recommendations",
     response_model=list[schemas.RecommendationOut],
@@ -104,7 +102,6 @@ def list_recommendations(db: Session = Depends(get_db)):
     ).all()
 
 
-# REQUISITO: CRUD - READ (por id)
 @app.get(
     "/recommendations/{recommendation_id}",
     response_model=schemas.RecommendationOut,
@@ -115,12 +112,11 @@ def get_recommendation(recommendation_id: int, db: Session = Depends(get_db)):
     return _get_recommendation_or_404(db, recommendation_id)
 
 
-# REQUISITO: CRUD - UPDATE
 @app.put(
     "/recommendations/{recommendation_id}",
     response_model=schemas.RecommendationOut,
     tags=["Recommendations"],
-    summary="Atualiza a nota pessoal de uma recomendação",
+    summary="Muda a avaliação (curti / não curti) de uma recomendação",
 )
 def update_recommendation(
     recommendation_id: int,
@@ -128,13 +124,12 @@ def update_recommendation(
     db: Session = Depends(get_db),
 ):
     rec = _get_recommendation_or_404(db, recommendation_id)
-    rec.personal_note = payload.personal_note
+    rec.liked = payload.liked
     db.commit()
     db.refresh(rec)
     return rec
 
 
-# REQUISITO: CRUD - DELETE
 @app.delete(
     "/recommendations/{recommendation_id}",
     status_code=status.HTTP_204_NO_CONTENT,

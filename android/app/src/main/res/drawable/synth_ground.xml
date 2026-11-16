@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Camada do chão com a grade neon. Acima do horizonte é transparente -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="360dp"
+    android:height="200dp"
+    android:viewportWidth="360"
+    android:viewportHeight="200">
+
+    <!-- Chão -->
+    <path android:fillColor="#FF0D0221" android:pathData="M0,130 H360 V200 H0 Z" />
+
+    <!-- Grade: linhas horizontais (cada vez mais espaçadas = perspectiva) -->
+    <path
+        android:strokeColor="#9905D9E8"
+        android:strokeWidth="1"
+        android:pathData="M0,136 H360 M0,145 H360 M0,158 H360 M0,176 H360 M0,199 H360" />
+
+    <!-- Grade: linhas que partem do ponto de fuga no centro do horizonte -->
+    <path
+        android:strokeColor="#9905D9E8"
+        android:strokeWidth="1"
+        android:pathData="M180,130 L-120,200 M180,130 L-30,200 M180,130 L60,200 M180,130 L130,200 M180,130 L180,200 M180,130 L230,200 M180,130 L300,200 M180,130 L390,200 M180,130 L480,200" />
+
+    <!-- Linha do horizonte em magenta neon -->
+    <path
+        android:strokeColor="#FFFF2A6D"
+        android:strokeWidth="2"
+        android:pathData="M0,130 H360" />
+</vector>

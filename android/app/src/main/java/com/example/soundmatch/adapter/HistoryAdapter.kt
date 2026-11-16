@@ -8,16 +8,16 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.soundmatch.R
 import com.example.soundmatch.databinding.ItemRecommendationBinding
-import com.example.soundmatch.model.Archetype
+import com.example.soundmatch.model.Genre
 import com.example.soundmatch.model.RecommendationResponse
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
 
-// Os cliques de editar e excluir só são repassados: quem chama a API é a HistoryActivity.
+// Os cliques de avaliar e excluir só são repassados: quem chama a API é a HistoryActivity.
 class HistoryAdapter(
-    private val onEditNote: (RecommendationResponse) -> Unit,
+    private val onToggleRating: (RecommendationResponse) -> Unit,
     private val onDelete: (RecommendationResponse) -> Unit
 ) : ListAdapter<RecommendationResponse, HistoryAdapter.ViewHolder>(DiffCallback) {
 
@@ -31,7 +31,7 @@ class HistoryAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
         val context = holder.itemView.context
-        val colorRes = Archetype.fromTitle(item.archetype)?.colorRes ?: R.color.neon_cyan
+        val colorRes = Genre.fromTitle(item.archetype)?.colorRes ?: R.color.neon_cyan
         val color = ContextCompat.getColor(context, colorRes)
 
         with(holder.binding) {
@@ -39,13 +39,15 @@ class HistoryAdapter(
             tvUserName.text = item.user.name
             tvDate.text = formatApiDate(item.createdAt)
             tvSong.text = context.getString(R.string.item_song, item.recommendedSong, item.songArtist)
-            tvArchetype.text = item.archetype
-            tvArchetype.setTextColor(color)
-            tvScore.text = context.getString(R.string.item_score, item.score)
-            tvScore.setTextColor(color)
-            tvNote.text = item.personalNote.ifBlank { context.getString(R.string.item_note_empty) }
+            tvGenre.text = item.archetype
+            tvGenre.setTextColor(color)
+            tvMatch.text = context.getString(R.string.item_match, item.score)
+            tvMatch.setTextColor(color)
+            tvRating.setText(if (item.liked) R.string.item_liked else R.string.item_disliked)
+            tvRating.setTextColor(ContextCompat.getColor(context, if (item.liked) R.color.neon_cyan else R.color.neon_magenta))
+            btnToggleRating.setText(if (item.liked) R.string.btn_mark_disliked else R.string.btn_mark_liked)
 
-            btnEditNote.setOnClickListener { onEditNote(item) }
+            btnToggleRating.setOnClickListener { onToggleRating(item) }
             btnDelete.setOnClickListener { onDelete(item) }
         }
     }

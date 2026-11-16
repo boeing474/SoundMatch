@@ -1,45 +1,54 @@
 package com.example.soundmatch.logic
 
-import com.example.soundmatch.model.Archetype
+import com.example.soundmatch.model.Genre
+import com.example.soundmatch.model.Instrument.BASS
+import com.example.soundmatch.model.Instrument.DRUMS
+import com.example.soundmatch.model.Instrument.GUITAR
+import com.example.soundmatch.model.Instrument.KEYS
+import com.example.soundmatch.model.Instrument.VOCALS
 import com.example.soundmatch.model.Song
-import com.example.soundmatch.model.Subgenre.BLUES_ROCK
-import com.example.soundmatch.model.Subgenre.FUNK_ALTERNATIVE
-import com.example.soundmatch.model.Subgenre.HARD_ROCK
-import com.example.soundmatch.model.Subgenre.PROG_ROCK
 
-// 5 músicas por perfil. Os subgêneros de cada uma servem para desempatar a escolha.
+// 5 músicas por gênero, uma para cada instrumento (assim quem toca sempre tem uma opção).
+// Nenhum artista daqui aparece nas opções do quiz, para a recomendação ser sempre uma novidade.
 object SongCatalog {
 
-    private val songs: Map<Archetype, List<Song>> = mapOf(
-        Archetype.VINTAGE_BLUES to listOf(
-            Song("Tumbling Dice", "The Rolling Stones", listOf(BLUES_ROCK)),
-            Song("Pride and Joy", "Stevie Ray Vaughan", listOf(BLUES_ROCK)),
-            Song("La Grange", "ZZ Top", listOf(BLUES_ROCK, HARD_ROCK)),
-            Song("Sunshine of Your Love", "Cream", listOf(BLUES_ROCK, PROG_ROCK)),
-            Song("Seven Nation Army", "The White Stripes", listOf(BLUES_ROCK, FUNK_ALTERNATIVE))
+    private val songs: Map<Genre, List<Song>> = mapOf(
+        Genre.POP to listOf(
+            Song("Super Shy", "NewJeans", VOCALS),
+            Song("God's Menu", "Stray Kids", DRUMS),
+            Song("Espresso", "Sabrina Carpenter", BASS),
+            Song("As It Was", "Harry Styles", KEYS),
+            Song("Uptown Funk", "Mark Ronson ft. Bruno Mars", GUITAR)
         ),
-        Archetype.HARD_ROCK to listOf(
-            Song("Black Dog", "Led Zeppelin", listOf(HARD_ROCK, BLUES_ROCK)),
-            Song("Highway to Hell", "AC/DC", listOf(HARD_ROCK)),
-            Song("Paranoid", "Black Sabbath", listOf(HARD_ROCK)),
-            Song("Smoke on the Water", "Deep Purple", listOf(HARD_ROCK, PROG_ROCK)),
-            Song("Sweet Child O' Mine", "Guns N' Roses", listOf(HARD_ROCK))
+        Genre.ROCK to listOf(
+            Song("Mr. Brightside", "The Killers", VOCALS),
+            Song("Black Dog", "Led Zeppelin", DRUMS),
+            Song("Another One Bites the Dust", "Queen", BASS),
+            Song("Riders on the Storm", "The Doors", KEYS),
+            Song("Paranoid Android", "Radiohead", GUITAR)
         ),
-        Archetype.GROOVE_FUNK to listOf(
-            Song("Give It Away", "Red Hot Chili Peppers", listOf(FUNK_ALTERNATIVE)),
-            Song("Superstition", "Stevie Wonder", listOf(FUNK_ALTERNATIVE)),
-            Song("Another One Bites the Dust", "Queen", listOf(FUNK_ALTERNATIVE, HARD_ROCK)),
-            Song("Feel Good Inc.", "Gorillaz", listOf(FUNK_ALTERNATIVE)),
-            Song("Take Me Out", "Franz Ferdinand", listOf(FUNK_ALTERNATIVE, BLUES_ROCK))
+        Genre.HIPHOP to listOf(
+            Song("Kill Bill", "SZA", VOCALS),
+            Song("In Da Club", "50 Cent", DRUMS),
+            Song("Redbone", "Childish Gambino", BASS),
+            Song("Juicy", "The Notorious B.I.G.", KEYS),
+            Song("Lose Yourself", "Eminem", GUITAR)
         ),
-        Archetype.PROG_EXPLORER to listOf(
-            Song("Time", "Pink Floyd", listOf(PROG_ROCK)),
-            Song("Roundabout", "Yes", listOf(PROG_ROCK)),
-            Song("Tom Sawyer", "Rush", listOf(PROG_ROCK, HARD_ROCK)),
-            Song("Paranoid Android", "Radiohead", listOf(PROG_ROCK, FUNK_ALTERNATIVE)),
-            Song("21st Century Schizoid Man", "King Crimson", listOf(PROG_ROCK, HARD_ROCK))
+        Genre.ELECTRONIC to listOf(
+            Song("Clarity", "Zedd ft. Foxes", VOCALS),
+            Song("Losing It", "FISHER", DRUMS),
+            Song("Scary Monsters and Nice Sprites", "Skrillex", BASS),
+            Song("Strobe", "deadmau5", KEYS),
+            Song("Wake Me Up", "Avicii", GUITAR)
+        ),
+        Genre.BRAZILIAN to listOf(
+            Song("Evidências", "Chitãozinho & Xororó", VOCALS),
+            Song("Baile de Favela", "MC João", DRUMS),
+            Song("Sossego", "Tim Maia", BASS),
+            Song("Mania de Você", "Rita Lee", KEYS),
+            Song("Aquarela", "Toquinho", GUITAR)
         )
     )
 
-    fun songsFor(archetype: Archetype): List<Song> = songs.getValue(archetype)
+    fun songsFor(genre: Genre): List<Song> = songs.getValue(genre)
 }

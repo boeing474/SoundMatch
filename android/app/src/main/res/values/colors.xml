@@ -19,11 +19,12 @@
     <color name="text_secondary">#B8A9D9</color>
     <color name="title_glow_text">#FFE3EE</color> <!-- branco rosado do título neon -->
     <color name="text_disabled">#C9A3B8</color>
-    <color name="text_on_archetype">#0D0221</color> <!-- texto escuro sobre a cor do arquétipo -->
+    <color name="text_on_genre">#0D0221</color> <!-- texto escuro sobre a cor do perfil -->
 
-    <!-- Cor de cada Arquétipo Sonoro (card do resultado e faixa do histórico) -->
-    <color name="archetype_blues">#FF6C11</color>   <!-- Vintage Blues & Classic Rock -->
-    <color name="archetype_hard">#FF2A6D</color>    <!-- Hard Rock & Heavy Riffs -->
-    <color name="archetype_funk">#F9C80E</color>    <!-- Groove & Funk Rock Alternativo -->
-    <color name="archetype_prog">#05D9E8</color>    <!-- Explorador Progressivo & Conceitual -->
+    <!-- Cor de cada perfil (card do resultado e faixa do histórico) -->
+    <color name="genre_pop">#FF2A6D</color>
+    <color name="genre_rock">#FF6C11</color>
+    <color name="genre_hiphop">#F9C80E</color>
+    <color name="genre_electronic">#05D9E8</color>
+    <color name="genre_brazilian">#2BE89A</color>
 </resources>

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Uma pergunta por vez: os 4 blocos "step" ficam no layout e o Kotlin mostra só o atual -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -28,102 +29,317 @@
             android:paddingHorizontal="24dp">
 
             <TextView
-                style="@style/Widget.SoundMatch.ScreenTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="@string/profile_title" />
-
-            <TextView
+                android:id="@+id/tvStep"
                 style="@style/Widget.SoundMatch.Caption"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:gravity="center"
-                android:text="@string/profile_step" />
+                android:layout_marginTop="24dp"
+                tools:text="Passo 1 de 4" />
 
-            <com.google.android.material.card.MaterialCardView
-                style="@style/Widget.SoundMatch.Card"
+            <ProgressBar
+                android:id="@+id/progressSteps"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:layout_marginTop="8dp"
+                android:max="4"
+                android:progressBackgroundTint="@color/night_card"
+                android:progressTint="@color/neon_magenta"
+                tools:progress="1" />
+
+            <!-- Passo 1 -->
+            <LinearLayout
+                android:id="@+id/stepName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
+                android:orientation="vertical">
 
-                <LinearLayout
+                <TextView
+                    style="@style/Widget.SoundMatch.ProfileQuestion"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:text="@string/step_name_question" />
 
-                    <!-- TextInputEditText é uma subclasse de EditText -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/tilName"
-                        style="@style/Widget.SoundMatch.TextInput"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilName"
+                    style="@style/Widget.SoundMatch.TextInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:hint="@string/hint_name">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/hint_name">
+                        android:imeOptions="actionNext"
+                        android:inputType="textPersonName|textCapWords"
+                        android:maxLength="100" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etName"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="textPersonName|textCapWords"
-                            android:maxLength="100" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/tilArtist"
-                        style="@style/Widget.SoundMatch.TextInput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:hint="@string/hint_artist">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etArtist"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="textCapWords"
-                            android:maxLength="100" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <TextView
-                        style="@style/Widget.SoundMatch.Caption"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
-                        android:labelFor="@id/spinnerListeningMode"
-                        android:text="@string/label_listening_mode" />
-
-                    <Spinner
-                        android:id="@+id/spinnerListeningMode"
-                        android:layout_width="match_parent"
-                        android:layout_height="52dp"
-                        android:layout_marginTop="8dp"
-                        android:background="@drawable/bg_spinner"
-                        android:popupBackground="@color/night_card"
-                        android:spinnerMode="dropdown" />
-
-                    <!-- MaterialSwitch é o Switch do Material Design 3 -->
-                    <com.google.android.material.materialswitch.MaterialSwitch
-                        android:id="@+id/switchInstrument"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:minHeight="48dp"
-                        android:text="@string/switch_instrument"
-                        android:textColor="@color/text_primary"
-                        android:textSize="16sp"
-                        app:thumbTint="@color/switch_thumb"
-                        app:trackTint="@color/switch_track" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <Button
-                android:id="@+id/btnGoQuiz"
-                style="@style/Widget.SoundMatch.Button.Primary"
+            <!-- Passo 2: o artista é buscado no iTunes e aparece num card para confirmar -->
+            <LinearLayout
+                android:id="@+id/stepArtist"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                android:text="@string/btn_go_quiz" />
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    style="@style/Widget.SoundMatch.ProfileQuestion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/step_artist_question" />
+
+                <TextView
+                    style="@style/Widget.SoundMatch.Caption"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="@string/step_artist_hint" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilArtist"
+                    style="@style/Widget.SoundMatch.TextInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:hint="@string/hint_artist">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etArtist"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:imeOptions="actionSearch"
+                        android:inputType="textCapWords"
+                        android:maxLength="100" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <ProgressBar
+                    android:id="@+id/progressArtist"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="20dp"
+                    android:indeterminateTint="@color/neon_cyan"
+                    android:visibility="gone" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardArtist"
+                    style="@style/Widget.SoundMatch.Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:visibility="gone"
+                    app:contentPadding="12dp"
+                    tools:visibility="visible">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/imgArtist"
+                            android:layout_width="72dp"
+                            android:layout_height="72dp"
+                            android:importantForAccessibility="no"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/ic_vinyl" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvArtistName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/text_primary"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                tools:text="BTS" />
+
+                            <TextView
+                                android:id="@+id/tvArtistGenre"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:textColor="@color/neon_cyan"
+                                android:textSize="14sp"
+                                tools:text="K-pop" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    android:id="@+id/tvArtistNotFound"
+                    style="@style/Widget.SoundMatch.Caption"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/step_artist_not_found"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <!-- Passo 3 -->
+            <LinearLayout
+                android:id="@+id/stepSituation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    style="@style/Widget.SoundMatch.ProfileQuestion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/step_situation_question" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipGroupSituation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    app:chipSpacingVertical="6dp"
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipRelaxing"
+                        style="@style/Widget.SoundMatch.Chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/situation_relaxing" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipGym"
+                        style="@style/Widget.SoundMatch.Chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/situation_gym" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipStreet"
+                        style="@style/Widget.SoundMatch.Chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/situation_street" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipParty"
+                        style="@style/Widget.SoundMatch.Chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/situation_party" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipStudying"
+                        style="@style/Widget.SoundMatch.Chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/situation_studying" />
+                </com.google.android.material.chip.ChipGroup>
+            </LinearLayout>
+
+            <!-- Passo 4 -->
+            <LinearLayout
+                android:id="@+id/stepInstrument"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    style="@style/Widget.SoundMatch.ProfileQuestion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/step_instrument_question" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipGroupInstrument"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    app:chipSpacingVertical="6dp"
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipNoInstrument"
+                        style="@style/Widget.SoundMatch.Chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/instrument_none" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipGuitar"
+                        style="@style/Widget.SoundMatch.Chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/instrument_guitar" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipDrums"
+                        style="@style/Widget.SoundMatch.Chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/instrument_drums" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipBass"
+                        style="@style/Widget.SoundMatch.Chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/instrument_bass" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipKeys"
+                        style="@style/Widget.SoundMatch.Chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/instrument_keys" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipVocals"
+                        style="@style/Widget.SoundMatch.Chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/instrument_vocals" />
+                </com.google.android.material.chip.ChipGroup>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnBack"
+                    style="@style/Widget.SoundMatch.Button.Outlined"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="12dp"
+                    android:layout_weight="1"
+                    android:text="@string/btn_back"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <Button
+                    android:id="@+id/btnNext"
+                    style="@style/Widget.SoundMatch.Button.Primary"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:text="@string/btn_next" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

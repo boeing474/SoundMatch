@@ -9,8 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.soundmatch.R
 import com.example.soundmatch.adapter.HistoryAdapter
 import com.example.soundmatch.databinding.ActivityHistoryBinding
-import com.example.soundmatch.databinding.DialogEditNoteBinding
-import com.example.soundmatch.model.NoteUpdateRequest
+import com.example.soundmatch.model.RatingUpdateRequest
 import com.example.soundmatch.model.RecommendationResponse
 import com.example.soundmatch.network.RetrofitClient
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -23,7 +22,7 @@ class HistoryActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHistoryBinding
 
     private val adapter = HistoryAdapter(
-        onEditNote = { item -> showEditNoteDialog(item) },
+        onToggleRating = { item -> updateRating(item.id, liked = !item.liked) },
         onDelete = { item -> confirmDelete(item) }
     )
 
@@ -61,26 +60,11 @@ class HistoryActivity : AppCompatActivity() {
         }
     }
 
-    private fun showEditNoteDialog(item: RecommendationResponse) {
-        val dialogBinding = DialogEditNoteBinding.inflate(layoutInflater)
-        dialogBinding.etDialogNote.setText(item.personalNote)
-
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.dialog_edit_title)
-            .setView(dialogBinding.root)
-            .setNegativeButton(R.string.dialog_cancel, null)
-            .setPositiveButton(R.string.dialog_save) { _, _ ->
-                val newNote = dialogBinding.etDialogNote.text?.toString()?.trim().orEmpty()
-                updateNote(item.id, newNote)
-            }
-            .show()
-    }
-
-    // PUT /recommendations/{id}
-    private fun updateNote(id: Int, note: String) {
+    // PUT /recommendations/{id}: a pessoa mudou de ideia sobre a música.
+    private fun updateRating(id: Int, liked: Boolean) {
         lifecycleScope.launch {
             try {
-                RetrofitClient.api.updateNote(id, NoteUpdateRequest(note))
+                RetrofitClient.api.updateRating(id, RatingUpdateRequest(liked))
                 Toast.makeText(this@HistoryActivity, R.string.toast_updated, Toast.LENGTH_SHORT).show()
                 loadHistory()
             } catch (e: IOException) {

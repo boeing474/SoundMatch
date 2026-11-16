@@ -9,8 +9,8 @@ import androidx.core.content.IntentCompat
 import com.example.soundmatch.R
 import com.example.soundmatch.databinding.ActivitySoundQuizBinding
 import com.example.soundmatch.logic.SoundMatchEngine
+import com.example.soundmatch.model.Genre
 import com.example.soundmatch.model.QuizAnswers
-import com.example.soundmatch.model.Subgenre
 import com.example.soundmatch.model.UserProfile
 
 class SoundQuizActivity : AppCompatActivity() {
@@ -19,15 +19,16 @@ class SoundQuizActivity : AppCompatActivity() {
     private lateinit var profile: UserProfile
 
     private val questionGroups: List<RadioGroup> by lazy {
-        listOf(binding.rgPlaylist, binding.rgConcert, binding.rgLongTrack)
+        listOf(binding.rgSongPick, binding.rgArtistPick, binding.rgAlbumPick)
     }
 
-    private val subgenreChecks by lazy {
+    private val styleChecks by lazy {
         mapOf(
-            binding.cbBlues to Subgenre.BLUES_ROCK,
-            binding.cbHard to Subgenre.HARD_ROCK,
-            binding.cbFunk to Subgenre.FUNK_ALTERNATIVE,
-            binding.cbProg to Subgenre.PROG_ROCK
+            binding.cbPop to Genre.POP,
+            binding.cbRock to Genre.ROCK,
+            binding.cbHiphop to Genre.HIPHOP,
+            binding.cbElectronic to Genre.ELECTRONIC,
+            binding.cbBrazilian to Genre.BRAZILIAN
         )
     }
 
@@ -39,11 +40,19 @@ class SoundQuizActivity : AppCompatActivity() {
         profile = IntentCompat.getSerializableExtra(intent, EXTRA_PROFILE, UserProfile::class.java)
             ?: run { finish(); return }
 
+        showPersonalizedQuestions()
         questionGroups.forEach { group ->
             group.setOnCheckedChangeListener { _, _ -> updateProgress() }
         }
         binding.btnSeeResult.setOnClickListener { showResult() }
         updateProgress()
+    }
+
+    // As perguntas usam o que a pessoa contou no perfil.
+    private fun showPersonalizedQuestions() {
+        binding.tvQuestion1.text = getString(R.string.q1_title, profile.situation.context)
+        binding.tvQuestion2.text = getString(R.string.q2_title, profile.favoriteArtist)
+        binding.tvQuestion3.text = getString(R.string.q3_title)
     }
 
     private fun updateProgress() {
@@ -58,10 +67,10 @@ class SoundQuizActivity : AppCompatActivity() {
 
     private fun showResult() {
         val answers = QuizAnswers(
-            playlist = selectedIndex(binding.rgPlaylist),
-            concert = selectedIndex(binding.rgConcert),
-            longTrack = selectedIndex(binding.rgLongTrack),
-            subgenres = subgenreChecks.filterKeys { it.isChecked }.values.toList()
+            songPick = selectedGenre(binding.rgSongPick),
+            artistPick = selectedGenre(binding.rgArtistPick),
+            albumPick = selectedGenre(binding.rgAlbumPick),
+            likedGenres = styleChecks.filterKeys { it.isChecked }.values.toList()
         )
         val result = SoundMatchEngine.recommend(profile, answers)
 
@@ -70,9 +79,11 @@ class SoundQuizActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    // A posição da opção marcada (0, 1, 2...) é o peso dela no score.
-    private fun selectedIndex(group: RadioGroup): Int =
-        group.indexOfChild(group.findViewById<View>(group.checkedRadioButtonId))
+    // A posição da opção marcada (0 a 4) é a posição do gênero no enum Genre.
+    private fun selectedGenre(group: RadioGroup): Genre {
+        val index = group.indexOfChild(group.findViewById<View>(group.checkedRadioButtonId))
+        return Genre.entries[index]
+    }
 
     companion object {
         const val EXTRA_PROFILE = "extra_profile"

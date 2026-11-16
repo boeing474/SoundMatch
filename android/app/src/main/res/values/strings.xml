@@ -4,59 +4,72 @@
 
     <!-- ===== MainActivity ===== -->
     <string name="main_title">SoundMatch</string>
-    <string name="main_subtitle">Descubra seu perfil sonoro</string>
-    <string name="main_how_title">Como funciona</string>
-    <string name="main_how_step1">1. Conte quem você é como ouvinte</string>
-    <string name="main_how_step2">2. Responda ao quiz sonoro</string>
-    <string name="main_how_step3">3. Receba uma música nova feita pra você</string>
+    <string name="main_subtitle">Conte como você ouve música, responda três perguntas e descubra uma música nova, do estilo que é a sua cara.</string>
     <string name="btn_discover">Descobrir Meu Som</string>
     <string name="btn_history">Minhas Descobertas</string>
     <string name="cd_vinyl">Disco de vinil girando</string>
 
     <!-- ===== UserProfileActivity ===== -->
-    <string name="profile_title">Seu Perfil</string>
-    <string name="profile_step">Passo 1 de 2</string>
-    <string name="hint_name">Nome do ouvinte</string>
-    <string name="hint_artist">Banda/Artista favorito atual</string>
-    <string name="label_listening_mode">Como você costuma ouvir música?</string>
-    <string name="switch_instrument">Toco algum instrumento musical</string>
+    <string name="profile_step">Passo %1$d de %2$d</string>
+    <string name="step_name_question">Como você se chama?</string>
+    <string name="hint_name">Seu nome</string>
+    <string name="step_artist_question">Qual artista você mais ouve?</string>
+    <string name="step_artist_hint">Pode ser cantor, banda ou grupo, de qualquer estilo.</string>
+    <string name="hint_artist">Artista ou banda</string>
+    <string name="step_artist_not_found">Não achamos esse artista agora. Confira o nome ou continue assim mesmo.</string>
+    <string name="artist_genre_unknown">%1$s (vamos usar só as suas respostas)</string>
+    <string name="step_situation_question">Quando você mais ouve música?</string>
+    <string name="situation_relaxing">Relaxando em casa</string>
+    <string name="situation_gym">Academia</string>
+    <string name="situation_street">Na rua</string>
+    <string name="situation_party">Festa com amigos</string>
+    <string name="situation_studying">Estudando</string>
+    <string name="step_instrument_question">Você toca algum instrumento?</string>
+    <string name="instrument_none">Não toco</string>
+    <string name="instrument_guitar">Guitarra</string>
+    <string name="instrument_drums">Bateria</string>
+    <string name="instrument_bass">Baixo</string>
+    <string name="instrument_keys">Teclado</string>
+    <string name="instrument_vocals">Canto</string>
+    <string name="btn_back">Voltar</string>
+    <string name="btn_next">Continuar</string>
+    <string name="btn_search_artist">Buscar artista</string>
     <string name="btn_go_quiz">Ir para o Quiz</string>
-    <string name="toast_fill_fields">Preencha seu nome e seu artista favorito</string>
+    <string name="toast_pick_option">Escolha uma das opções</string>
     <string name="error_required">Campo obrigatório</string>
-
-    <string-array name="listening_modes">
-        <item>Fone de Ouvido</item>
-        <item>Caixa de Som/Vinil</item>
-        <item>No Carro/Transporte</item>
-        <item>Enquanto Estuda/Codifica</item>
-    </string-array>
 
     <!-- ===== SoundQuizActivity ===== -->
     <string name="quiz_title">Quiz Sonoro</string>
     <string name="quiz_step">Passo 2 de 2</string>
 
-    <string name="q1_title">1. Montando a playlist de uma viagem de carro. O que não pode faltar?</string>
-    <string name="q1_opt_blues">Um blues de estrada</string>
-    <string name="q1_opt_riff">Um riff pesado pra gritar junto</string>
-    <string name="q1_opt_groove">Algo com groove pra dançar</string>
-    <string name="q1_opt_journey">Uma faixa longa e viajante</string>
+    <!-- Em cada pergunta, a opção N é do gênero N do enum Genre: Pop, Rock, Hip-hop, Eletrônica, Brasileira -->
+    <string name="q1_title">1. Qual destas você colocaria pra tocar %1$s?</string>
+    <string name="q1_opt_0">Blinding Lights – The Weeknd</string>
+    <string name="q1_opt_1">Smells Like Teen Spirit – Nirvana</string>
+    <string name="q1_opt_2">HUMBLE. – Kendrick Lamar</string>
+    <string name="q1_opt_3">Titanium – David Guetta ft. Sia</string>
+    <string name="q1_opt_4">Vai Malandra – Anitta</string>
 
-    <string name="q2_title">2. Num show, onde você está?</string>
-    <string name="q2_opt_front">Na grade, vendo o guitarrista</string>
-    <string name="q2_opt_mosh">No meio da roda punk</string>
-    <string name="q2_opt_dance">Dançando lá no fundo</string>
-    <string name="q2_opt_focus">Parado, prestando atenção em cada detalhe</string>
+    <string name="q2_title">2. O que mais te prende quando você ouve %1$s?</string>
+    <string name="q2_opt_0">O refrão que não sai da cabeça</string>
+    <string name="q2_opt_1">A guitarra e a energia da banda</string>
+    <string name="q2_opt_2">A letra e o flow</string>
+    <string name="q2_opt_3">A batida e a hora do drop</string>
+    <string name="q2_opt_4">O suingue e a letra em português</string>
 
-    <string name="q3_title">3. Começa uma música de 10 minutos. Você…</string>
-    <string name="q3_opt_skip">Pula pra próxima</string>
-    <string name="q3_opt_try">Dá uma chance</string>
-    <string name="q3_opt_stay">Fica até o fim e quer mais</string>
+    <string name="q3_title">3. Qual destes discos você ouviria inteiro, do começo ao fim?</string>
+    <string name="q3_opt_0">Future Nostalgia – Dua Lipa</string>
+    <string name="q3_opt_1">AM – Arctic Monkeys</string>
+    <string name="q3_opt_2">Scorpion – Drake</string>
+    <string name="q3_opt_3">Random Access Memories – Daft Punk</string>
+    <string name="q3_opt_4">Acabou Chorare – Novos Baianos</string>
 
-    <string name="subgenres_title">Subgêneros que você curte</string>
-    <string name="sub_blues">Blues Rock</string>
-    <string name="sub_hard">Hard Rock</string>
-    <string name="sub_prog">Prog Rock</string>
-    <string name="sub_funk">Funk/Alternative</string>
+    <string name="styles_title">Outros estilos que você curte</string>
+    <string name="style_pop">Pop e K-pop</string>
+    <string name="style_rock">Rock e alternativo</string>
+    <string name="style_hiphop">Hip-hop e R&amp;B</string>
+    <string name="style_electronic">Eletrônica</string>
+    <string name="style_brazilian">Música brasileira</string>
 
     <string name="btn_see_result">Ver Minha Música</string>
     <string name="quiz_hint_answer_all">Responda às 3 perguntas para continuar</string>
@@ -65,25 +78,24 @@
     <!-- ===== ResultActivity ===== -->
     <string name="result_title">Sua Descoberta</string>
     <string name="result_header_label">SEU PERFIL SONORO</string>
-    <string name="result_score_label">Score</string>
-    <string name="result_score_suffix">/100</string>
-    <string name="result_song_label">MÚSICA RECOMENDADA</string>
+    <string name="result_match_suffix" formatted="false">% de match</string>
+    <string name="result_match_hint">É quanto das suas respostas apontou para esse estilo, contando o seu artista favorito.</string>
     <string name="result_reason_label">Por que essa música?</string>
-    <string name="result_no_subgenres">Nenhum subgênero marcado</string>
-    <string name="hint_personal_note">Sua nota pessoal sobre a música</string>
-    <string name="btn_save">Salvar nas Minhas Descobertas</string>
-    <string name="btn_saved">Salva nas suas descobertas ✓</string>
-    <string name="btn_youtube">YouTube</string>
-    <string name="btn_spotify">Spotify</string>
-    <string name="result_listen_label">OUVIR AGORA</string>
+    <string name="result_no_styles">Nenhum outro estilo marcado</string>
+    <string name="result_rate_question">Curtiu a descoberta?</string>
+    <string name="btn_like">Curti</string>
+    <string name="btn_dislike">Não curti</string>
+    <string name="result_saved_liked">Salva em Minhas Descobertas como Curti</string>
+    <string name="result_saved_disliked">Salva em Minhas Descobertas como Não curti</string>
+    <string name="cd_youtube">Ouvir no YouTube</string>
+    <string name="cd_spotify">Ouvir no Spotify</string>
     <string name="result_album">Álbum: %1$s</string>
     <string name="cd_album_cover">Capa do álbum</string>
     <string name="btn_share">Compartilhar Meu Perfil Sonoro</string>
-    <string name="toast_saved">Música salva nas suas descobertas!</string>
     <string name="toast_connection_error">Não foi possível conectar. Verifique sua conexão.</string>
     <string name="toast_no_app">Nenhum app disponível para abrir</string>
     <string name="share_chooser">Compartilhar via</string>
-    <string name="share_text">%1$s fez o quiz do SoundMatch! Perfil sonoro: %2$s (score %3$d/100). Descoberta musical: %4$s</string>
+    <string name="share_text">%1$s fez o quiz do SoundMatch! Perfil sonoro: %2$s (%3$d%% de match). Descoberta musical: %4$s</string>
 
     <!-- ===== HistoryActivity ===== -->
     <string name="history_title">Minhas Descobertas</string>
@@ -94,15 +106,15 @@
         <item quantity="other">%d músicas salvas</item>
     </plurals>
     <string name="item_song">%1$s – %2$s</string>
-    <string name="item_score">%1$d/100</string>
-    <string name="item_note_empty">Sem nota pessoal</string>
+    <string name="item_match">%1$d%% de match</string>
+    <string name="item_liked">Curtiu</string>
+    <string name="item_disliked">Não curtiu</string>
     <string name="dialog_delete_title">Excluir descoberta?</string>
     <string name="dialog_delete_message">A recomendação de %1$s será removida das suas descobertas.</string>
-    <string name="btn_edit_note">Editar Nota</string>
+    <string name="btn_mark_liked">Mudar para Curti</string>
+    <string name="btn_mark_disliked">Mudar para Não curti</string>
     <string name="btn_delete">Excluir</string>
-    <string name="dialog_edit_title">Editar nota pessoal</string>
-    <string name="dialog_save">Salvar</string>
     <string name="dialog_cancel">Cancelar</string>
-    <string name="toast_updated">Nota atualizada!</string>
+    <string name="toast_updated">Avaliação atualizada!</string>
     <string name="toast_deleted">Descoberta excluída!</string>
 </resources>

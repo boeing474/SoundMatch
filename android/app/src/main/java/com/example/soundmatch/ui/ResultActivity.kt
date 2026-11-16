@@ -2,8 +2,6 @@ package com.example.soundmatch.ui
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -16,13 +14,11 @@ import com.example.soundmatch.R
 import com.example.soundmatch.databinding.ActivityResultBinding
 import com.example.soundmatch.model.RecommendationRequest
 import com.example.soundmatch.model.SoundResult
+import com.example.soundmatch.network.ImageLoader
 import com.example.soundmatch.network.RetrofitClient
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
-import java.net.URL
 
 class ResultActivity : AppCompatActivity() {
 
@@ -40,27 +36,29 @@ class ResultActivity : AppCompatActivity() {
 
         showResult()
         loadAlbumCover()
-        binding.btnSave.setOnClickListener { saveRecommendation() }
+        binding.btnLike.setOnClickListener { saveRecommendation(liked = true) }
+        binding.btnDislike.setOnClickListener { saveRecommendation(liked = false) }
         binding.btnYoutube.setOnClickListener { openYoutube() }
         binding.btnSpotify.setOnClickListener { openSpotify() }
         binding.btnShare.setOnClickListener { shareProfile() }
     }
 
     private fun showResult() {
-        val archetypeColor = ContextCompat.getColor(this, result.archetype.colorRes)
+        val genreColor = ContextCompat.getColor(this, result.genre.colorRes)
 
         with(binding) {
-            cardResult.strokeColor = archetypeColor
-            layoutArchetypeHeader.setBackgroundColor(archetypeColor)
-            tvScore.setTextColor(archetypeColor)
+            cardCover.strokeColor = genreColor
+            cardResult.strokeColor = genreColor
+            layoutGenreHeader.setBackgroundColor(genreColor)
+            tvMatch.setTextColor(genreColor)
 
-            tvArchetype.text = result.archetype.title
-            tvScore.text = result.score.toString()
+            tvGenre.text = result.genre.title
+            tvMatch.text = result.match.toString()
             tvSongTitle.text = result.song.title
             tvSongArtist.text = result.song.artist
-            tvHighlight.text = result.archetype.highlight
+            tvHighlight.text = result.genre.highlight
             tvReason.text = result.reason
-            tvSubgenres.text = result.subgenresLabel.ifEmpty { getString(R.string.result_no_subgenres) }
+            tvLikedGenres.text = result.likedGenresLabel.ifEmpty { getString(R.string.result_no_styles) }
         }
     }
 
@@ -70,7 +68,7 @@ class ResultActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val track = RetrofitClient.itunes
-                    .searchSong("${result.song.title} ${result.song.artist}")
+                    .search("${result.song.title} ${result.song.artist}")
                     .results.firstOrNull() ?: return@launch
 
                 track.collectionName?.let {
@@ -78,9 +76,8 @@ class ResultActivity : AppCompatActivity() {
                     binding.tvAlbum.visibility = View.VISIBLE
                 }
 
-                // A API devolve a capa em 100x100; trocando no link pedimos uma maior.
-                val coverUrl = track.artworkUrl100?.replace("100x100", "600x600") ?: return@launch
-                downloadImage(coverUrl)?.let { binding.imgAlbumCover.setImageBitmap(it) }
+                val artwork = track.artworkUrl100 ?: return@launch
+                ImageLoader.load(ImageLoader.bigCover(artwork))?.let { binding.imgAlbumCover.setImageBitmap(it) }
             } catch (e: IOException) {
                 // sem conexão: mantém o vinil
             } catch (e: HttpException) {
@@ -89,23 +86,15 @@ class ResultActivity : AppCompatActivity() {
         }
     }
 
-    // Download em Dispatchers.IO, porque o Android não deixa usar a rede na thread da tela.
-    private suspend fun downloadImage(url: String): Bitmap? = withContext(Dispatchers.IO) {
-        URL(url).openStream().use { BitmapFactory.decodeStream(it) }
-    }
-
-    // POST /recommendations na nossa API
-    private fun saveRecommendation() {
-        val note = binding.etNote.text?.toString()?.trim().orEmpty()
-        val request = RecommendationRequest.from(result, note)
-
+    // POST /recommendations: Curti e Não curti salvam a música, cada um com a sua avaliação.
+    private fun saveRecommendation(liked: Boolean) {
         lifecycleScope.launch {
             setSaving(true)
             try {
-                RetrofitClient.api.createRecommendation(request)
-                isSaved = true   // trava o botão para não salvar a mesma música duas vezes
-                binding.etNote.isEnabled = false
-                Toast.makeText(this@ResultActivity, R.string.toast_saved, Toast.LENGTH_SHORT).show()
+                RetrofitClient.api.createRecommendation(RecommendationRequest.from(result, liked))
+                isSaved = true   // trava os botões para não salvar a mesma música duas vezes
+                binding.tvSaved.setText(if (liked) R.string.result_saved_liked else R.string.result_saved_disliked)
+                binding.tvSaved.visibility = View.VISIBLE
             } catch (e: IOException) {
                 showConnectionError()
             } catch (e: HttpException) {
@@ -118,12 +107,8 @@ class ResultActivity : AppCompatActivity() {
 
     private fun setSaving(saving: Boolean) {
         binding.progressSave.visibility = if (saving) View.VISIBLE else View.GONE
-        binding.btnSave.isEnabled = !saving && !isSaved
-        binding.btnSave.text = when {
-            saving -> ""
-            isSaved -> getString(R.string.btn_saved)
-            else -> getString(R.string.btn_save)
-        }
+        binding.btnLike.isEnabled = !saving && !isSaved
+        binding.btnDislike.isEnabled = !saving && !isSaved
     }
 
     private fun showConnectionError() {
@@ -151,8 +136,8 @@ class ResultActivity : AppCompatActivity() {
         val text = getString(
             R.string.share_text,
             result.profile.name,
-            result.archetype.title,
-            result.score,
+            result.genre.title,
+            result.match,
             result.song.displayName
         )
         val sendIntent = Intent(Intent.ACTION_SEND).apply {

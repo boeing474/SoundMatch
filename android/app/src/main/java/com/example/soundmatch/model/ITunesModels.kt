@@ -7,6 +7,8 @@ data class ITunesSearchResponse(
 )
 
 data class ITunesTrack(
+    val artistName: String?,
     val collectionName: String?,
+    val primaryGenreName: String?,
     val artworkUrl100: String?
 )

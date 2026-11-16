@@ -96,14 +96,16 @@ Código copiado da internet ou de colegas leva nota zero, e eu preciso demonstra
   - `requirements.txt`: dependências.
 - **Tabelas:**
   - `users`: `id`, `name`, `favorite_artist`, `listening_mode`, `plays_instrument`, `created_at`.
-  - `recommendations`: `id`, `user_id` (FK → `users.id`), `score` (10–100), `archetype`, `recommended_song`, `song_artist`, `subgenres`, `personal_note`, `created_at`.
-  - Se existir um `soundmatch.db` antigo (com `recommended_album`), apague-o. A API recria o banco ao iniciar.
+  - `recommendations`: `id`, `user_id` (FK → `users.id`), `score` (10–100), `archetype`, `recommended_song`, `song_artist`, `subgenres`, `liked` (bool), `created_at`.
+  - `users.listening_mode` guarda a **situação** escolhida no perfil (ex.: "Academia").
+  - **Os nomes das colunas ficaram da 1ª versão:** `archetype` guarda o perfil/gênero (ex.: "Pop & K-pop"), `score` guarda o **% de match** (10–100) e `subgenres` guarda os "outros estilos" marcados. O backend não mudou na troca para gêneros. Isso está comentado em `model/ApiModels.kt`.
+  - Se o schema mudar, apague o `soundmatch.db` (é gitignored). A API recria o banco ao iniciar. Ele já foi recriado com a coluna `liked`.
   - Relação 1 usuário → N recomendações.
 - **Endpoints** (Swagger em `/docs`):
   - `POST /recommendations`: cria o usuário ou reaproveita um existente pelo nome.
   - `GET /recommendations`: lista com o usuário aninhado.
   - `GET /recommendations/{id}`
-  - `PUT /recommendations/{id}`: altera a `personal_note`.
+  - `PUT /recommendations/{id}`: altera o `liked` (curti / não curti).
   - `DELETE /recommendations/{id}`
 - **Rodar:** `uvicorn main:app --host 0.0.0.0 --port 8000`.
 - **Endereço no Android:** `http://10.0.2.2:8000/` no emulador, ou `http://localhost:8000/` com `adb reverse` no celular físico.
@@ -119,79 +121,60 @@ Código copiado da internet ou de colegas leva nota zero, e eu preciso demonstra
 - **Extras aprovados:**
   - o disco de vinil gira na MainActivity (3 s por volta);
   - o título fica inclinado e pulsa entre magenta e ciano;
-  - **cada arquétipo tem uma cor**, usada no card do resultado e na faixa do histórico.
+  - **cada perfil (gênero) tem uma cor** (`genre_*` em `colors.xml`: pop magenta, rock laranja, hip-hop amarelo, eletrônica ciano, brasileira verde `#2BE89A`), usada no card do resultado e na faixa do histórico.
 - Cores, estilos e textos centralizados em `colors.xml`, `themes.xml` e `strings.xml`. Não deixar cor nem texto fixo nos layouts.
 
 ### As 5 telas (Activities)
-1. **MainActivity:** disco de vinil girando (`ImageView`), título neon (`TextView`), card "Como funciona" (`CardView`) e 2 botões ("Descobrir Meu Som" e "Minhas Descobertas"). Usa Intents explícitas para o Perfil e o Histórico.
-2. **UserProfileActivity:** nome e artista favorito (`EditText`), modo de escuta (`Spinner`), "toco instrumento" (`Switch`), validação com `Toast` e Intent explícita com extras.
-3. **SoundQuizActivity:** **tela única com rolagem**, com um card por pergunta (`RadioGroup` + `RadioButton`), subgêneros em `CheckBox` e uma `ProgressBar` que avança a cada resposta.
-4. **ResultActivity:**
-   - card na cor do arquétipo, com score, a música recomendada, **capa e nome do álbum** (iTunes Search API, com o vinil como reserva), a explicação do porquê e uma nota pessoal (`EditText`);
-   - botão "Salvar nas Minhas Descobertas" (POST) com `ProgressBar`;
-   - **Intents implícitas**: YouTube e Spotify (`ACTION_VIEW`; o Spotify tenta `spotify:search:` e cai no web) e Compartilhar (`ACTION_SEND`).
-5. **HistoryActivity:** `RecyclerView` + `CardView`, botões Editar Nota (`AlertDialog` → PUT) e Excluir (DELETE), e mensagem de estado vazio.
+1. **MainActivity:** vinil nascendo no horizonte e girando (camadas `synth_sky`/`synth_sun`/`synth_ground`), título neon, frase curta ("descubra uma música nova, do estilo que é a sua cara") e 2 botões ("Descobrir Meu Som" e "Minhas Descobertas"). Intents explícitas.
+2. **UserProfileActivity: "conversa", uma pergunta por vez** (mesma Activity, 4 blocos `step*` no XML e o Kotlin troca a visibilidade; "Passo X de 4" + ProgressBar; Voltar/Continuar; o voltar do celular volta um passo):
+   1. "Como você se chama?" (`TextInputLayout`)
+   2. "Qual artista você mais ouve?" → botão "Buscar artista" consulta o **iTunes** e mostra um card (capa, nome oficial via `logic/ArtistName.kt`, gênero do iTunes). Sem internet ou não encontrado: aviso e segue só com o texto digitado (`artistGenre = null`).
+   3. "Quando você mais ouve música?" (`ChipGroup`: Relaxando em casa, Academia, Na rua, Festa com amigos, Estudando)
+   4. "Você toca algum instrumento?" (`ChipGroup`: Não toco, Guitarra, Bateria, Baixo, Teclado, Canto)
+   - **Spinner e Switch saíram** (ainda são 9 tipos de View: TextView, EditText, Button, ImageView, CheckBox/Chip, RadioButton, RecyclerView, ProgressBar, CardView; o edital pede 6).
+3. **SoundQuizActivity:** tela com rolagem, 3 cards com `RadioGroup` de **5 opções (uma por gênero, na ordem do enum `Genre`)** + "Outros estilos que você curte" em `CheckBox` (um por gênero) + `ProgressBar`. Perguntas atuais: música para a situação (`rgSongPick`), o que prende no artista favorito (`rgArtistPick`), disco que ouviria inteiro (`rgAlbumPick`). **O estudante ainda acha as perguntas genéricas (ver "Ainda a decidir").**
+4. **ResultActivity:** estilo "tocando agora": capa grande (260dp, contorno na cor do perfil; iTunes, vinil como reserva), música, ícones Spotify/YouTube (Simple Icons, brancos), card do perfil com **"67% de match"** + "É quanto das suas respostas apontou para esse estilo, contando o seu artista favorito.", destaque do gênero, outros estilos, explicação. **"Curti" / "Não curti"** já salvam (POST com `liked`) com `ProgressBar`. Compartilhar (`ACTION_SEND`); YouTube/Spotify (`ACTION_VIEW`, Spotify tenta `spotify:search:` e cai no web).
+5. **HistoryActivity:** `RecyclerView` + `CardView`, Curtiu (ciano)/Não curtiu (magenta), botão "Mudar para…" (PUT do `liked`), Excluir com `AlertDialog` (DELETE), estado vazio.
 
-Isso dá 11 tipos de Views, e o edital exige 6.
-
-### Mockup visual (aguardando revisão do estudante)
-- Canvas com as 5 telas no claude.ai (privado, só o estudante acessa): https://claude.ai/artifact/KByessN86rhHbGwmUw6df8
-- A Etapa 2 começa revisando este mockup. Os XMLs devem seguir o visual aprovado nele.
+### Mockup visual
+- Canvas antigo (anterior às mudanças de 16/11): https://claude.ai/artifact/KByessN86rhHbGwmUw6df8
 
 ### Finalidade do app (decidida pelo estudante)
-**Recomendar uma MÚSICA nova** com base no gosto do usuário e nas respostas do quiz, em vez de um álbum fixo.
+**Recomendar uma MÚSICA nova de qualquer estilo** (não só rock), a partir do artista favorito e das respostas. Se a pessoa coloca BTS, a recomendação tem que ser do universo dela (ex.: NewJeans), nunca um rock aleatório.
 
-### Lógica de recomendação (`logic/SoundMatchEngine.kt` + `logic/SongCatalog.kt`)
-1. **Score:**
-   - Cada pergunta vale de 0 a 3 pontos, pelo índice da opção, ordenadas do mais "raiz" ao mais "experimental":
-     - Playlist de viagem (`playlist`): Blues de estrada 0, Riff pesado 1, Groove 2, Faixa longa e viajante 3
-     - No show (`concert`): Na grade 0, Roda punk 1, Dançando no fundo 2, Prestando atenção nos detalhes 3
-     - Música de 10 min (`longTrack`): Pula 0, Dá uma chance 1,5, Fica até o fim 3
-   - Subgêneros: média dos pesos marcados (Blues 0, Hard 1, Funk 2, Prog 3). Se nenhum estiver marcado, vale 1,5.
-   - Fórmula: `score = 10 + (soma / 12) × 90`, arredondado e limitado a 10–100.
-2. **Perfil sonoro (`model/Archetype.kt`):**
-
-   | Score | Perfil |
-   |---|---|
-   | 10–35 | Vintage Blues & Classic Rock |
-   | 36–60 | Hard Rock & Heavy Riffs |
-   | 61–80 | Groove & Funk Rock Alternativo |
-   | 81–100 | Explorador Progressivo & Conceitual |
-
-3. **Música:** cada perfil tem 5 músicas no catálogo, marcadas por subgênero. A escolha:
-   - **exclui o artista favorito** (a ideia é descobrir algo novo);
-   - **prioriza** as músicas com mais subgêneros marcados em comum;
-   - desempata de forma determinística (nome + score).
-4. **Explicação:** um texto com o porquê da recomendação. Se o usuário toca instrumento, ganha uma dica do que prestar atenção.
-5. **Testes unitários:** `app/src/test/.../logic/SoundMatchEngineTest.kt` (JUnit 4).
+### Lógica de recomendação: votação por gênero (`logic/SoundMatchEngine.kt`)
+- **5 perfis** (`model/Genre.kt`, a ordem importa): POP "Pop & K-pop", ROCK "Rock & Alternativo", HIPHOP "Hip-hop & R&B", ELECTRONIC "Eletrônica", BRAZILIAN "Música Brasileira". `Genre.fromITunes(primaryGenreName)` mapeia por palavras-chave (busca Brasileira primeiro, Pop por último; ex.: "K-pop"→POP, "Metal"→ROCK, "Hip-Hop/Rap"→HIPHOP, "Dance"→ELECTRONIC, "Sertanejo"/"MPB"/"Pagode"→BRAZILIAN; "Reggae"→null).
+- **Votos:** gênero do artista favorito (iTunes) = **3 votos** (`ARTIST_VOTES`); cada pergunta do quiz = 1; cada estilo marcado = 1. Ganha o mais votado; **empate → gênero do artista**.
+- **% de match** = votos do vencedor / total × 100, arredondado e limitado a 10–100 (substituiu o score "raiz → experimental", que o estudante achou sem sentido e com "cara de IA").
+- **Música** (`logic/SongCatalog.kt`: 5 por gênero, 25 no total, cada uma com `featured: Instrument` e um de cada instrumento por gênero; nenhum artista do catálogo aparece nas opções do quiz): exclui o artista favorito; quem toca recebe a música do seu instrumento; os outros, uma escolha fixa pelo hash do nome.
+- **Explicação:** cita o nome, o artista, o gênero, o artista da descoberta e, para quem toca, `Instrument.practice` + `focus` ("Você toca baixo: repare na linha de baixo de Espresso").
+- **iTunes** (`network/ITunesApi.search`, `country=BR`, que acerta mais os gêneros brasileiros); `network/ImageLoader` (capa 600x600, download em `Dispatchers.IO`).
+- **Testes:** `SoundMatchEngineTest.kt`, 12 testes (votação, empate, sem internet, match mínimo, exclusão do favorito, instrumento, determinismo, explicação, `fromITunes`, `ArtistName.clean`). Todos passando.
 
 ### Estrutura do código (decidida com a delegação do estudante)
-- **Pacotes** em `com.example.soundmatch`:
-  - `ui/`: Activities
-  - `adapter/`: RecyclerView
-  - `network/`: Retrofit
-  - `model/`: dados
-  - `logic/`: regra de negócio, sem Android
-- **Layouts:** ScrollView + LinearLayout. Campos com `TextInputLayout` neon (`Widget.SoundMatch.TextInput`).
-- **Dados entre telas:** `UserProfile` e `SoundResult` são `Serializable`, lidos com `IntentCompat.getSerializableExtra`. As chaves (`EXTRA_*`) ficam no `companion object` da Activity que recebe.
+- **Pacotes** em `com.example.soundmatch`: `ui/` (Activities), `adapter/` (RecyclerView), `network/` (Retrofit + ImageLoader), `model/` (dados), `logic/` (regra de negócio, sem Android).
+- **Layouts:** ScrollView + LinearLayout. Campos com `TextInputLayout` neon (`Widget.SoundMatch.TextInput`), perguntas do perfil com `Widget.SoundMatch.ProfileQuestion`, chips `Widget.SoundMatch.Chip` (48dp, 16sp).
+- **Dados entre telas:** `UserProfile` (name, favoriteArtist, situation, instrument?, artistGenre?) e `SoundResult` (profile, match, genre, song, reason, likedGenres) são `Serializable`, lidos com `IntentCompat.getSerializableExtra`. As chaves `EXTRA_*` ficam no `companion object` da Activity que recebe.
 
 ### Ajustes de 16/11 (pedidos pelo estudante)
-- **Textos de tela sem jargão técnico:** nada de "API" ou "Banco" para o usuário. O histórico se chama "Minhas Descobertas".
-- **Comentários curtos e naturais:** sem marcações `REQUISITO:` e sem KDoc óbvio. O mapa de onde está cada requisito fica no `GUIA_APRESENTACAO.md`.
-- **API externa:** `network/ITunesApi.kt` + `model/ITunesModels.kt`. O `RetrofitClient` tem `api` (a nossa) e `itunes`. A imagem é baixada sem biblioteca nova (`URL.openStream` em `Dispatchers.IO`).
-- **App rodando no celular físico** (Galaxy S23 FE) com `BASE_URL = http://localhost:8000/` + `adb reverse`.
-- **Ambiente:** o projeto Android é aberto no Android Studio (Windows) a partir de uma **cópia** em `C:\Users\pedro\AndroidStudioProjects\SoundMatch`. Depois de editar no WSL, sincronizar com `rsync -a --delete --exclude build --exclude .gradle --exclude .idea --exclude local.properties android/ /mnt/c/Users/pedro/AndroidStudioProjects/SoundMatch/`. O Gradle JDK é o temurin-17 (o Java 25 do AS não roda o Gradle 8.9). O backend roda no WSL (venv com Python 3.14).
+- **Sem emoji** nos textos do app e **sem "cara de IA"**: nada de jargão técnico na tela ("API", "Banco"), comentários curtos e naturais, sem `REQUISITO:`. O mapa dos requisitos fica no `GUIA_APRESENTACAO.md`.
+- **Não gosta de "cara de formulário"** (por isso o perfil virou conversa em passos).
+- Edge-to-edge do Android 16 desligado com `windowOptOutEdgeToEdgeEnforcement` (o topo ficava embaixo da barra de status).
+- **App rodando no celular físico** (Galaxy S23 FE) com `BASE_URL = http://localhost:8000/` + `adb reverse tcp:8000 tcp:8000`. Ao capturar prints com `adb exec-out screencap`, **nunca tocar no celular** (o estudante usa ao mesmo tempo); se a tela não for o SoundMatch, apagar o print sem abrir.
+- **Ambiente:** o projeto Android é aberto no Android Studio (Windows) a partir de uma **cópia** em `C:\Users\pedro\AndroidStudioProjects\SoundMatch`. Depois de editar no WSL, sincronizar com `rsync -a --delete --exclude build --exclude .gradle --exclude .idea --exclude local.properties android/ /mnt/c/Users/pedro/AndroidStudioProjects/SoundMatch/`. Build: `gradlew.bat --no-daemon` com `JAVA_HOME=C:\Users\pedro\.jdks\temurin-17.0.21` (o Java 25 do AS não roda o Gradle 8.9). O backend roda no WSL (venv com Python 3.14).
 
-### Ainda a decidir com o estudante
-- **Top 3 músicas favoritas** no perfil: adiado para depois da apresentação, porque mexe no backend e no banco.
-- Ajustes visuais restantes do mockup (fontes, contraste do botão magenta).
-
----
+### Ainda a decidir com o estudante (próximos passos, nesta ordem)
+1. **Perguntas do quiz: o estudante ainda acha genéricas.** Ideia escolhida por ele: a **1ª pergunta usa músicas reais do artista favorito** ("Qual dessas do BTS você mais ouve?"; a mesma busca do iTunes com `limit=25` filtrada pelo artista devolve as mais conhecidas, com ano e gênero). Ele quer que **a música escolhida influencie a recomendação, mas NÃO pelo ano**. Também **não gostou** da proposta "O que mais te prende em Dynamite? voz/batida/guitarra/baixo/teclados". Ainda é preciso propor outra forma, e conversar antes de programar.
+2. **Design:** o estudante sente que o design ainda não chegou no que ele quer. Trabalhar **uma tela por vez**, com print (`adb screencap`) e opções visuais antes de mexer.
+3. Atualizar o README e o `GUIA_APRESENTACAO.md` para a lógica de gêneros, votação, % de match, perfil em passos e Views sem Spinner/Switch. **Hoje eles ainda descrevem a versão de rock com score.**
+4. Commit (tudo desde `8e620ae` está **sem commit**: Curti/Não curti, perfil em passos, gêneros). Depois: screenshots em `docs/screenshots/`, apagar o `LEIA-ME.txt`, push só com confirmação e conferir se o repositório está público.
+- Adiado: Top 3 músicas favoritas, swipe estilo Tinder.
 
 ## 6. Status das Etapas
 0. ✅ `.gitignore` + backend
 1. ✅ Esqueleto Android: Gradle, tema, cores, textos, fonte e drawables (build validado)
 2. ✅ MainActivity + UserProfileActivity
-3. ✅ Lógica de recomendação de música + SoundQuizActivity + ResultActivity (YouTube/Compartilhar) + testes
-4. ✅ Retrofit (POST/GET/PUT/DELETE) + salvar no Resultado + HistoryActivity/HistoryAdapter com AlertDialog
-5. ✅ README.md + GUIA_APRESENTACAO.md (faltam os screenshots em docs/screenshots/)
+3. ✅ Lógica de recomendação + SoundQuizActivity + ResultActivity + testes
+4. ✅ Retrofit (POST/GET/PUT/DELETE) + HistoryActivity/HistoryAdapter com AlertDialog
+5. ✅ README.md + GUIA_APRESENTACAO.md (desatualizados após 16/11, ver "Ainda a decidir")
+6. 🔄 Reforma de 16/11: gêneros + votação + % de match + perfil em passos + Curti/Não curti. **Build e testes passando e app instalado no celular, mas sem commit.** Faltam as perguntas do quiz, o design, a documentação e o commit.
