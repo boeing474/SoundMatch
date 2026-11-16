@@ -55,7 +55,7 @@ class HistoryAdapter(
     }
 
     /** Diz ao RecyclerView o que mudou entre a lista antiga e a nova (anima só o necessário). */
-    private object DiffCallback : DiffUtil.ItemCallback<RecommendationResponse>() {
+    object DiffCallback : DiffUtil.ItemCallback<RecommendationResponse>() {
         override fun areItemsTheSame(old: RecommendationResponse, new: RecommendationResponse) = old.id == new.id
         override fun areContentsTheSame(old: RecommendationResponse, new: RecommendationResponse) = old == new
     }
