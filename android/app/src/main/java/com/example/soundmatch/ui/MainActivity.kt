@@ -45,6 +45,10 @@ class MainActivity : AppCompatActivity() {
         binding.btnDiscover.setOnClickListener {
             startActivity(Intent(this, UserProfileActivity::class.java))
         }
+        // REQUISITO: Intent Explícita -> HistoryActivity
+        binding.btnHistory.setOnClickListener {
+            startActivity(Intent(this, HistoryActivity::class.java))
+        }
     }
 
     private fun startAnimations() {

@@ -41,6 +41,11 @@
             android:exported="false"
             android:parentActivityName=".ui.SoundQuizActivity" />
 
+        <activity
+            android:name=".ui.HistoryActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.MainActivity" />
+
     </application>
 
 </manifest>

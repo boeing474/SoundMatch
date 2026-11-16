@@ -185,5 +185,5 @@ Isso dá 11 tipos de Views, e o edital exige 6.
 1. ✅ Esqueleto Android: Gradle, tema, cores, textos, fonte e drawables (build validado)
 2. ✅ MainActivity + UserProfileActivity
 3. ✅ Lógica de recomendação de música + SoundQuizActivity + ResultActivity (YouTube/Compartilhar) + testes
-4. ⏳ Retrofit + HistoryActivity/HistoryAdapter
+4. ✅ Retrofit (POST/GET/PUT/DELETE) + salvar no Resultado + HistoryActivity/HistoryAdapter com AlertDialog
 5. ⏳ README.md + GUIA_APRESENTACAO.md

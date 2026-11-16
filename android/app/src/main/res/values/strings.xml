@@ -84,6 +84,16 @@
     <!-- ===== HistoryActivity ===== -->
     <string name="history_title">Histórico</string>
     <string name="history_empty">Nenhum registro ainda.\nFaça o quiz e salve seu resultado!</string>
+    <string name="history_load_error">Não foi possível carregar o histórico.\nVerifique se a API está rodando.</string>
+    <plurals name="history_count">
+        <item quantity="one">%d registro salvo na API</item>
+        <item quantity="other">%d registros salvos na API</item>
+    </plurals>
+    <string name="item_song">%1$s – %2$s</string>
+    <string name="item_score">%1$d/100</string>
+    <string name="item_note_empty">Sem nota pessoal</string>
+    <string name="dialog_delete_title">Excluir registro?</string>
+    <string name="dialog_delete_message">A recomendação de %1$s será removida do banco de dados.</string>
     <string name="btn_edit_note">Editar Nota</string>
     <string name="btn_delete">Excluir</string>
     <string name="dialog_edit_title">Editar nota pessoal</string>

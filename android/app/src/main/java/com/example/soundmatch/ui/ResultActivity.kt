@@ -4,13 +4,20 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.soundmatch.R
 import com.example.soundmatch.databinding.ActivityResultBinding
+import com.example.soundmatch.model.RecommendationRequest
 import com.example.soundmatch.model.SoundResult
+import com.example.soundmatch.network.RetrofitClient
+import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 
 /**
  * Mostra o perfil sonoro e a música recomendada, permite salvar na API
@@ -20,6 +27,7 @@ class ResultActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityResultBinding
     private lateinit var result: SoundResult
+    private var isSaved = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,8 +38,46 @@ class ResultActivity : AppCompatActivity() {
             ?: run { finish(); return }
 
         showResult()
+        binding.btnSave.setOnClickListener { saveToApi() }
         binding.btnYoutube.setOnClickListener { openYoutube() }
         binding.btnShare.setOnClickListener { shareProfile() }
+    }
+
+    /** REQUISITO: CRUD Retrofit (POST /recommendations), salvando no banco via API. */
+    private fun saveToApi() {
+        val note = binding.etNote.text?.toString()?.trim().orEmpty()
+        val request = RecommendationRequest.from(result, note)
+
+        lifecycleScope.launch {
+            setSaving(true)
+            try {
+                RetrofitClient.api.createRecommendation(request)
+                isSaved = true   // trava o botão para não duplicar o registro
+                binding.etNote.isEnabled = false
+                Toast.makeText(this@ResultActivity, R.string.toast_saved, Toast.LENGTH_SHORT).show()
+            } catch (e: IOException) {
+                showApiError()   // sem conexão / API desligada
+            } catch (e: HttpException) {
+                showApiError()   // a API respondeu com erro (4xx/5xx)
+            } finally {
+                setSaving(false)
+            }
+        }
+    }
+
+    /** Feedback visual: durante a chamada a ProgressBar aparece por cima do botão. */
+    private fun setSaving(saving: Boolean) {
+        binding.progressSave.visibility = if (saving) View.VISIBLE else View.GONE
+        binding.btnSave.isEnabled = !saving && !isSaved
+        binding.btnSave.text = when {
+            saving -> ""
+            isSaved -> getString(R.string.btn_saved)
+            else -> getString(R.string.btn_save_api)
+        }
+    }
+
+    private fun showApiError() {
+        Toast.makeText(this, R.string.toast_api_error, Toast.LENGTH_LONG).show()
     }
 
     private fun showResult() {
