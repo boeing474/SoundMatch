@@ -5,9 +5,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
 
-    // No celular, "localhost" só chega no PC depois de rodar: adb reverse tcp:8000 tcp:8000
-    // (no emulador, sem adb reverse, daria para usar http://10.0.2.2:8000/)
-    private const val BASE_URL = "http://localhost:8000/"
+    // API publicada no Render. Para usar a API local no PC, troque por "http://localhost:8000/"
+    // e rode: adb reverse tcp:8000 tcp:8000 (no emulador: "http://10.0.2.2:8000/")
+    private const val BASE_URL = "https://soundmatch-api-dnh5.onrender.com/"
 
     private const val ITUNES_URL = "https://itunes.apple.com/"
 

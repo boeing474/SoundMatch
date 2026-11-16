@@ -108,7 +108,7 @@ Código copiado da internet ou de colegas leva nota zero, e eu preciso demonstra
   - `PUT /recommendations/{id}`: altera o `liked` (curti / não curti).
   - `DELETE /recommendations/{id}`
 - **Rodar:** `uvicorn main:app --host 0.0.0.0 --port 8000`.
-- **Endereço no Android:** `http://10.0.2.2:8000/` no emulador, ou `http://localhost:8000/` com `adb reverse` no celular físico.
+- **Endereço no Android:** o `BASE_URL` aponta para a API no **Render** (`https://soundmatch-api-dnh5.onrender.com/`, Swagger em `/docs`; plano grátis: dorme após 15 min, acorda em ~1 min, SQLite volta vazio ao reiniciar; deploy automático a cada push na `main`; Root Directory `backend`, `PYTHON_VERSION=3.12.7`). Plano B local: `http://localhost:8000/` + `adb reverse` (emulador: `http://10.0.2.2:8000/`).
 
 ### Identidade visual: "Neon Miami / synthwave anos 80" (tema escuro)
 - Inspirada na estética de Hotline Miami. **Não usar** logo, personagens, máscaras ou arte do jogo. No README e na apresentação, chamar de "Neon Miami / synthwave anos 80".
@@ -167,7 +167,7 @@ Código copiado da internet ou de colegas leva nota zero, e eu preciso demonstra
 1. **Perguntas do quiz: o estudante ainda acha genéricas.** Ideia escolhida por ele: a **1ª pergunta usa músicas reais do artista favorito** ("Qual dessas do BTS você mais ouve?"; a mesma busca do iTunes com `limit=25` filtrada pelo artista devolve as mais conhecidas, com ano e gênero). Ele quer que **a música escolhida influencie a recomendação, mas NÃO pelo ano**. Também **não gostou** da proposta "O que mais te prende em Dynamite? voz/batida/guitarra/baixo/teclados". Ainda é preciso propor outra forma, e conversar antes de programar.
 2. **Design:** o estudante sente que o design ainda não chegou no que ele quer. Trabalhar **uma tela por vez**, com print (`adb screencap`) e opções visuais antes de mexer.
 3. ✅ README e `GUIA_APRESENTACAO.md` atualizados para gêneros/votação/% de match (16/11), com 6 prints em `docs/screenshots/` tirados no celular. `LEIA-ME.txt` apagado.
-4. ✅ Commit da reforma (`1c45160`) e da documentação. **Falta: push (só com confirmação) e conferir se o repositório está público.**
+4. ✅ Commit e push da reforma e da documentação (repositório público). API publicada no Render em 16/11 e app apontando para ela.
 5. Mockup do novo Perfil (botões fixos embaixo, sol + grade no rodapé subindo a cada passo, frase que usa a resposta anterior: "Prazer, Pedro."): https://claude.ai/artifact/B7KUviGeVDxj1Vw9NfRrFj (passos 1–3 prontos, falta o 4). Retomar depois da entrega.
 6. Notado e não corrigido: o quiz mostra "Passo 2 de 2" (o perfil agora tem 4 passos); no Resultado, "outros estilos" pode repetir o próprio perfil vencedor.
 - Adiado: Top 3 músicas favoritas, swipe estilo Tinder.

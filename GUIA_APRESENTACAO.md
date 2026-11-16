@@ -10,16 +10,17 @@ A apresentação oral e o domínio técnico valem **2,5 pontos**. Este guia traz
 
 ## 1. Checklist antes de apresentar
 
-- [ ] Subir a API:
-  ```bash
-  cd backend
-  source .venv/bin/activate
-  uvicorn main:app --host 0.0.0.0 --port 8000
-  ```
-- [ ] Abrir http://localhost:8000/docs no navegador (Swagger), para mostrar depois.
-- [ ] Ligar o celular no cabo (Depuração USB ativa) e rodar `adb reverse tcp:8000 tcp:8000`. Sem isso, o app não alcança a API. Se o cabo desconectar, rodar de novo.
-- [ ] Celular com internet (Wi-Fi ou 4G), para a busca do artista e a capa do álbum.
-- [ ] Deixar pelo menos uma descoberta salva antes, para o histórico não aparecer vazio.
+A API está no Render (https://soundmatch-api-dnh5.onrender.com). Não precisa de notebook nem de cabo.
+
+- [ ] Celular com internet (Wi-Fi ou 4G).
+- [ ] **Uns 2 minutos antes**, abrir https://soundmatch-api-dnh5.onrender.com/docs no navegador do celular. No plano grátis, a API dorme depois de 15 min sem uso e leva até 1 min para acordar.
+- [ ] Lembrar que o banco do Render começa vazio sempre que a API reinicia. No roteiro, salvar uma descoberta ao vivo (Curti) **antes** de abrir o histórico.
+- [ ] Mostrar o código pelo GitHub (repositório público), se não estiver com o notebook.
+
+**Plano B (com o notebook na tomada):**
+1. Subir a API local (`cd backend`, `source .venv/bin/activate`, `uvicorn main:app --host 0.0.0.0 --port 8000`).
+2. Trocar o `BASE_URL` em `RetrofitClient.kt` para `http://localhost:8000/`.
+3. Rodar o app pelo Android Studio e depois `adb reverse tcp:8000 tcp:8000`.
 
 ---
 
@@ -52,7 +53,7 @@ A apresentação oral e o domínio técnico valem **2,5 pontos**. Este guia traz
    - Tocar em **"Compartilhar"** → *Intent implícita `ACTION_SEND`*.
    - Tocar em **"Curti"**: aparece a `ProgressBar` e depois a confirmação (**POST**).
 5. **Swagger**
-   - Mostrar o `GET /recommendations` no navegador com o registro que acabou de ser salvo, o que prova a persistência no banco.
+   - Abrir https://soundmatch-api-dnh5.onrender.com/docs e mostrar o `GET /recommendations` com o registro que acabou de ser salvo, o que prova a persistência no banco.
 6. **Histórico**
    - Voltar ao início e abrir **"Minhas Descobertas"** (**GET**). Cada card tem a faixa na cor do perfil.
    - **Mudar para Não curti** (**PUT**).
@@ -184,7 +185,10 @@ A busca começa pela Música Brasileira e deixa o Pop por último, porque "pop" 
 **Como garante que a música é uma "descoberta"?**
 O `pickSong` tira do catálogo as músicas do artista favorito. Quem toca recebe a música em que o seu instrumento se destaca. Os outros recebem uma escolha fixa pelo nome, de modo que pessoas diferentes ganham músicas diferentes, mas a mesma pessoa sempre recebe a mesma.
 
-**Como o celular acessa uma API que roda no PC usando `localhost`?**
+**Onde a API está rodando?**
+No Render, um serviço de hospedagem na nuvem. Ele baixa o código do GitHub (pasta `backend`), instala o `requirements.txt` e roda o `uvicorn` na porta que ele escolhe (`$PORT`). O app acessa por HTTPS. No plano grátis, o disco não é permanente, então o SQLite volta vazio quando a API reinicia. Para guardar os dados para sempre, eu trocaria por um PostgreSQL gerenciado, mudando só a `DATABASE_URL` no `database.py`.
+
+**Como o celular acessava a API no PC usando `localhost`?** (plano B)
 No celular, `localhost` é o próprio celular. O `adb reverse tcp:8000 tcp:8000` cria um túnel pelo cabo USB: o que chega na porta 8000 do celular vai para a porta 8000 do PC, onde a API está. No emulador daria para usar `10.0.2.2`, um endereço especial que aponta para o computador.
 
 **De onde vem a capa do álbum?**

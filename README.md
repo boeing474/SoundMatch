@@ -17,6 +17,8 @@ Quem coloca BTS, por exemplo, recebe uma descoberta do universo do pop e do K-po
 
 A pessoa responde "Curti" ou "Não curti", e a descoberta é salva no banco pela API. Em "Minhas Descobertas" dá para consultar, mudar a avaliação ou excluir.
 
+**API publicada no Render:** https://soundmatch-api-dnh5.onrender.com · **Swagger:** [https://soundmatch-api-dnh5.onrender.com/docs](https://soundmatch-api-dnh5.onrender.com/docs)
+
 > Projeto da **Avaliação Parcial 2 (AP2) – Desenvolvimento Mobile**.
 
 ---
@@ -61,7 +63,7 @@ MainActivity ──► UserProfileActivity ──► SoundQuizActivity ──►
 | Camada | Tecnologias |
 |---|---|
 | **Android** | Kotlin, XML Views + ViewBinding, Material Components, RecyclerView, CardView, Retrofit 2 + Gson, Coroutines (`lifecycleScope`) |
-| **Backend** | Python 3, FastAPI, SQLAlchemy 2.0, Pydantic 2, Uvicorn |
+| **Backend** | Python 3, FastAPI, SQLAlchemy 2.0, Pydantic 2, Uvicorn, publicado no Render |
 | **Banco** | SQLite (relacional, com chave estrangeira) |
 | **Documentação da API** | Swagger / OpenAPI, gerado automaticamente pelo FastAPI |
 | **API externa** | iTunes Search API (gênero do artista e capa do álbum) |
@@ -101,6 +103,10 @@ SoundMatch/
 
 ### 1. Backend (API)
 
+A API já está publicada no Render (https://soundmatch-api-dnh5.onrender.com), e o app usa esse endereço. No plano grátis, ela "dorme" depois de 15 minutos sem uso. A primeira chamada pode levar até 1 minuto, enquanto ela acorda (abrir o `/docs` antes resolve), e o SQLite volta vazio sempre que ela reinicia.
+
+Para rodar localmente:
+
 ```bash
 cd backend
 python -m venv .venv
@@ -115,12 +121,10 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ### 2. App Android
 
 1. Abra a pasta **`android/`** no Android Studio e aguarde o *Gradle Sync* (Gradle JDK: **17**).
-2. Ligue o celular por USB, com a **Depuração USB** ativada, e rode no PC:
-   ```bash
-   adb reverse tcp:8000 tcp:8000
-   ```
-   O app acessa a API em `http://localhost:8000/`, e o `adb reverse` leva essa porta do celular até o PC.
-   No emulador, troque o `BASE_URL` em `network/RetrofitClient.kt` para `http://10.0.2.2:8000/`.
+2. Ligue o celular por USB, com a **Depuração USB** ativada. O app já aponta para a API no Render (`BASE_URL` em `network/RetrofitClient.kt`).
+   Para usar a API local:
+   - troque o `BASE_URL` para `http://localhost:8000/` e rode `adb reverse tcp:8000 tcp:8000`;
+   - no emulador, use `http://10.0.2.2:8000/`.
 3. Execute o app (Run). A busca do artista e a capa do álbum precisam de internet no celular. Sem internet, o app segue só com o nome digitado e mostra um disco de vinil no lugar da capa.
 
 **Testes da regra de negócio:** abra `app/src/test/.../logic/SoundMatchEngineTest.kt` e clique em Run. Pelo terminal, use `./gradlew test`.
@@ -129,7 +133,7 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
 ## API REST
 
-Base: `http://localhost:8000`. Documentação interativa em **[/docs](http://localhost:8000/docs)** (Swagger UI).
+Base: `https://soundmatch-api-dnh5.onrender.com` (ou `http://localhost:8000` rodando localmente). Documentação interativa em **[https://soundmatch-api-dnh5.onrender.com/docs](https://soundmatch-api-dnh5.onrender.com/docs)** (Swagger UI).
 
 | Método | Endpoint | Descrição | Usado em |
 |---|---|---|---|
@@ -231,4 +235,4 @@ Se o artista não for encontrado, ou não houver internet, o perfil sai só das 
 | CRUD + JSON | POST, GET, PUT e DELETE via Retrofit (`network/SoundMatchApi.kt`) |
 | Banco relacional | SQLite com `users` 1:N `recommendations` (FK) |
 | Organização | Pacotes `ui`, `adapter`, `network`, `model`, `logic` |
-| Bônus | App rodando em celular físico (`adb reverse tcp:8000 tcp:8000`) |
+| Bônus | App rodando em celular físico e API publicada em nuvem (Render) |
