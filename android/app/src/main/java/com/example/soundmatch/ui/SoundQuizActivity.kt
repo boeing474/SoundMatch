@@ -9,6 +9,7 @@ import androidx.core.content.IntentCompat
 import com.example.soundmatch.R
 import com.example.soundmatch.databinding.ActivitySoundQuizBinding
 import com.example.soundmatch.logic.SoundMatchEngine
+import com.example.soundmatch.model.Energy
 import com.example.soundmatch.model.Genre
 import com.example.soundmatch.model.QuizAnswers
 import com.example.soundmatch.model.UserProfile
@@ -66,11 +67,13 @@ class SoundQuizActivity : AppCompatActivity() {
     }
 
     private fun showResult() {
+        // Provisório até a etapa 4 (tela nova do quiz): energia fixa e sem surpresa.
         val answers = QuizAnswers(
-            songPick = selectedGenre(binding.rgSongPick),
-            artistPick = selectedGenre(binding.rgArtistPick),
-            albumPick = selectedGenre(binding.rgAlbumPick),
-            likedGenres = styleChecks.filterKeys { it.isChecked }.values.toList()
+            firstPick = selectedGenre(binding.rgSongPick),
+            firstPickSong = null,
+            energy = Energy.DANCE,
+            likedGenres = styleChecks.filterKeys { it.isChecked }.values.toList(),
+            surprise = false
         )
         val result = SoundMatchEngine.recommend(profile, answers)
 
