@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -39,7 +40,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="8dp"
                 android:layout_marginTop="20dp"
-                android:max="3"
+                android:max="2"
                 android:progress="0"
                 android:progressBackgroundTint="@color/night_card"
                 android:progressTint="@color/neon_magenta" />
@@ -52,8 +53,9 @@
                 android:layout_marginTop="6dp"
                 android:gravity="end"
                 android:textSize="12sp"
-                tools:text="0 de 3 respondidas" />
+                tools:text="0 de 2 respondidas" />
 
+            <!-- 1ª pergunta: músicas do artista favorito (ou a pergunta reserva). Opções criadas no Kotlin. -->
             <com.google.android.material.card.MaterialCardView
                 style="@style/Widget.SoundMatch.Card"
                 android:layout_width="match_parent"
@@ -70,46 +72,16 @@
                         style="@style/Widget.SoundMatch.QuestionTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        tools:text="@string/q1_title" />
+                        tools:text="@string/q1_title_artist" />
 
-                    <!-- Não mudar a ordem das opções: a posição de cada uma é o gênero do voto (ordem do enum Genre) -->
                     <RadioGroup
-                        android:id="@+id/rgSongPick"
+                        android:id="@+id/rgFirstPick"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <RadioButton
-                            style="@style/Widget.SoundMatch.RadioButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/q1_opt_0" />
-
-                        <RadioButton
-                            style="@style/Widget.SoundMatch.RadioButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/q1_opt_1" />
-
-                        <RadioButton
-                            style="@style/Widget.SoundMatch.RadioButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/q1_opt_2" />
-
-                        <RadioButton
-                            style="@style/Widget.SoundMatch.RadioButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/q1_opt_3" />
-                        <RadioButton
-                            style="@style/Widget.SoundMatch.RadioButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/q1_opt_4" />
-                    </RadioGroup>
+                        android:layout_height="wrap_content" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- 2ª pergunta: a energia. Uma opção por item do enum Energy. -->
             <com.google.android.material.card.MaterialCardView
                 style="@style/Widget.SoundMatch.Card"
                 android:layout_width="match_parent"
@@ -122,104 +94,19 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/tvQuestion2"
                         style="@style/Widget.SoundMatch.QuestionTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        tools:text="@string/q2_title" />
+                        android:text="@string/q2_title" />
 
                     <RadioGroup
-                        android:id="@+id/rgArtistPick"
+                        android:id="@+id/rgEnergy"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <RadioButton
-                            style="@style/Widget.SoundMatch.RadioButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/q2_opt_0" />
-
-                        <RadioButton
-                            style="@style/Widget.SoundMatch.RadioButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/q2_opt_1" />
-
-                        <RadioButton
-                            style="@style/Widget.SoundMatch.RadioButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/q2_opt_2" />
-
-                        <RadioButton
-                            style="@style/Widget.SoundMatch.RadioButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/q2_opt_3" />
-                        <RadioButton
-                            style="@style/Widget.SoundMatch.RadioButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/q2_opt_4" />
-                    </RadioGroup>
+                        android:layout_height="wrap_content" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView
-                style="@style/Widget.SoundMatch.Card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/tvQuestion3"
-                        style="@style/Widget.SoundMatch.QuestionTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        tools:text="@string/q3_title" />
-
-                    <RadioGroup
-                        android:id="@+id/rgAlbumPick"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <RadioButton
-                            style="@style/Widget.SoundMatch.RadioButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/q3_opt_0" />
-
-                        <RadioButton
-                            style="@style/Widget.SoundMatch.RadioButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/q3_opt_1" />
-
-                        <RadioButton
-                            style="@style/Widget.SoundMatch.RadioButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/q3_opt_2" />
-
-                        <RadioButton
-                            style="@style/Widget.SoundMatch.RadioButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/q3_opt_3" />
-                        <RadioButton
-                            style="@style/Widget.SoundMatch.RadioButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/q3_opt_4" />
-                    </RadioGroup>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
+            <!-- Outros estilos + Me surpreenda -->
             <com.google.android.material.card.MaterialCardView
                 style="@style/Widget.SoundMatch.Card"
                 android:layout_width="match_parent"
@@ -271,6 +158,31 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/style_brazilian" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="12dp"
+                        android:background="@color/stroke_subtle" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchSurprise"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:text="@string/surprise_label"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:thumbTint="@color/switch_thumb"
+                        app:trackTint="@color/switch_track" />
+
+                    <TextView
+                        style="@style/Widget.SoundMatch.Caption"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/surprise_hint"
+                        android:textSize="13sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

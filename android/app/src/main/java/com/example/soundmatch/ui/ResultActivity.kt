@@ -60,6 +60,14 @@ class ResultActivity : AppCompatActivity() {
             tvHighlight.text = result.genre.highlight
             tvReason.text = result.reason
             tvLikedGenres.text = result.likedGenresLabel.ifEmpty { getString(R.string.result_no_styles) }
+
+            // Na surpresa o % não faz sentido (o estilo não foi o mais votado): mostra uma frase.
+            if (result.surprise) {
+                layoutMatch.visibility = View.GONE
+                tvSurpriseTitle.visibility = View.VISIBLE
+                tvSurpriseTitle.setTextColor(genreColor)
+                tvMatchHint.setText(R.string.result_surprise_hint)
+            }
         }
     }
 
@@ -135,13 +143,11 @@ class ResultActivity : AppCompatActivity() {
 
     // Intent implícita: o usuário escolhe por onde compartilhar (WhatsApp, e-mail...).
     private fun shareProfile() {
-        val text = getString(
-            R.string.share_text,
-            result.profile.name,
-            result.genre.title,
-            result.match,
-            result.song.displayName
-        )
+        val text = if (result.surprise) {
+            getString(R.string.share_text_surprise, result.profile.name, result.genre.title, result.song.displayName)
+        } else {
+            getString(R.string.share_text, result.profile.name, result.genre.title, result.match, result.song.displayName)
+        }
         val sendIntent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, text)

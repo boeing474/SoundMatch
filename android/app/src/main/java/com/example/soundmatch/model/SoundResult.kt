@@ -14,5 +14,7 @@ data class SoundResult(
     val surprise: Boolean
 ) : Serializable {
 
-    val likedGenresLabel: String get() = likedGenres.joinToString(", ") { it.title }
+    // Os estilos marcados, sem repetir o do próprio resultado.
+    val likedGenresLabel: String
+        get() = likedGenres.filter { it != genre }.joinToString(", ") { it.title }
 }

@@ -4,7 +4,7 @@
 
     <!-- ===== MainActivity ===== -->
     <string name="main_title">SoundMatch</string>
-    <string name="main_subtitle">Conte como você ouve música, responda três perguntas e descubra uma música nova, do estilo que é a sua cara.</string>
+    <string name="main_subtitle">Conte como você ouve música, escolha a energia do momento e descubra uma música nova, do estilo que é a sua cara.</string>
     <string name="btn_discover">Descobrir Meu Som</string>
     <string name="btn_history">Minhas Descobertas</string>
     <string name="cd_vinyl">Disco de vinil girando</string>
@@ -43,9 +43,10 @@
 
     <!-- ===== SoundQuizActivity ===== -->
     <string name="quiz_title">Quiz Sonoro</string>
-    <string name="quiz_step">Passo 2 de 2</string>
+    <string name="quiz_step">Última parte</string>
 
-    <!-- Em cada pergunta, a opção N é do gênero N do enum Genre: Pop, Rock, Hip-hop, Eletrônica, Brasileira -->
+    <string name="q1_title_artist">1. Qual dessas de %1$s você colocaria pra tocar %2$s?</string>
+    <!-- Pergunta reserva (artista não encontrado): a opção N é do gênero N do enum Genre -->
     <string name="q1_title">1. Qual destas você colocaria pra tocar %1$s?</string>
     <string name="q1_opt_0">Blinding Lights – The Weeknd</string>
     <string name="q1_opt_1">Smells Like Teen Spirit – Nirvana</string>
@@ -53,29 +54,21 @@
     <string name="q1_opt_3">Titanium – David Guetta ft. Sia</string>
     <string name="q1_opt_4">Vai Malandra – Anitta</string>
 
-    <string name="q2_title">2. O que mais te prende quando você ouve %1$s?</string>
-    <string name="q2_opt_0">O refrão que não sai da cabeça</string>
-    <string name="q2_opt_1">A guitarra e a energia da banda</string>
-    <string name="q2_opt_2">A letra e o flow</string>
-    <string name="q2_opt_3">A batida e a hora do drop</string>
-    <string name="q2_opt_4">O suingue e a letra em português</string>
+    <string name="q2_title">2. Qual a energia da música que você quer ouvir agora?</string>
 
-    <string name="q3_title">3. Qual destes discos você ouviria inteiro, do começo ao fim?</string>
-    <string name="q3_opt_0">Future Nostalgia – Dua Lipa</string>
-    <string name="q3_opt_1">AM – Arctic Monkeys</string>
-    <string name="q3_opt_2">Scorpion – Drake</string>
-    <string name="q3_opt_3">Random Access Memories – Daft Punk</string>
-    <string name="q3_opt_4">Acabou Chorare – Novos Baianos</string>
-
-    <string name="styles_title">Outros estilos que você curte</string>
+    <string name="styles_title">3. Outros estilos que você curte</string>
     <string name="style_pop">Pop e K-pop</string>
     <string name="style_rock">Rock e alternativo</string>
     <string name="style_hiphop">Hip-hop e R&amp;B</string>
     <string name="style_electronic">Eletrônica</string>
     <string name="style_brazilian">Música brasileira</string>
 
+    <string name="surprise_label">Me surpreenda</string>
+    <string name="surprise_hint">A música vem de um dos estilos que você marcou, fora do seu de sempre.</string>
+    <string name="toast_surprise_needs_style">Marque outro estilo além de %1$s</string>
+
     <string name="btn_see_result">Ver Minha Música</string>
-    <string name="quiz_hint_answer_all">Responda às 3 perguntas para continuar</string>
+    <string name="quiz_hint_answer_all">Responda às 2 perguntas para continuar</string>
     <string name="quiz_progress">%1$d de %2$d respondidas</string>
 
     <!-- ===== ResultActivity ===== -->
@@ -83,6 +76,8 @@
     <string name="result_header_label">SEU PERFIL SONORO</string>
     <string name="result_match_suffix" formatted="false">% de match</string>
     <string name="result_match_hint">É quanto das suas respostas apontou para esse estilo, contando o seu artista favorito.</string>
+    <string name="result_surprise_title">Fora da sua zona de conforto</string>
+    <string name="result_surprise_hint" formatted="false">Você ligou o Me surpreenda, então aqui não tem %: a música vem de um estilo que você marcou, fora do seu de sempre.</string>
     <string name="result_reason_label">Por que essa música?</string>
     <string name="result_no_styles">Nenhum outro estilo marcado</string>
     <string name="result_rate_question">Curtiu a descoberta?</string>
@@ -98,6 +93,7 @@
     <string name="toast_connection_error">Não foi possível conectar. Verifique sua conexão.</string>
     <string name="toast_no_app">Nenhum app disponível para abrir</string>
     <string name="share_chooser">Compartilhar via</string>
+    <string name="share_text_surprise">%1$s fez o quiz do SoundMatch e pediu uma surpresa: %2$s. Descoberta musical: %3$s</string>
     <string name="share_text">%1$s fez o quiz do SoundMatch! Perfil sonoro: %2$s (%3$d%% de match). Descoberta musical: %4$s</string>
 
     <!-- ===== HistoryActivity ===== -->

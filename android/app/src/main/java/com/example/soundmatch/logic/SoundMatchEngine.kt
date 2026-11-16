@@ -94,7 +94,7 @@ object SoundMatchEngine {
         val name = profile.name
         when {
             genre != usualGenre -> {
-                append("$name, você pediu para sair da zona de conforto: em vez de ${usualGenre.title}, ")
+                append("$name, você quis sair da zona de conforto: em vez de ${usualGenre.title}, ")
                 append("a descoberta vem de ${genre.title}, um dos estilos que você marcou.")
             }
             profile.artistGenre == genre && answers.firstPickSong != null -> {

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Uma opção de pergunta do quiz. As opções são criadas no Kotlin
+     (dependem do artista favorito e das energias), mas o visual fica aqui. -->
+<RadioButton xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/Widget.SoundMatch.RadioButton"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="6dp" />

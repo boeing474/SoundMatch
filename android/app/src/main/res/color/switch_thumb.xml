@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Bolinha do Switch: escura quando ligado (sobre trilho ciano), lilás quando desligado -->
+<!-- Bolinha do Switch: magenta ligado, cinza desligado -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="@color/night_bg" android:state_checked="true" />
-    <item android:color="@color/text_secondary" />
+    <item android:color="@color/neon_magenta" android:state_checked="true" />
+    <item android:color="@color/text_muted" />
 </selector>
