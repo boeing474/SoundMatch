@@ -99,20 +99,19 @@
 
     <!-- ===== HistoryActivity ===== -->
     <string name="history_title">Minhas Descobertas</string>
-    <string name="history_empty">Nenhuma descoberta ainda.\nFaça o quiz e salve sua música!</string>
+    <string name="history_empty_title">Nenhuma descoberta ainda</string>
+    <string name="history_empty_text">Faça o quiz e toque em Curti ou Não curti para salvar a sua música aqui.</string>
     <string name="history_load_error">Não foi possível carregar suas descobertas.\nVerifique sua conexão.</string>
     <plurals name="history_count">
         <item quantity="one">%d música salva</item>
         <item quantity="other">%d músicas salvas</item>
     </plurals>
-    <string name="item_song">%1$s – %2$s</string>
-    <string name="item_match">%1$d%% de match</string>
-    <string name="item_liked">Curtiu</string>
-    <string name="item_disliked">Não curtiu</string>
+    <string name="item_genre_match">%1$s · %2$d%%</string>
+    <string name="item_meta">%1$s · %2$s</string>
+    <string name="item_liked_action">Curtiu. Toque para mudar para Não curti</string>
+    <string name="item_disliked_action">Não curtiu. Toque para mudar para Curti</string>
     <string name="dialog_delete_title">Excluir descoberta?</string>
     <string name="dialog_delete_message">A recomendação de %1$s será removida das suas descobertas.</string>
-    <string name="btn_mark_liked">Mudar para Curti</string>
-    <string name="btn_mark_disliked">Mudar para Não curti</string>
     <string name="btn_delete">Excluir</string>
     <string name="dialog_cancel">Cancelar</string>
     <string name="toast_updated">Avaliação atualizada!</string>

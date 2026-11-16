@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Uma linha da lista: capa | música, artista, perfil e data | curtir e excluir -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -6,114 +7,106 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    app:contentPadding="0dp">
+    app:contentPadding="12dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <!-- A cor da faixa é definida no HistoryAdapter, de acordo com o perfil -->
-        <View
-            android:id="@+id/viewStripe"
-            android:layout_width="6dp"
-            android:layout_height="match_parent"
-            tools:background="@color/genre_pop" />
+        <!-- O contorno da capa fica na cor do perfil (definida no HistoryAdapter) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardCover"
+            android:layout_width="68dp"
+            android:layout_height="68dp"
+            app:cardBackgroundColor="@color/night_bg"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="2dp"
+            tools:strokeColor="@color/genre_pop">
+
+            <ImageView
+                android:id="@+id/imgCover"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:importantForAccessibility="no"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_vinyl" />
+        </com.google.android.material.card.MaterialCardView>
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:padding="14dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/tvUserName"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textColor="@color/text_primary"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    tools:text="Ana" />
-
-                <TextView
-                    android:id="@+id/tvDate"
-                    style="@style/Widget.SoundMatch.Caption"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    tools:text="15/11/2026 19:42" />
-            </LinearLayout>
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/tvSong"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:textColor="@color/text_primary"
                 android:textSize="16sp"
-                tools:text="Super Shy – NewJeans" />
+                android:textStyle="bold"
+                tools:text="Espresso" />
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/tvArtist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp"
+                tools:text="Sabrina Carpenter" />
+
+            <TextView
+                android:id="@+id/tvGenre"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/tvGenre"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textSize="13sp"
-                    tools:text="Pop &amp; K-pop" />
-
-                <TextView
-                    android:id="@+id/tvMatch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    tools:text="67% de match" />
-            </LinearLayout>
+                android:fontFamily="sans-serif-medium"
+                android:textSize="13sp"
+                tools:text="Pop &amp; K-pop · 86%"
+                tools:textColor="@color/genre_pop" />
 
             <TextView
-                android:id="@+id/tvRating"
+                android:id="@+id/tvMeta"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                tools:text="Curtiu"
-                tools:textColor="@color/neon_cyan" />
+                android:layout_marginTop="2dp"
+                android:textColor="@color/text_muted"
+                android:textSize="12sp"
+                tools:text="Pedro · 16/11, 04:15" />
+        </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:orientation="horizontal">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/btnToggleRating"
-                    style="@style/Widget.SoundMatch.Button.Small"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    tools:text="@string/btn_mark_disliked" />
+            <!-- Coração cheio = Curtiu, vazio = Não curtiu. Tocar faz o PUT -->
+            <ImageButton
+                android:id="@+id/btnLike"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                tools:contentDescription="@string/item_liked_action"
+                tools:src="@drawable/ic_heart"
+                tools:tint="@color/neon_magenta" />
 
-                <Button
-                    android:id="@+id/btnDelete"
-                    style="@style/Widget.SoundMatch.Button.Danger"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="@string/btn_delete" />
-            </LinearLayout>
+            <ImageButton
+                android:id="@+id/btnDelete"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/btn_delete"
+                android:src="@drawable/ic_delete"
+                app:tint="@color/text_muted" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

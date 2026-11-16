@@ -18,6 +18,7 @@
     <!-- Texto -->
     <color name="text_primary">#FFFFFF</color>
     <color name="text_secondary">#B8A9D9</color>
+    <color name="text_muted">#8F80B8</color>      <!-- data, ícones apagados -->
     <color name="title_glow_text">#FFE3EE</color> <!-- branco rosado do título neon -->
     <color name="text_disabled">#C9A3B8</color>
     <color name="text_on_genre">#0D0221</color> <!-- texto escuro sobre a cor do perfil -->

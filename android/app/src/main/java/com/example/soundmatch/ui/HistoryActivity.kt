@@ -1,9 +1,9 @@
 package com.example.soundmatch.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.soundmatch.R
@@ -21,16 +21,24 @@ class HistoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHistoryBinding
 
-    private val adapter = HistoryAdapter(
-        onToggleRating = { item -> updateRating(item.id, liked = !item.liked) },
-        onDelete = { item -> confirmDelete(item) }
-    )
+    private val adapter by lazy {
+        HistoryAdapter(
+            scope = lifecycleScope,
+            onToggleRating = { item -> updateRating(item.id, liked = !item.liked) },
+            onDelete = { item -> confirmDelete(item) }
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHistoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.recyclerHistory.adapter = adapter
+
+        // Lista vazia: o botão leva direto ao perfil (Intent explícita)
+        binding.btnDiscover.setOnClickListener {
+            startActivity(Intent(this, UserProfileActivity::class.java))
+        }
     }
 
     // Recarrega toda vez que a tela aparece.
@@ -43,13 +51,16 @@ class HistoryActivity : AppCompatActivity() {
     private fun loadHistory() {
         lifecycleScope.launch {
             binding.progressHistory.visibility = View.VISIBLE
-            binding.tvEmpty.visibility = View.GONE
+            binding.layoutEmpty.visibility = View.GONE
+            binding.tvError.visibility = View.GONE
             try {
                 val items = RetrofitClient.api.listRecommendations()
                 adapter.submitList(items)
                 binding.tvHistoryCount.text =
                     resources.getQuantityString(R.plurals.history_count, items.size, items.size)
-                if (items.isEmpty()) showMessage(R.string.history_empty)
+                // Com a lista vazia, o contador some e aparece o convite para fazer o quiz.
+                binding.tvHistoryCount.visibility = if (items.isEmpty()) View.GONE else View.VISIBLE
+                binding.layoutEmpty.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
             } catch (e: IOException) {
                 showLoadError()
             } catch (e: HttpException) {
@@ -101,15 +112,10 @@ class HistoryActivity : AppCompatActivity() {
         }
     }
 
-    private fun showMessage(@StringRes messageRes: Int) {
-        binding.tvEmpty.setText(messageRes)
-        binding.tvEmpty.visibility = View.VISIBLE
-    }
-
     private fun showLoadError() {
         adapter.submitList(emptyList())
-        binding.tvHistoryCount.text = ""
-        showMessage(R.string.history_load_error)
+        binding.tvHistoryCount.visibility = View.GONE
+        binding.tvError.visibility = View.VISIBLE
     }
 
     private fun showConnectionError() {

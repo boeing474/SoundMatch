@@ -1,5 +1,6 @@
 package com.example.soundmatch.adapter
 
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -10,13 +11,18 @@ import com.example.soundmatch.R
 import com.example.soundmatch.databinding.ItemRecommendationBinding
 import com.example.soundmatch.model.Genre
 import com.example.soundmatch.model.RecommendationResponse
+import com.example.soundmatch.network.CoverRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
 
-// Os cliques de avaliar e excluir só são repassados: quem chama a API é a HistoryActivity.
+// Os cliques de curtir e excluir só são repassados: quem chama a API é a HistoryActivity.
+// O scope vem da Activity, para a busca das capas parar se a tela for fechada.
 class HistoryAdapter(
+    private val scope: CoroutineScope,
     private val onToggleRating: (RecommendationResponse) -> Unit,
     private val onDelete: (RecommendationResponse) -> Unit
 ) : ListAdapter<RecommendationResponse, HistoryAdapter.ViewHolder>(DiffCallback) {
@@ -31,24 +37,34 @@ class HistoryAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position)
         val context = holder.itemView.context
-        val colorRes = Genre.fromTitle(item.archetype)?.colorRes ?: R.color.neon_cyan
-        val color = ContextCompat.getColor(context, colorRes)
+        val genreColor = ContextCompat.getColor(context, Genre.fromTitle(item.archetype)?.colorRes ?: R.color.neon_cyan)
 
         with(holder.binding) {
-            viewStripe.setBackgroundColor(color)
-            tvUserName.text = item.user.name
-            tvDate.text = formatApiDate(item.createdAt)
-            tvSong.text = context.getString(R.string.item_song, item.recommendedSong, item.songArtist)
-            tvGenre.text = item.archetype
-            tvGenre.setTextColor(color)
-            tvMatch.text = context.getString(R.string.item_match, item.score)
-            tvMatch.setTextColor(color)
-            tvRating.setText(if (item.liked) R.string.item_liked else R.string.item_disliked)
-            tvRating.setTextColor(ContextCompat.getColor(context, if (item.liked) R.color.neon_cyan else R.color.neon_magenta))
-            btnToggleRating.setText(if (item.liked) R.string.btn_mark_disliked else R.string.btn_mark_liked)
+            cardCover.strokeColor = genreColor
+            tvSong.text = item.recommendedSong
+            tvArtist.text = item.songArtist
+            tvGenre.text = context.getString(R.string.item_genre_match, item.archetype, item.score)
+            tvGenre.setTextColor(genreColor)
+            tvMeta.text = context.getString(R.string.item_meta, item.user.name, formatApiDate(item.createdAt))
 
-            btnToggleRating.setOnClickListener { onToggleRating(item) }
+            val heartColor = if (item.liked) R.color.neon_magenta else R.color.text_muted
+            btnLike.setImageResource(if (item.liked) R.drawable.ic_heart else R.drawable.ic_heart_outline)
+            btnLike.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(context, heartColor))
+            btnLike.contentDescription = context.getString(
+                if (item.liked) R.string.item_liked_action else R.string.item_disliked_action
+            )
+
+            btnLike.setOnClickListener { onToggleRating(item) }
             btnDelete.setOnClickListener { onDelete(item) }
+
+            // O card pode ser reaproveitado para outra música enquanto a capa baixa.
+            // A tag confere se ele ainda mostra a mesma música antes de trocar a imagem.
+            imgCover.setImageResource(R.drawable.ic_vinyl)
+            imgCover.tag = item.id
+            scope.launch {
+                val cover = CoverRepository.coverFor(item.recommendedSong, item.songArtist)
+                if (cover != null && imgCover.tag == item.id) imgCover.setImageBitmap(cover)
+            }
         }
     }
 
@@ -63,7 +79,7 @@ class HistoryAdapter(
         val API_DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).apply {
             timeZone = TimeZone.getTimeZone("UTC")
         }
-        val DISPLAY_DATE_FORMAT = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale("pt", "BR"))
+        val DISPLAY_DATE_FORMAT = SimpleDateFormat("dd/MM, HH:mm", Locale("pt", "BR"))
 
         fun formatApiDate(apiDate: String): String = try {
             API_DATE_FORMAT.parse(apiDate.take(19))?.let { DISPLAY_DATE_FORMAT.format(it) } ?: apiDate
