@@ -15,6 +15,8 @@ import androidx.lifecycle.lifecycleScope
 import com.example.soundmatch.R
 import com.example.soundmatch.databinding.ActivityUserProfileBinding
 import com.example.soundmatch.logic.ArtistName
+import com.example.soundmatch.logic.TrackPicker
+import com.example.soundmatch.model.ArtistSong
 import com.example.soundmatch.model.Genre
 import com.example.soundmatch.model.Instrument
 import com.example.soundmatch.model.Situation
@@ -36,6 +38,7 @@ class UserProfileActivity : AppCompatActivity() {
     // Resultado da busca do artista no iTunes. Fica null até a busca terminar.
     private var foundArtist: String? = null
     private var artistGenre: Genre? = null
+    private var artistSongs: List<ArtistSong> = emptyList()
     private var artistSearched = false
 
     private val steps: List<View> by lazy {
@@ -165,7 +168,8 @@ class UserProfileActivity : AppCompatActivity() {
         return ok
     }
 
-    // Busca no iTunes uma música do artista: dela vêm o nome oficial, o gênero e uma capa.
+    // Uma busca só no iTunes: o 1º resultado dá o nome oficial, o gênero e a capa,
+    // e os outros viram as opções da 1ª pergunta do quiz.
     private fun searchArtist() {
         val typed = binding.etArtist.text.toString().trim()
         hideKeyboard()
@@ -174,12 +178,15 @@ class UserProfileActivity : AppCompatActivity() {
             binding.progressArtist.visibility = View.VISIBLE
             binding.btnNext.isEnabled = false
             try {
-                val track = RetrofitClient.itunes.search(typed).results.firstOrNull()
+                val results = RetrofitClient.itunes.search(typed, limit = ARTIST_SEARCH_LIMIT).results
+                val track = results.firstOrNull()
                 if (track?.artistName == null) {
                     showArtistNotFound()
                 } else {
-                    foundArtist = ArtistName.clean(typed, track.artistName)
+                    val artist = ArtistName.clean(typed, track.artistName)
+                    foundArtist = artist
                     artistGenre = track.primaryGenreName?.let { Genre.fromITunes(it) }
+                    artistSongs = TrackPicker.artistSongs(results, artist)
                     showArtistCard(track.primaryGenreName.orEmpty())
                     track.artworkUrl100?.let { url ->
                         ImageLoader.load(ImageLoader.bigCover(url))?.let { binding.imgArtist.setImageBitmap(it) }
@@ -216,6 +223,7 @@ class UserProfileActivity : AppCompatActivity() {
     private fun showArtistNotFound() {
         foundArtist = null
         artistGenre = null
+        artistSongs = emptyList()
         binding.cardArtist.visibility = View.GONE
         binding.tvArtistNotFound.visibility = View.VISIBLE
     }
@@ -225,6 +233,7 @@ class UserProfileActivity : AppCompatActivity() {
         artistSearched = false
         foundArtist = null
         artistGenre = null
+        artistSongs = emptyList()
         binding.imgArtist.setImageResource(R.drawable.ic_vinyl)
         binding.cardArtist.visibility = View.GONE
         binding.tvArtistNotFound.visibility = View.GONE
@@ -242,7 +251,8 @@ class UserProfileActivity : AppCompatActivity() {
             favoriteArtist = foundArtist ?: binding.etArtist.text.toString().trim(),
             situation = situationChips.getValue(binding.chipGroupSituation.checkedChipId),
             instrument = instrumentChips[binding.chipGroupInstrument.checkedChipId],
-            artistGenre = artistGenre
+            artistGenre = artistGenre,
+            artistSongs = artistSongs
         )
         val intent = Intent(this, SoundQuizActivity::class.java)
             .putExtra(SoundQuizActivity.EXTRA_PROFILE, profile)
@@ -255,5 +265,6 @@ class UserProfileActivity : AppCompatActivity() {
         private const val STEP_SITUATION = 2
         private const val STEP_INSTRUMENT = 3
         private const val SUN_STEP_DP = 18f
+        private const val ARTIST_SEARCH_LIMIT = 25
     }
 }

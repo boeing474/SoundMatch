@@ -12,6 +12,7 @@ import androidx.core.content.IntentCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.soundmatch.R
 import com.example.soundmatch.databinding.ActivityResultBinding
+import com.example.soundmatch.logic.TrackPicker
 import com.example.soundmatch.model.RecommendationRequest
 import com.example.soundmatch.model.SoundResult
 import com.example.soundmatch.network.ImageLoader
@@ -67,9 +68,10 @@ class ResultActivity : AppCompatActivity() {
     private fun loadAlbumCover() {
         lifecycleScope.launch {
             try {
-                val track = RetrofitClient.itunes
-                    .search("${result.song.title} ${result.song.artist}")
-                    .results.firstOrNull() ?: return@launch
+                val results = RetrofitClient.itunes
+                    .search("${result.song.title} ${result.song.artist}", limit = COVER_SEARCH_LIMIT)
+                    .results
+                val track = TrackPicker.bestMatch(results, result.song.artist) ?: return@launch
 
                 track.collectionName?.let {
                     binding.tvAlbum.text = getString(R.string.result_album, it)
@@ -158,6 +160,7 @@ class ResultActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_RESULT = "extra_result"
+        private const val COVER_SEARCH_LIMIT = 10
         private const val YOUTUBE_SEARCH_URL = "https://www.youtube.com/results?search_query="
         private const val SPOTIFY_APP_URI = "spotify:search:"
         private const val SPOTIFY_WEB_URL = "https://open.spotify.com/search/"

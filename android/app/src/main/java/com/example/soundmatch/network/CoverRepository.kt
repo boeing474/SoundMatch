@@ -1,6 +1,7 @@
 package com.example.soundmatch.network
 
 import android.graphics.Bitmap
+import com.example.soundmatch.logic.TrackPicker
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -15,8 +16,8 @@ object CoverRepository {
         cache[key]?.let { return it }
 
         return try {
-            val artwork = RetrofitClient.itunes.search("$song $artist")
-                .results.firstOrNull()?.artworkUrl100 ?: return null
+            val results = RetrofitClient.itunes.search("$song $artist", limit = SEARCH_LIMIT).results
+            val artwork = TrackPicker.bestMatch(results, artist)?.artworkUrl100 ?: return null
             ImageLoader.load(ImageLoader.smallCover(artwork))?.also { cache[key] = it }
         } catch (e: IOException) {
             null   // sem conexão: o card fica com o vinil
@@ -24,4 +25,6 @@ object CoverRepository {
             null
         }
     }
+
+    private const val SEARCH_LIMIT = 10
 }
