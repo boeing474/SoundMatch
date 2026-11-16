@@ -49,10 +49,10 @@ MainActivity ──► UserProfileActivity ──► SoundQuizActivity ──►
 | # | Activity | O que faz | Views principais |
 |---|---|---|---|
 | 1 | `MainActivity` | Tela inicial: o disco de vinil nasce no horizonte e gira, e o título neon pulsa | ImageView, TextView, Button |
-| 2 | `UserProfileActivity` | Perfil em formato de conversa, uma pergunta por vez, em 4 passos: nome, artista favorito (buscado no iTunes e mostrado num card com capa e gênero), quando mais ouve música e instrumento. Tem "Passo X de 4", barra de progresso e Voltar / Continuar | EditText, Button, CheckBox (Chip), CardView, ImageView, ProgressBar |
+| 2 | `UserProfileActivity` | Perfil em formato de conversa, uma pergunta por vez, em 4 passos: nome, artista favorito (buscado no iTunes e mostrado num card com capa e gênero), quando mais ouve música e instrumento. Uma frase usa a resposta anterior ("Prazer, Pedro."), e no rodapé o sol sobe a cada passo. Tem "Passo X de 4", barra de progresso e Voltar / Continuar | EditText, Button, CheckBox (Chip), CardView, ImageView, ProgressBar |
 | 3 | `SoundQuizActivity` | 3 perguntas com 5 opções cada, uma por perfil. A 1ª cita a situação escolhida e a 2ª cita o artista favorito. Depois vêm os "outros estilos que você curte". A barra avança a cada resposta | RadioButton, CheckBox, CardView, ProgressBar |
 | 4 | `ResultActivity` | Estilo "tocando agora": capa do álbum, música, perfil com a cor do gênero, % de match e explicação. Curti / Não curti salva na API; abre no Spotify ou no YouTube e compartilha | ImageView, CardView, ProgressBar, Button |
-| 5 | `HistoryActivity` | Lista as descobertas salvas, com a faixa na cor do perfil. Permite mudar a avaliação (PUT) e excluir, com confirmação em AlertDialog (DELETE) | RecyclerView, CardView, ProgressBar |
+| 5 | `HistoryActivity` | Lista de músicas salvas, cada uma com a capa (buscada no iTunes) contornada na cor do perfil. O coração muda a avaliação (PUT) e a lixeira exclui, com confirmação em AlertDialog (DELETE) | RecyclerView, CardView, ProgressBar |
 
 **9 tipos de Views usados** (o edital exige 6): TextView, EditText, Button, ImageView, CheckBox (e Chip, que é um CheckBox), RadioButton, RecyclerView, ProgressBar e CardView.
 
@@ -73,7 +73,7 @@ MainActivity ──► UserProfileActivity ──► SoundQuizActivity ──►
 
 **Identidade visual:** "Neon Miami / synthwave anos 80".
 - Tema escuro, com magenta `#FF2A6D` e ciano `#05D9E8`.
-- Fonte retrô **Monoton** (licença OFL) nos títulos.
+- Fonte retrô **Monoton** (licença OFL) no título da tela inicial; nas outras telas, títulos limpos com uma linha em degradê magenta → ciano.
 - Sol listrado, grade e disco de vinil desenhados em Vector Drawable.
 - Cada perfil tem a sua cor: pop magenta, rock laranja, hip-hop amarelo, eletrônica ciano e brasileira verde.
 

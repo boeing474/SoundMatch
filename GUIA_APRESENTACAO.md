@@ -33,9 +33,10 @@ A API está no Render (https://soundmatch-api-dnh5.onrender.com). Não precisa d
    - Tentar continuar com o nome vazio: o campo fica em erro (**feedback visual**).
    - Digitar um artista (ex.: BTS) e tocar em **"Buscar artista"**:
      - o app consulta o **iTunes**;
-     - aparece um card com a capa, o nome oficial e o gênero ("K-pop").
+     - aparece um card com a capa, o nome oficial e o gênero ("K-pop"), com contorno na cor do perfil.
    - Escolher a situação e o instrumento nos chips (o `Chip` é subclasse de `CheckBox`).
    - Mostrar o "Passo X de 4" com a `ProgressBar`, e que o voltar do celular volta um passo.
+   - Mostrar a frase que usa a resposta anterior ("Prazer, Pedro.") e o sol do rodapé subindo a cada passo (`moveSun`, com `animate().translationY`).
    - Avançar → *Intent explícita com `putExtra`* levando o `UserProfile`.
 3. **Quiz**
    - Mostrar que as perguntas citam o perfil: a situação na 1ª e o artista favorito na 2ª.
@@ -55,9 +56,9 @@ A API está no Render (https://soundmatch-api-dnh5.onrender.com). Não precisa d
 5. **Swagger**
    - Abrir https://soundmatch-api-dnh5.onrender.com/docs e mostrar o `GET /recommendations` com o registro que acabou de ser salvo, o que prova a persistência no banco.
 6. **Histórico**
-   - Voltar ao início e abrir **"Minhas Descobertas"** (**GET**). Cada card tem a faixa na cor do perfil.
-   - **Mudar para Não curti** (**PUT**).
-   - **Excluir**, com confirmação em `AlertDialog` (**DELETE**).
+   - Voltar ao início e abrir **"Minhas Descobertas"** (**GET**). Cada música aparece com a capa contornada na cor do perfil.
+   - Tocar no **coração** para mudar a avaliação (**PUT**).
+   - Tocar na **lixeira** para excluir, com confirmação em `AlertDialog` (**DELETE**).
 7. **Código**
    - Abrir `SoundMatchEngine.kt` e explicar a votação.
    - Mostrar os 12 testes passando (`SoundMatchEngineTest`, botão Run).
@@ -126,6 +127,7 @@ Resposta 201 com o JSON salvo → Retrofit converte em RecommendationResponse �
 | `network/ITunesApi` | Busca na iTunes Search API (gênero do artista e capa) |
 | `network/RetrofitClient` | Instâncias do Retrofit: a nossa API (`BASE_URL`) e o iTunes |
 | `network/ImageLoader` | Baixa a capa em `Dispatchers.IO` e devolve o `Bitmap` |
+| `network/CoverRepository` | Busca a capa de cada música do histórico no iTunes e guarda num cache, para não baixar de novo ao rolar a lista |
 | `model/Genre` | Os 5 perfis: título, descrição, cor e palavras-chave para traduzir o gênero do iTunes |
 | `model/Situation`, `Instrument` | Situação e instrumento do perfil (o instrumento sabe "em que prestar atenção") |
 | `model/UserProfile`, `SoundResult` | Dados que passam entre as telas (`Serializable`) |

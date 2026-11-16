@@ -165,10 +165,10 @@ Código copiado da internet ou de colegas leva nota zero, e eu preciso demonstra
 
 ### Ainda a decidir com o estudante (próximos passos, nesta ordem)
 1. **Perguntas do quiz: o estudante ainda acha genéricas.** Ideia escolhida por ele: a **1ª pergunta usa músicas reais do artista favorito** ("Qual dessas do BTS você mais ouve?"; a mesma busca do iTunes com `limit=25` filtrada pelo artista devolve as mais conhecidas, com ano e gênero). Ele quer que **a música escolhida influencie a recomendação, mas NÃO pelo ano**. Também **não gostou** da proposta "O que mais te prende em Dynamite? voz/batida/guitarra/baixo/teclados". Ainda é preciso propor outra forma, e conversar antes de programar.
-2. **Design:** o estudante sente que o design ainda não chegou no que ele quer. Trabalhar **uma tela por vez**, com print (`adb screencap`) e opções visuais antes de mexer.
+2. ✅ **Design (16/11):** A) synthwave contido (Monoton só na Main, títulos sans-serif-black + `HorizonLine` em degradê, cards sem contorno); B) Histórico como lista de músicas (capa do iTunes via `network/CoverRepository`, coração = PUT, lixeira = DELETE); C) Perfil novo (céu/sol/chão no rodapé com os botões por cima, sol sobe a cada passo em `moveSun`, frase `tvLead` com a resposta anterior, card do artista na cor do gênero). Prints e README/guia atualizados.
 3. ✅ README e `GUIA_APRESENTACAO.md` atualizados para gêneros/votação/% de match (16/11), com 6 prints em `docs/screenshots/` tirados no celular. `LEIA-ME.txt` apagado.
 4. ✅ Commit e push da reforma e da documentação (repositório público). API publicada no Render em 16/11 e app apontando para ela.
-5. Mockup do novo Perfil (botões fixos embaixo, sol + grade no rodapé subindo a cada passo, frase que usa a resposta anterior: "Prazer, Pedro."): https://claude.ai/artifact/B7KUviGeVDxj1Vw9NfRrFj (passos 1–3 prontos, falta o 4). Retomar depois da entrega.
+5. ✅ Mockup do novo Perfil (https://claude.ai/artifact/B7KUviGeVDxj1Vw9NfRrFj) implementado.
 6. Notado e não corrigido: o quiz mostra "Passo 2 de 2" (o perfil agora tem 4 passos); no Resultado, "outros estilos" pode repetir o próprio perfil vencedor.
 - Adiado: Top 3 músicas favoritas, swipe estilo Tinder.
 
@@ -179,4 +179,5 @@ Código copiado da internet ou de colegas leva nota zero, e eu preciso demonstra
 3. ✅ Lógica de recomendação + SoundQuizActivity + ResultActivity + testes
 4. ✅ Retrofit (POST/GET/PUT/DELETE) + HistoryActivity/HistoryAdapter com AlertDialog
 5. ✅ README.md + GUIA_APRESENTACAO.md (atualizados em 16/11)
-6. ✅ Reforma de 16/11 (gêneros + votação + % de match + perfil em passos + Curti/Não curti) com commit, build e testes passando. Pendentes: push, perguntas do quiz e design.
+7. ✅ Redesign A/B/C (synthwave contido, Histórico em lista, Perfil com pôr do sol) com prints novos e push.
+6. ✅ Reforma de 16/11 (gêneros + votação + % de match + perfil em passos + Curti/Não curti) com commit, build e testes passando. Pendentes: perguntas do quiz.
