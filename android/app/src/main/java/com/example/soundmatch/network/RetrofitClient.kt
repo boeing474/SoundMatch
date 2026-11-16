@@ -1,5 +1,7 @@
 package com.example.soundmatch.network
 
+import java.util.concurrent.TimeUnit
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -11,13 +13,22 @@ object RetrofitClient {
 
     private const val ITUNES_URL = "https://itunes.apple.com/"
 
-    val api: SoundMatchApi by lazy { create(BASE_URL) }
+    // No plano grátis, o Render "dorme" a API e leva até ~1 min para acordar.
+    // O padrão do OkHttp (10 s) desistiria antes disso.
+    private val apiClient = OkHttpClient.Builder()
+        .connectTimeout(60, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .build()
 
-    val itunes: ITunesApi by lazy { create(ITUNES_URL) }
+    val api: SoundMatchApi by lazy { create(BASE_URL, apiClient) }
 
-    private inline fun <reified T> create(baseUrl: String): T =
+    // O iTunes fica com o tempo padrão: se demorar, o app segue sem capa.
+    val itunes: ITunesApi by lazy { create(ITUNES_URL, OkHttpClient()) }
+
+    private inline fun <reified T> create(baseUrl: String, client: OkHttpClient): T =
         Retrofit.Builder()
             .baseUrl(baseUrl)
+            .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(T::class.java)
