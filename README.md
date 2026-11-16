@@ -4,11 +4,12 @@ Aplicativo Android nativo (Kotlin + XML Views) integrado a uma **API REST em Fas
 
 A ideia é recomendar **uma música nova, do estilo que é a cara da pessoa**. Funciona assim:
 - A pessoa conta o nome, o artista que mais ouve, quando mais ouve música e se toca algum instrumento.
-- O app busca o artista no iTunes para descobrir o gênero dele.
-- A pessoa responde a um quiz curto.
-- Cada resposta vira um voto em um de **5 perfis** (Pop & K-pop, Rock & Alternativo, Hip-hop & R&B, Eletrônica e Música Brasileira).
-- O perfil mais votado ganha, e o app mostra:
-  - o **% de match**, que é quanto das respostas apontou para esse perfil;
+- O app busca o artista no iTunes para descobrir o gênero dele e as músicas mais conhecidas.
+- No quiz, a pessoa escolhe qual música desse artista colocaria pra tocar na situação dela, a **energia** que quer ouvir agora (Porradeira, Dançante, Pra cantar junto, Sofrência, Viajada ou De boa) e outros estilos que curte.
+- O artista e as respostas votam em um de **5 perfis** (Pop & K-pop, Rock & Alternativo, Hip-hop & R&B, Eletrônica e Música Brasileira), e a energia escolhe a música dentro do perfil.
+- Com o **Me surpreenda** ligado, a descoberta vem de um dos estilos marcados, fora do de sempre.
+- O app mostra:
+  - o **% de match**, que é quanto das respostas apontou para esse perfil (na surpresa, a frase "Fora da sua zona de conforto");
   - uma **música recomendada**, sempre de um artista diferente do favorito;
   - a capa do álbum;
   - uma explicação do porquê da escolha.
@@ -50,11 +51,11 @@ MainActivity ──► UserProfileActivity ──► SoundQuizActivity ──►
 |---|---|---|---|
 | 1 | `MainActivity` | Tela inicial: o disco de vinil nasce no horizonte e gira, e o título neon pulsa | ImageView, TextView, Button |
 | 2 | `UserProfileActivity` | Perfil em formato de conversa, uma pergunta por vez, em 4 passos: nome, artista favorito (buscado no iTunes e mostrado num card com capa e gênero), quando mais ouve música e instrumento. Uma frase usa a resposta anterior ("Prazer, Pedro."), e no rodapé o sol sobe a cada passo. Tem "Passo X de 4", barra de progresso e Voltar / Continuar | EditText, Button, CheckBox (Chip), CardView, ImageView, ProgressBar |
-| 3 | `SoundQuizActivity` | 3 perguntas com 5 opções cada, uma por perfil. A 1ª cita a situação escolhida e a 2ª cita o artista favorito. Depois vêm os "outros estilos que você curte". A barra avança a cada resposta | RadioButton, CheckBox, CardView, ProgressBar |
+| 3 | `SoundQuizActivity` | 1ª pergunta com músicas reais do artista favorito, para a situação escolhida ("Qual dessas de BTS você colocaria pra tocar numa festa com amigos?"); 2ª pergunta com as 6 energias; outros estilos que você curte e o Switch "Me surpreenda". A barra avança a cada resposta | RadioButton, CheckBox, Switch, CardView, ProgressBar |
 | 4 | `ResultActivity` | Estilo "tocando agora": capa do álbum, música, perfil com a cor do gênero, % de match e explicação. Curti / Não curti salva na API; abre no Spotify ou no YouTube e compartilha | ImageView, CardView, ProgressBar, Button |
 | 5 | `HistoryActivity` | Lista de músicas salvas, cada uma com a capa (buscada no iTunes) contornada na cor do perfil. O coração muda a avaliação (PUT) e a lixeira exclui, com confirmação em AlertDialog (DELETE) | RecyclerView, CardView, ProgressBar |
 
-**9 tipos de Views usados** (o edital exige 6): TextView, EditText, Button, ImageView, CheckBox (e Chip, que é um CheckBox), RadioButton, RecyclerView, ProgressBar e CardView.
+**10 tipos de Views usados** (o edital exige 6): TextView, EditText, Button, ImageView, CheckBox (e Chip, que é um CheckBox), RadioButton, Switch, RecyclerView, ProgressBar e CardView.
 
 ---
 
@@ -193,24 +194,21 @@ users (1) ────────< (N) recommendations
 
 ## Lógica de recomendação
 
-O código fica em `logic/SoundMatchEngine.kt`, sem nada de Android, e é coberto por 12 testes unitários.
+O código fica em `logic/SoundMatchEngine.kt`, sem nada de Android, e é coberto por testes unitários (`SoundMatchEngineTest` e `TrackPickerTest`, 20 no total). Em uma frase: **o artista e as respostas votam no estilo, o "Me surpreenda" decide se a pessoa fica nele, e a energia escolhe a música.**
 
-1. **Votos.** Cada resposta é um voto em um dos 5 perfis:
+1. **Votos.** Cada um vale votos em um dos 5 perfis:
    - o gênero do artista favorito (vindo do iTunes) vale **3 votos**;
-   - cada pergunta do quiz vale 1 voto (a opção N vota no perfil N);
+   - a música escolhida na 1ª pergunta vale 1 voto, no gênero dela no iTunes (para quem varia de estilo, como Anitta, isso faz diferença);
    - cada estilo marcado em "outros estilos que você curte" vale 1 voto.
-2. **Perfil.** Ganha o mais votado. Em caso de empate, ganha o gênero do artista favorito.
-3. **% de match** = votos do perfil vencedor ÷ total de votos × 100, arredondado e limitado entre 10 e 100.
-   Exemplo dos prints:
-   - BTS (K-pop) dá 3 votos para Pop;
-   - as 3 respostas do quiz dão mais 3 votos para Pop;
-   - marcar "Eletrônica" dá 1 voto para Eletrônica;
-   - Pop fica com 6 de 7 votos, ou seja, **86%**.
-4. **Música.** O catálogo (`logic/SongCatalog.kt`) tem 5 músicas por perfil, 25 no total. Em cada perfil, cada música destaca um instrumento (voz, bateria, baixo, teclado e guitarra). O app:
+2. **Perfil.** Ganha o mais votado. No empate, ganha o gênero do artista; depois, o da música da 1ª pergunta.
+3. **% de match** = votos do perfil ÷ total de votos × 100, arredondado e limitado entre 10 e 100. Exemplo: BTS (3 votos Pop) + Dynamite (1 voto Pop) + marcar Eletrônica (1 voto) = Pop com 4 de 5 votos, **80%**. Quem marca muitos estilos tem um gosto mais espalhado, e o % cai.
+4. **Me surpreenda.** Entre os estilos marcados, pega o mais votado que não seja o de sempre. No resultado, o % dá lugar à frase "Fora da sua zona de conforto". Se nenhum outro estilo foi marcado, o quiz pede para marcar.
+5. **Música.** O catálogo (`logic/SongCatalog.kt`) tem 12 músicas por perfil, 60 no total: **2 de cada energia**, e os 5 instrumentos aparecem em todo perfil. O app:
+   - fica com as 2 músicas da energia pedida;
    - **tira o artista favorito**, para ser sempre uma descoberta;
    - para quem toca, escolhe a música em que o seu instrumento se destaca;
    - para os outros, faz uma escolha fixa pelo nome da pessoa (a mesma pessoa sempre recebe a mesma música).
-5. **Explicação.** Cita o nome, o artista favorito, o perfil e o artista da descoberta. Para quem toca, diz em que prestar atenção (ex.: "Você toca baixo: repare na linha de baixo de Espresso").
+6. **Explicação.** Cita o nome, o artista, a música escolhida, a energia e a descoberta. Exemplo: "Pedro, você ouve BTS e colocaria Dynamite pra tocar numa festa com amigos: seu perfil é Pop & K-pop. Você pediu uma música dançante, então a descoberta é Espresso, de Sabrina Carpenter. Você toca baixo: repare na linha de baixo de Espresso."
 
 O gênero do iTunes vira um dos 5 perfis por palavras-chave (`Genre.fromITunes`). Alguns exemplos:
 - "K-pop" → Pop;
@@ -219,7 +217,7 @@ O gênero do iTunes vira um dos 5 perfis por palavras-chave (`Genre.fromITunes`)
 - "Dance" → Eletrônica;
 - "Sertanejo" → Brasileira.
 
-Se o artista não for encontrado, ou não houver internet, o perfil sai só das respostas do quiz.
+Se o artista não for encontrado, ou não houver internet, o artista não vota e a 1ª pergunta vira uma pergunta reserva, com 5 músicas de 5 estilos.
 
 ---
 
@@ -230,7 +228,7 @@ Se o artista não for encontrado, ou não houver internet, o perfil sai só das 
 | 5 Activities | `ui/` (Main, UserProfile, SoundQuiz, Result, History) |
 | Intents explícitas | Main → Perfil / Histórico, Perfil → Quiz, Quiz → Resultado (com `putExtra`) |
 | Intent implícita | `ResultActivity`: `ACTION_VIEW` (YouTube e Spotify) e `ACTION_SEND` (compartilhar) |
-| 6+ Views | 9 tipos (lista acima) |
+| 6+ Views | 10 tipos (lista acima) |
 | API REST + Swagger | `backend/` + `/docs` |
 | CRUD + JSON | POST, GET, PUT e DELETE via Retrofit (`network/SoundMatchApi.kt`) |
 | Banco relacional | SQLite com `users` 1:N `recommendations` (FK) |

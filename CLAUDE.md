@@ -96,7 +96,7 @@ Código copiado da internet ou de colegas leva nota zero, e eu preciso demonstra
   - `requirements.txt`: dependências.
 - **Tabelas:**
   - `users`: `id`, `name`, `favorite_artist`, `listening_mode`, `plays_instrument`, `created_at`.
-  - `recommendations`: `id`, `user_id` (FK → `users.id`), `score` (10–100), `archetype`, `recommended_song`, `song_artist`, `subgenres`, `liked` (bool), `created_at`.
+  - `recommendations`: `id`, `user_id` (FK → `users.id`), `score` (10–100), `archetype`, `recommended_song`, `song_artist`, `subgenres`, `liked` (bool), `surprise` (bool, padrão false, veio do Me surpreenda), `created_at`.
   - `users.listening_mode` guarda a **situação** escolhida no perfil (ex.: "Academia").
   - **Os nomes das colunas ficaram da 1ª versão:** `archetype` guarda o perfil/gênero (ex.: "Pop & K-pop"), `score` guarda o **% de match** (10–100) e `subgenres` guarda os "outros estilos" marcados. O backend não mudou na troca para gêneros. Isso está comentado em `model/ApiModels.kt`.
   - Se o schema mudar, apague o `soundmatch.db` (é gitignored). A API recria o banco ao iniciar. Ele já foi recriado com a coluna `liked`.
@@ -131,8 +131,8 @@ Código copiado da internet ou de colegas leva nota zero, e eu preciso demonstra
    2. "Qual artista você mais ouve?" → botão "Buscar artista" consulta o **iTunes** e mostra um card (capa, nome oficial via `logic/ArtistName.kt`, gênero do iTunes). Sem internet ou não encontrado: aviso e segue só com o texto digitado (`artistGenre = null`).
    3. "Quando você mais ouve música?" (`ChipGroup`: Relaxando em casa, Academia, Na rua, Festa com amigos, Estudando)
    4. "Você toca algum instrumento?" (`ChipGroup`: Não toco, Guitarra, Bateria, Baixo, Teclado, Canto)
-   - **Spinner e Switch saíram** (ainda são 9 tipos de View: TextView, EditText, Button, ImageView, CheckBox/Chip, RadioButton, RecyclerView, ProgressBar, CardView; o edital pede 6).
-3. **SoundQuizActivity:** tela com rolagem, 3 cards com `RadioGroup` de **5 opções (uma por gênero, na ordem do enum `Genre`)** + "Outros estilos que você curte" em `CheckBox` (um por gênero) + `ProgressBar`. Perguntas atuais: música para a situação (`rgSongPick`), o que prende no artista favorito (`rgArtistPick`), disco que ouviria inteiro (`rgAlbumPick`). **O estudante ainda acha as perguntas genéricas (ver "Ainda a decidir").**
+   - **Spinner saiu**; o **Switch voltou** no quiz (Me surpreenda). São 10 tipos de View: TextView, EditText, Button, ImageView, CheckBox/Chip, RadioButton, Switch, RecyclerView, ProgressBar, CardView (o edital pede 6).
+3. **SoundQuizActivity (refeita em 16/11):** 1ª pergunta "Qual dessas de BTS você colocaria pra tocar numa festa com amigos?" com as 4 músicas do artista (`UserProfile.artistSongs`, vindas da busca do perfil com `limit=25` filtrada por `logic/TrackPicker`; sem artista, pergunta reserva com 5 músicas de 5 gêneros). 2ª pergunta: as **6 energias** (`model/Energy`: Porradeira, Dançante, Pra cantar junto, Sofrência, Viajada, De boa; nome em negrito + `hint`). Opções criadas no Kotlin com `item_quiz_option.xml`. Depois "Outros estilos" (CheckBox) + **Switch Me surpreenda** (sem outro estilo marcado, Toast pede para marcar). Caption "Última parte".
 4. **ResultActivity:** estilo "tocando agora": capa grande (260dp, contorno na cor do perfil; iTunes, vinil como reserva), música, ícones Spotify/YouTube (Simple Icons, brancos), card do perfil com **"67% de match"** + "É quanto das suas respostas apontou para esse estilo, contando o seu artista favorito.", destaque do gênero, outros estilos, explicação. **"Curti" / "Não curti"** já salvam (POST com `liked`) com `ProgressBar`. Compartilhar (`ACTION_SEND`); YouTube/Spotify (`ACTION_VIEW`, Spotify tenta `spotify:search:` e cai no web).
 5. **HistoryActivity:** `RecyclerView` + `CardView`, Curtiu (ciano)/Não curtiu (magenta), botão "Mudar para…" (PUT do `liked`), Excluir com `AlertDialog` (DELETE), estado vazio.
 
@@ -144,12 +144,12 @@ Código copiado da internet ou de colegas leva nota zero, e eu preciso demonstra
 
 ### Lógica de recomendação: votação por gênero (`logic/SoundMatchEngine.kt`)
 - **5 perfis** (`model/Genre.kt`, a ordem importa): POP "Pop & K-pop", ROCK "Rock & Alternativo", HIPHOP "Hip-hop & R&B", ELECTRONIC "Eletrônica", BRAZILIAN "Música Brasileira". `Genre.fromITunes(primaryGenreName)` mapeia por palavras-chave (busca Brasileira primeiro, Pop por último; ex.: "K-pop"→POP, "Metal"→ROCK, "Hip-Hop/Rap"→HIPHOP, "Dance"→ELECTRONIC, "Sertanejo"/"MPB"/"Pagode"→BRAZILIAN; "Reggae"→null).
-- **Votos:** gênero do artista favorito (iTunes) = **3 votos** (`ARTIST_VOTES`); cada pergunta do quiz = 1; cada estilo marcado = 1. Ganha o mais votado; **empate → gênero do artista**.
+- **Votos:** gênero do artista favorito (iTunes) = **3 votos** (`ARTIST_VOTES`); a música da 1ª pergunta = 1 voto no gênero dela no iTunes; cada estilo marcado = 1. Ganha o mais votado; **empate → gênero do artista, depois o da 1ª pergunta**. **Me surpreenda:** estilo marcado mais votado fora o de sempre (`surpriseGenre`); `SoundResult.surprise` esconde o % no resultado ("Fora da sua zona de conforto") e o histórico mostra "· surpresa".
 - **% de match** = votos do vencedor / total × 100, arredondado e limitado a 10–100 (substituiu o score "raiz → experimental", que o estudante achou sem sentido e com "cara de IA").
-- **Música** (`logic/SongCatalog.kt`: 5 por gênero, 25 no total, cada uma com `featured: Instrument` e um de cada instrumento por gênero; nenhum artista do catálogo aparece nas opções do quiz): exclui o artista favorito; quem toca recebe a música do seu instrumento; os outros, uma escolha fixa pelo hash do nome.
-- **Explicação:** cita o nome, o artista, o gênero, o artista da descoberta e, para quem toca, `Instrument.practice` + `focus` ("Você toca baixo: repare na linha de baixo de Espresso").
+- **Música** (`logic/SongCatalog.kt`: **12 por gênero, 60 no total, 2 de cada energia**, todos os instrumentos em cada gênero, todas conferidas no iTunes BR; nenhum artista do catálogo aparece na pergunta reserva): filtra pela energia pedida, exclui o artista favorito; quem toca recebe a música do seu instrumento; os outros, uma escolha fixa pelo hash do nome.
+- **Explicação:** cita o nome, o artista, a música escolhida ("colocaria Dynamite pra tocar numa festa com amigos"), o gênero, a energia (`Energy.phrase`), a descoberta e, para quem toca, `Instrument.practice` + `focus`. Na surpresa: "você quis sair da zona de conforto: em vez de X, a descoberta vem de Y".
 - **iTunes** (`network/ITunesApi.search`, `country=BR`, que acerta mais os gêneros brasileiros); `network/ImageLoader` (capa 600x600, download em `Dispatchers.IO`).
-- **Testes:** `SoundMatchEngineTest.kt`, 12 testes (votação, empate, sem internet, match mínimo, exclusão do favorito, instrumento, determinismo, explicação, `fromITunes`, `ArtistName.clean`). Todos passando.
+- **Testes:** `SoundMatchEngineTest.kt` (16: votação, empate, surpresa, energia, exclusão do favorito, instrumento, determinismo, explicação, catálogo, `fromITunes`, `ArtistName.clean`) + `TrackPickerTest.kt` (4). Capas do resultado/histórico usam `TrackPicker.bestMatch` (artista certo, versão de estúdio).
 
 ### Estrutura do código (decidida com a delegação do estudante)
 - **Pacotes** em `com.example.soundmatch`: `ui/` (Activities), `adapter/` (RecyclerView), `network/` (Retrofit + ImageLoader), `model/` (dados), `logic/` (regra de negócio, sem Android).
@@ -164,12 +164,12 @@ Código copiado da internet ou de colegas leva nota zero, e eu preciso demonstra
 - **Ambiente:** o projeto Android é aberto no Android Studio (Windows) a partir de uma **cópia** em `C:\Users\pedro\AndroidStudioProjects\SoundMatch`. Depois de editar no WSL, sincronizar com `rsync -a --delete --exclude build --exclude .gradle --exclude .idea --exclude local.properties android/ /mnt/c/Users/pedro/AndroidStudioProjects/SoundMatch/`. Build: `gradlew.bat --no-daemon` com `JAVA_HOME=C:\Users\pedro\.jdks\temurin-17.0.21` (o Java 25 do AS não roda o Gradle 8.9). O backend roda no WSL (venv com Python 3.14).
 
 ### Ainda a decidir com o estudante (próximos passos, nesta ordem)
-1. **Perguntas do quiz: o estudante ainda acha genéricas.** Ideia escolhida por ele: a **1ª pergunta usa músicas reais do artista favorito** ("Qual dessas do BTS você mais ouve?"; a mesma busca do iTunes com `limit=25` filtrada pelo artista devolve as mais conhecidas, com ano e gênero). Ele quer que **a música escolhida influencie a recomendação, mas NÃO pelo ano**. Também **não gostou** da proposta "O que mais te prende em Dynamite? voz/batida/guitarra/baixo/teclados". Ainda é preciso propor outra forma, e conversar antes de programar.
+1. ✅ **Perguntas do quiz (16/11):** a partir da análise do prompt do Gemini, ficou só a ideia de energia + funil; quiz refeito em 5 etapas (catálogo, motor, iTunes, tela, campo `surprise`).
 2. ✅ **Design (16/11):** A) synthwave contido (Monoton só na Main, títulos sans-serif-black + `HorizonLine` em degradê, cards sem contorno); B) Histórico como lista de músicas (capa do iTunes via `network/CoverRepository`, coração = PUT, lixeira = DELETE); C) Perfil novo (céu/sol/chão no rodapé com os botões por cima, sol sobe a cada passo em `moveSun`, frase `tvLead` com a resposta anterior, card do artista na cor do gênero). Prints e README/guia atualizados.
 3. ✅ README e `GUIA_APRESENTACAO.md` atualizados para gêneros/votação/% de match (16/11), com 6 prints em `docs/screenshots/` tirados no celular. `LEIA-ME.txt` apagado.
 4. ✅ Commit e push da reforma e da documentação (repositório público). API publicada no Render em 16/11 e app apontando para ela.
 5. ✅ Mockup do novo Perfil (https://claude.ai/artifact/B7KUviGeVDxj1Vw9NfRrFj) implementado.
-6. Notado e não corrigido: o quiz mostra "Passo 2 de 2" (o perfil agora tem 4 passos); no Resultado, "outros estilos" pode repetir o próprio perfil vencedor.
+6. ✅ "Passo 2 de 2" virou "Última parte"; "outros estilos" não repete mais o perfil vencedor.
 - Adiado: Top 3 músicas favoritas, swipe estilo Tinder.
 
 ## 6. Status das Etapas
@@ -180,4 +180,5 @@ Código copiado da internet ou de colegas leva nota zero, e eu preciso demonstra
 4. ✅ Retrofit (POST/GET/PUT/DELETE) + HistoryActivity/HistoryAdapter com AlertDialog
 5. ✅ README.md + GUIA_APRESENTACAO.md (atualizados em 16/11)
 7. ✅ Redesign A/B/C (synthwave contido, Histórico em lista, Perfil com pôr do sol) com prints novos e push.
-6. ✅ Reforma de 16/11 (gêneros + votação + % de match + perfil em passos + Curti/Não curti) com commit, build e testes passando. Pendentes: perguntas do quiz.
+8. ✅ Quiz novo (músicas do artista + 6 energias + Me surpreenda + `surprise` na API) com push. Faltam os prints novos do quiz/resultado no README.
+6. ✅ Reforma de 16/11 (gêneros + votação + % de match + perfil em passos + Curti/Não curti) com commit, build e testes passando. Perguntas do quiz refeitas depois (ver item 8).

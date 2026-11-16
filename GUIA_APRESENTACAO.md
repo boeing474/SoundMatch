@@ -39,16 +39,17 @@ A API está no Render (https://soundmatch-api-dnh5.onrender.com). Não precisa d
    - Mostrar a frase que usa a resposta anterior ("Prazer, Pedro.") e o sol do rodapé subindo a cada passo (`moveSun`, com `animate().translationY`).
    - Avançar → *Intent explícita com `putExtra`* levando o `UserProfile`.
 3. **Quiz**
-   - Mostrar que as perguntas citam o perfil: a situação na 1ª e o artista favorito na 2ª.
-   - Explicar que cada pergunta tem 5 opções, uma por perfil.
-   - Responder: a `ProgressBar` avança, e o botão só habilita quando as 3 perguntas têm resposta.
+   - Mostrar que a 1ª pergunta usa o perfil: músicas reais do artista (vindas do iTunes no passo do artista) para a situação escolhida.
+   - Escolher a energia (ex.: Dançante) e explicar que ela escolhe a música dentro do estilo.
+   - Responder: a `ProgressBar` avança, e o botão só habilita quando as 2 perguntas têm resposta.
+   - (Opcional) Ligar o **Me surpreenda** sem marcar estilo: o app pede para marcar outro estilo (feedback visual).
 4. **Resultado**
    - Mostrar a capa em destaque (contorno na cor do perfil), a música e o **% de match**.
    - Explicar a conta. Exemplo:
      - BTS = 3 votos para Pop;
-     - 3 respostas = mais 3 votos para Pop;
+     - Dynamite (gênero K-pop no iTunes) = mais 1 voto para Pop;
      - marcar Eletrônica = 1 voto para Eletrônica;
-     - total: Pop tem 6 de 7 votos = 86%.
+     - total: Pop tem 4 de 5 votos = 80%.
    - Mostrar o card **"Por que essa música?"** (processamento dos dados).
    - Tocar em **YouTube** ou **Spotify** → *Intent implícita `ACTION_VIEW`*. O Spotify abre direto no app; se ele não estiver instalado, abre no navegador.
    - Tocar em **"Compartilhar"** → *Intent implícita `ACTION_SEND`*.
@@ -85,7 +86,7 @@ Para achar rápido no Android Studio: Ctrl+Shift+F (busca no projeto) ou Ctrl+N 
 Onde está cada tipo de View:
 - `TextView`, `ImageView` e `Button`: `activity_main.xml`;
 - `EditText` (`TextInputEditText`), `Chip` (subclasse de `CheckBox`), `CardView` e `ProgressBar`: `activity_user_profile.xml`;
-- `RadioButton` e `CheckBox`: `activity_sound_quiz.xml`;
+- `RadioButton` (criados no Kotlin a partir de `item_quiz_option.xml`), `CheckBox` e `Switch`: `activity_sound_quiz.xml`;
 - `RecyclerView`: `activity_history.xml`.
 
 ---
@@ -124,17 +125,19 @@ Resposta 201 com o JSON salvo → Retrofit converte em RecommendationResponse �
 | `ui/HistoryActivity` | GET, PUT (muda a avaliação) e DELETE (com confirmação em AlertDialog) |
 | `adapter/HistoryAdapter` | Transforma cada registro da API em um card do RecyclerView (`ListAdapter` + `DiffUtil`) |
 | `network/SoundMatchApi` | Interface Retrofit: um método por endpoint |
-| `network/ITunesApi` | Busca na iTunes Search API (gênero do artista e capa) |
+| `network/ITunesApi` | Busca na iTunes Search API (gênero e músicas do artista, capa) |
 | `network/RetrofitClient` | Instâncias do Retrofit: a nossa API (`BASE_URL`) e o iTunes |
 | `network/ImageLoader` | Baixa a capa em `Dispatchers.IO` e devolve o `Bitmap` |
 | `network/CoverRepository` | Busca a capa de cada música do histórico no iTunes e guarda num cache, para não baixar de novo ao rolar a lista |
 | `model/Genre` | Os 5 perfis: título, descrição, cor e palavras-chave para traduzir o gênero do iTunes |
+| `model/Energy` | As 6 energias do quiz, cada uma com o nome, a frase de critério e o trecho da explicação |
 | `model/Situation`, `Instrument` | Situação e instrumento do perfil (o instrumento sabe "em que prestar atenção") |
 | `model/UserProfile`, `SoundResult` | Dados que passam entre as telas (`Serializable`) |
-| `model/QuizAnswers`, `Song` | Respostas do quiz e música do catálogo |
+| `model/QuizAnswers`, `Song`, `ArtistSong` | Respostas do quiz, música do catálogo e música do artista favorito |
 | `model/ApiModels`, `ITunesModels` | Espelho do JSON das APIs (`@SerializedName`) |
-| `logic/SoundMatchEngine` | **Regra de negócio**: votos, perfil, % de match, escolha da música e explicação |
-| `logic/SongCatalog` | 25 músicas: 5 por perfil, cada uma destacando um instrumento |
+| `logic/SoundMatchEngine` | **Regra de negócio**: votos, perfil, Me surpreenda, % de match, escolha da música pela energia e explicação |
+| `logic/SongCatalog` | 60 músicas: 12 por perfil, 2 de cada energia, cada uma destacando um instrumento |
+| `logic/TrackPicker` | Filtra os resultados do iTunes: as músicas do artista para o quiz (sem versões ao vivo, remix ou repetidas) e a faixa certa para a capa |
 | `logic/ArtistName` | Acerta o nome do artista vindo do iTunes: usa a grafia oficial ("bts" vira "BTS") e separa parcerias ("LUDMILLA & Caio Luccas") |
 
 ### Recursos (`res/`)
@@ -165,19 +168,28 @@ Resposta 201 com o JSON salvo → Retrofit converte em RecommendationResponse �
 **Como o perfil é escolhido?**
 Por votação entre 5 perfis:
 - o gênero do artista favorito vale 3 votos;
-- cada pergunta do quiz vale 1 (a opção N vota no perfil N);
+- a música escolhida na 1ª pergunta vale 1, no gênero dela no iTunes;
 - cada estilo marcado vale 1.
 
 Ganha o mais votado. No empate, ganha o gênero do artista favorito, porque é a informação mais forte sobre o gosto da pessoa.
 
+**Se a 1ª pergunta é sobre músicas do próprio artista, por que ela vota?**
+Porque o iTunes informa o gênero de cada música, não só do artista. Para BTS dá sempre K-pop, mas para quem varia, como Anitta (Pop, Brasileira, Latina), a música escolhida mostra qual lado a pessoa curte. Ela também aparece na explicação ("você colocaria Dynamite pra tocar numa festa").
+
+**O que a energia faz?**
+Escolhe a música dentro do estilo. Cada estilo tem 2 músicas de cada uma das 6 energias, então sempre existe uma música da energia pedida. Cada energia tem uma frase de critério (`Energy.hint`, ex.: "triste, de dor de cotovelo"), que é a mesma que aparece no quiz e a que usei para classificar as músicas.
+
+**Como funciona o Me surpreenda?**
+Entre os estilos marcados, o motor pega o mais votado que não seja o de sempre (`surpriseGenre`). Como esse estilo não foi o mais votado, o % não faz sentido, e o resultado mostra "Fora da sua zona de conforto". A API guarda `surprise = true`, e o histórico mostra "· surpresa" no lugar do %.
+
 **O que é o % de match?**
-É a parte dos votos que foi para o perfil vencedor: votos do vencedor ÷ total × 100, limitado entre 10 e 100. Se tudo apontou para Pop, dá 100%. Se as respostas se dividiram, o número cai.
+É a parte dos votos que foi para o perfil: votos do perfil ÷ total × 100, limitado entre 10 e 100. Se tudo apontou para Pop, dá 100%. Se a pessoa marcou vários outros estilos, o gosto está mais espalhado e o número cai.
 
 **Por que o artista favorito vale 3 votos?**
-Porque é o dado mais concreto que a pessoa dá: é o que ela realmente ouve. Com peso 3, quem coloca BTS recebe uma recomendação do universo do pop e do K-pop, a não ser que todas as respostas do quiz apontem para outro lado.
+Porque é o dado mais concreto que a pessoa dá: é o que ela realmente ouve. Com peso 3, quem coloca BTS recebe uma recomendação do universo do pop e do K-pop, a não ser que a música escolhida e os estilos marcados apontem para outro lado.
 
 **E se o iTunes não achar o artista ou não houver internet?**
-O `artistGenre` fica `null` e o artista não vota. O perfil sai só do quiz, e o app continua funcionando (isso também está nos testes).
+O `artistGenre` fica `null`, o artista não vota e a lista de músicas dele vem vazia. A 1ª pergunta vira a pergunta reserva (5 músicas de 5 estilos, a opção N vota no perfil N), e o app continua funcionando (isso também está nos testes).
 
 **Como o gênero do iTunes vira um dos 5 perfis?**
 `Genre.fromITunes` procura palavras-chave no nome do gênero. Exemplos: "K-pop" → Pop; "Hip-Hop/Rap" → Hip-hop; "Sertanejo" → Brasileira.
@@ -185,7 +197,7 @@ O `artistGenre` fica `null` e o artista não vota. O perfil sai só do quiz, e o
 A busca começa pela Música Brasileira e deixa o Pop por último, porque "pop" aparece em muitos nomes (ex.: "Pop Brasileiro").
 
 **Como garante que a música é uma "descoberta"?**
-O `pickSong` tira do catálogo as músicas do artista favorito. Quem toca recebe a música em que o seu instrumento se destaca. Os outros recebem uma escolha fixa pelo nome, de modo que pessoas diferentes ganham músicas diferentes, mas a mesma pessoa sempre recebe a mesma.
+O `pickSong` fica com as músicas da energia pedida e tira as do artista favorito. Quem toca recebe a música em que o seu instrumento se destaca. Os outros recebem uma escolha fixa pelo nome, de modo que pessoas diferentes ganham músicas diferentes, mas a mesma pessoa sempre recebe a mesma.
 
 **Onde a API está rodando?**
 No Render, um serviço de hospedagem na nuvem. Ele baixa o código do GitHub (pasta `backend`), instala o `requirements.txt` e roda o `uvicorn` na porta que ele escolhe (`$PORT`). O app acessa por HTTPS. No plano grátis, o disco não é permanente, então o SQLite volta vazio quando a API reinicia. Para guardar os dados para sempre, eu trocaria por um PostgreSQL gerenciado, mudando só a `DATABASE_URL` no `database.py`.
@@ -207,6 +219,7 @@ Os nomes vêm da primeira versão do projeto. Hoje:
 - `score` guarda o % de match;
 - `archetype` guarda o perfil;
 - `subgenres` guarda os outros estilos marcados.
+- `surprise` (a mais nova) diz se a música veio do Me surpreenda.
 
 Mantive os nomes para não quebrar a API. Isso está comentado em `model/ApiModels.kt`.
 
