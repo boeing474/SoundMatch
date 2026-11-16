@@ -131,9 +131,9 @@
     <!-- Pergunta grande do perfil (uma por tela) -->
     <style name="Widget.SoundMatch.ProfileQuestion" parent="Widget.AppCompat.TextView">
         <item name="android:textColor">@color/text_primary</item>
-        <item name="android:textSize">26sp</item>
+        <item name="android:textSize">28sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:layout_marginTop">28dp</item>
+        <item name="android:layout_marginTop">8dp</item>
     </style>
 
     <!-- Botão redondo só com ícone (YouTube / Spotify): contorno neon, logo branco -->

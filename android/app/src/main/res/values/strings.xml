@@ -11,10 +11,13 @@
 
     <!-- ===== UserProfileActivity ===== -->
     <string name="profile_step">Passo %1$d de %2$d</string>
+    <string name="step_lead_name">Vamos montar o seu perfil.</string>
+    <string name="step_lead_artist">Prazer, %1$s.</string>
+    <string name="step_lead_situation">%1$s, boa escolha.</string>
+    <string name="step_lead_instrument">Última pergunta, %1$s.</string>
     <string name="step_name_question">Como você se chama?</string>
     <string name="hint_name">Seu nome</string>
     <string name="step_artist_question">Qual artista você mais ouve?</string>
-    <string name="step_artist_hint">Pode ser cantor, banda ou grupo, de qualquer estilo.</string>
     <string name="hint_artist">Artista ou banda</string>
     <string name="step_artist_not_found">Não achamos esse artista agora. Confira o nome ou continue assim mesmo.</string>
     <string name="artist_genre_unknown">%1$s (vamos usar só as suas respostas)</string>

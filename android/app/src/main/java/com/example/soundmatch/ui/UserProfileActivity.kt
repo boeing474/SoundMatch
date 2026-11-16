@@ -1,6 +1,7 @@
 package com.example.soundmatch.ui
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -8,6 +9,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
 import com.example.soundmatch.R
@@ -95,8 +97,29 @@ class UserProfileActivity : AppCompatActivity() {
         }
         binding.tvStep.text = getString(R.string.profile_step, step + 1, steps.size)
         binding.progressSteps.progress = step + 1
+        binding.tvLead.text = leadFor(step)
         binding.btnBack.visibility = if (step == 0) View.GONE else View.VISIBLE
+        moveSun(step)
         updateNextButton()
+    }
+
+    // A frase de cima usa a resposta anterior, como numa conversa.
+    private fun leadFor(step: Int): String {
+        val name = binding.etName.text.toString().trim()
+        val artist = foundArtist ?: binding.etArtist.text.toString().trim()
+        return when (step) {
+            STEP_ARTIST -> getString(R.string.step_lead_artist, name)
+            STEP_SITUATION -> getString(R.string.step_lead_situation, artist)
+            STEP_INSTRUMENT -> getString(R.string.step_lead_instrument, name)
+            else -> getString(R.string.step_lead_name)
+        }
+    }
+
+    // O sol começa quase escondido no horizonte e sobe um pouco a cada passo.
+    private fun moveSun(step: Int) {
+        val stepsLeft = steps.lastIndex - step
+        val offset = stepsLeft * SUN_STEP_DP * resources.displayMetrics.density
+        binding.imgSun.animate().translationY(offset).setDuration(500).start()
     }
 
     private fun updateNextButton() {
@@ -182,6 +205,10 @@ class UserProfileActivity : AppCompatActivity() {
         } else {
             getString(R.string.artist_genre_unknown, iTunesGenre)
         }
+        // Contorno e pílula na cor do perfil do artista (ciano se o gênero não entrou em nenhum)
+        val color = ContextCompat.getColor(this, artistGenre?.colorRes ?: R.color.neon_cyan)
+        binding.cardArtist.strokeColor = color
+        binding.tvArtistGenre.backgroundTintList = ColorStateList.valueOf(color)
         binding.cardArtist.visibility = View.VISIBLE
         binding.tvArtistNotFound.visibility = View.GONE
     }
@@ -227,5 +254,6 @@ class UserProfileActivity : AppCompatActivity() {
         private const val STEP_ARTIST = 1
         private const val STEP_SITUATION = 2
         private const val STEP_INSTRUMENT = 3
+        private const val SUN_STEP_DP = 18f
     }
 }
