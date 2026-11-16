@@ -36,6 +36,7 @@ class RecommendationCreate(BaseModel):
     song_artist: str = Field(..., min_length=1, max_length=100, examples=["Radiohead"])
     subgenres: str = Field("", examples=["Eletrônica"])
     liked: bool = Field(..., examples=[True])
+    surprise: bool = Field(False, examples=[False])  # True quando veio do "Me surpreenda"
 
 
 class RecommendationUpdate(BaseModel):
@@ -55,5 +56,6 @@ class RecommendationOut(BaseModel):
     song_artist: str
     subgenres: str
     liked: bool
+    surprise: bool
     created_at: datetime
     user: UserOut

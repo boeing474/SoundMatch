@@ -81,6 +81,7 @@ def create_recommendation(payload: schemas.RecommendationCreate, db: Session = D
         song_artist=payload.song_artist,
         subgenres=payload.subgenres,
         liked=payload.liked,
+        surprise=payload.surprise,
     )
     db.add(rec)
     db.commit()

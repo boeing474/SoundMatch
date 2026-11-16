@@ -47,6 +47,7 @@ class Recommendation(Base):
     song_artist: Mapped[str] = mapped_column(String(100), nullable=False)       # ex.: "Sabrina Carpenter"
     subgenres: Mapped[str] = mapped_column(String(200), default="")  # outros estilos, ex.: "Eletrônica"
     liked: Mapped[bool] = mapped_column(Boolean, nullable=False)  # Curti / Não curti
+    surprise: Mapped[bool] = mapped_column(Boolean, default=False)  # veio do "Me surpreenda"
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
     # Lado "N" da relação: acessa o usuário dono da recomendação (recommendation.user).

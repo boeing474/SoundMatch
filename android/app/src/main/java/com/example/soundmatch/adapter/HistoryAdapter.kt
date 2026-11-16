@@ -43,7 +43,11 @@ class HistoryAdapter(
             cardCover.strokeColor = genreColor
             tvSong.text = item.recommendedSong
             tvArtist.text = item.songArtist
-            tvGenre.text = context.getString(R.string.item_genre_match, item.archetype, item.score)
+            tvGenre.text = if (item.surprise) {
+                context.getString(R.string.item_genre_surprise, item.archetype)
+            } else {
+                context.getString(R.string.item_genre_match, item.archetype, item.score)
+            }
             tvGenre.setTextColor(genreColor)
             tvMeta.text = context.getString(R.string.item_meta, item.user.name, formatApiDate(item.createdAt))
 

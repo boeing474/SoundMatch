@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName
 // JSON da nossa API. @SerializedName liga o snake_case do Python ao camelCase do Kotlin.
 // Os nomes das colunas ficaram da primeira versão: "archetype" guarda o perfil (ex.: "Pop & K-pop"),
 // "score" guarda o % de match e "subgenres" os outros estilos marcados.
+// "surprise" diz se a música veio do "Me surpreenda" (aí o histórico não mostra o %).
 
 data class RecommendationRequest(
     val name: String,
@@ -16,7 +17,8 @@ data class RecommendationRequest(
     @SerializedName("recommended_song") val recommendedSong: String,
     @SerializedName("song_artist") val songArtist: String,
     val subgenres: String,
-    val liked: Boolean
+    val liked: Boolean,
+    val surprise: Boolean
 ) {
     companion object {
         fun from(result: SoundResult, liked: Boolean) = RecommendationRequest(
@@ -29,7 +31,8 @@ data class RecommendationRequest(
             recommendedSong = result.song.title,
             songArtist = result.song.artist,
             subgenres = result.likedGenresLabel,
-            liked = liked
+            liked = liked,
+            surprise = result.surprise
         )
     }
 }
@@ -55,6 +58,7 @@ data class RecommendationResponse(
     @SerializedName("song_artist") val songArtist: String,
     val subgenres: String,
     val liked: Boolean,
+    val surprise: Boolean,
     @SerializedName("created_at") val createdAt: String,
     val user: UserResponse
 )
