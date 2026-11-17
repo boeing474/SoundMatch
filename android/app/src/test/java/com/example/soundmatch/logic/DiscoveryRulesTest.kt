@@ -23,12 +23,24 @@ class DiscoveryRulesTest {
             artist(6982223, "BTS", 3_878_290),
             artist(268175432, "Bts", null)
         )
-        assertEquals(6982223L, DiscoveryRules.mostFamous(results)?.id)
+        assertEquals(6982223L, DiscoveryRules.pickArtist("bts", results)?.id)
+    }
+
+    @Test
+    fun `acento e maiuscula nao atrapalham a comparacao do nome`() {
+        val results = listOf(artist(1, "Wesley Safadão Cover", 900_000), artist(2, "Wesley Safadão", 500_000))
+        assertEquals(2L, DiscoveryRules.pickArtist("wesley safadao", results)?.id)
+    }
+
+    @Test
+    fun `sem nome igual, vale o primeiro resultado do Deezer`() {
+        val results = listOf(artist(1, "Racionais MC's", 800_000), artist(2, "Racionais Tributo", 2_000_000))
+        assertEquals(1L, DiscoveryRules.pickArtist("racionais", results)?.id)
     }
 
     @Test
     fun `busca vazia nao acha artista`() {
-        assertNull(DiscoveryRules.mostFamous(emptyList()))
+        assertNull(DiscoveryRules.pickArtist("bts", emptyList()))
     }
 
     @Test

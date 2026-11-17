@@ -14,7 +14,6 @@
     <string name="step_lead_name">Vamos montar o seu perfil.</string>
     <string name="step_lead_artist">Prazer, %1$s.</string>
     <string name="step_lead_situation">%1$s, boa escolha.</string>
-    <string name="step_lead_instrument">Última pergunta, %1$s.</string>
     <string name="step_name_question">Como você se chama?</string>
     <string name="hint_name">Seu nome</string>
     <string name="step_artist_question">Qual artista você mais ouve?</string>
@@ -27,13 +26,6 @@
     <string name="situation_street">Na rua</string>
     <string name="situation_party">Festa com amigos</string>
     <string name="situation_studying">Estudando</string>
-    <string name="step_instrument_question">Você toca algum instrumento?</string>
-    <string name="instrument_none">Não toco</string>
-    <string name="instrument_guitar">Guitarra</string>
-    <string name="instrument_drums">Bateria</string>
-    <string name="instrument_bass">Baixo</string>
-    <string name="instrument_keys">Teclado</string>
-    <string name="instrument_vocals">Canto</string>
     <string name="btn_back">Voltar</string>
     <string name="btn_next">Continuar</string>
     <string name="btn_search_artist">Buscar artista</string>

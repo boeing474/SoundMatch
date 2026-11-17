@@ -4,14 +4,24 @@ import com.example.soundmatch.model.AudioFeatures
 import com.example.soundmatch.model.Candidate
 import com.example.soundmatch.model.DeezerArtist
 import com.example.soundmatch.model.DeezerTrack
+import java.text.Normalizer
 
 // Regras que não dependem da rede, separadas para poder testar sem internet.
 object DiscoveryRules {
 
-    // A busca do Deezer devolve vários artistas com o mesmo nome (há mais de um "BTS").
-    // O verdadeiro é o que tem mais fãs.
-    fun mostFamous(artists: List<DeezerArtist>): DeezerArtist? =
-        artists.maxByOrNull { it.fans ?: 0 }
+    // A busca do Deezer devolve vários artistas com o mesmo nome (há mais de um "BTS"):
+    // entre os de nome igual ao digitado, o verdadeiro é o que tem mais fãs.
+    // Sem nome igual ("racionais" para "Racionais MC's"), vale o 1º resultado do Deezer.
+    fun pickArtist(typed: String, results: List<DeezerArtist>): DeezerArtist? {
+        val wanted = normalize(typed)
+        return results.filter { normalize(it.name) == wanted }.maxByOrNull { it.fans ?: 0 }
+            ?: results.firstOrNull()
+    }
+
+    // Minúsculas e sem acento: "Wesley Safadao" e "wesley safadão" viram a mesma coisa.
+    private fun normalize(name: String): String =
+        Normalizer.normalize(name.trim().lowercase(), Normalizer.Form.NFD)
+            .replace(Regex("\\p{M}"), "")
 
     // Junta cada música com as características do som, ligando as duas pelo ISRC.
     // Música sem ISRC ou que o ReccoBeats não conhece fica com features = null.

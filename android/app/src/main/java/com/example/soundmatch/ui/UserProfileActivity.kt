@@ -17,32 +17,33 @@ import com.example.soundmatch.databinding.ActivityUserProfileBinding
 import com.example.soundmatch.logic.ArtistName
 import com.example.soundmatch.logic.TrackPicker
 import com.example.soundmatch.model.ArtistSong
+import com.example.soundmatch.model.DeezerArtist
 import com.example.soundmatch.model.Genre
-import com.example.soundmatch.model.Instrument
 import com.example.soundmatch.model.Situation
 import com.example.soundmatch.model.UserProfile
+import com.example.soundmatch.network.DiscoveryRepository
 import com.example.soundmatch.network.ImageLoader
 import com.example.soundmatch.network.RetrofitClient
+import com.example.soundmatch.network.networkOrNull
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 
 // Perfil em formato de conversa: uma pergunta por vez, na mesma Activity.
-// Os 4 passos estão no XML e aqui só trocamos qual deles fica visível.
+// Os 3 passos estão no XML e aqui só trocamos qual deles fica visível.
 class UserProfileActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityUserProfileBinding
     private var currentStep = 0
 
-    // Resultado da busca do artista no iTunes. Fica null até a busca terminar.
+    // Resultado da busca do artista. Fica null (ou vazio) até a busca terminar.
     private var foundArtist: String? = null
     private var artistGenre: Genre? = null
     private var artistSongs: List<ArtistSong> = emptyList()
+    private var relatedArtists: List<DeezerArtist> = emptyList()
     private var artistSearched = false
 
     private val steps: List<View> by lazy {
-        listOf(binding.stepName, binding.stepArtist, binding.stepSituation, binding.stepInstrument)
+        listOf(binding.stepName, binding.stepArtist, binding.stepSituation)
     }
 
     private val situationChips by lazy {
@@ -52,17 +53,6 @@ class UserProfileActivity : AppCompatActivity() {
             binding.chipStreet.id to Situation.STREET,
             binding.chipParty.id to Situation.PARTY,
             binding.chipStudying.id to Situation.STUDYING
-        )
-    }
-
-    // "Não toco" fica fora do mapa: get() devolve null, que é justamente "sem instrumento".
-    private val instrumentChips by lazy {
-        mapOf(
-            binding.chipGuitar.id to Instrument.GUITAR,
-            binding.chipDrums.id to Instrument.DRUMS,
-            binding.chipBass.id to Instrument.BASS,
-            binding.chipKeys.id to Instrument.KEYS,
-            binding.chipVocals.id to Instrument.VOCALS
         )
     }
 
@@ -113,7 +103,6 @@ class UserProfileActivity : AppCompatActivity() {
         return when (step) {
             STEP_ARTIST -> getString(R.string.step_lead_artist, name)
             STEP_SITUATION -> getString(R.string.step_lead_situation, artist)
-            STEP_INSTRUMENT -> getString(R.string.step_lead_instrument, name)
             else -> getString(R.string.step_lead_name)
         }
     }
@@ -141,13 +130,6 @@ class UserProfileActivity : AppCompatActivity() {
             STEP_ARTIST -> onArtistNext()
             STEP_SITUATION -> {
                 if (situationChips[binding.chipGroupSituation.checkedChipId] != null) {
-                    showStep(STEP_INSTRUMENT)
-                } else {
-                    Toast.makeText(this, R.string.toast_pick_option, Toast.LENGTH_SHORT).show()
-                }
-            }
-            STEP_INSTRUMENT -> {
-                if (binding.chipGroupInstrument.checkedChipId != View.NO_ID) {
                     openQuiz()
                 } else {
                     Toast.makeText(this, R.string.toast_pick_option, Toast.LENGTH_SHORT).show()
@@ -168,8 +150,8 @@ class UserProfileActivity : AppCompatActivity() {
         return ok
     }
 
-    // Uma busca só no iTunes: o 1º resultado dá o nome oficial, o gênero e a capa,
-    // e os outros viram as opções da 1ª pergunta do quiz.
+    // Duas buscas. O Deezer dá o nome oficial, a foto e os artistas parecidos (para o quiz).
+    // O iTunes dá o gênero (a cor do card) e é a reserva se o Deezer falhar.
     private fun searchArtist() {
         val typed = binding.etArtist.text.toString().trim()
         hideKeyboard()
@@ -177,40 +159,47 @@ class UserProfileActivity : AppCompatActivity() {
         lifecycleScope.launch {
             binding.progressArtist.visibility = View.VISIBLE
             binding.btnNext.isEnabled = false
-            try {
-                val results = RetrofitClient.itunes.search(typed, limit = ARTIST_SEARCH_LIMIT).results
-                val track = results.firstOrNull()
-                if (track?.artistName == null) {
-                    showArtistNotFound()
-                } else {
-                    val artist = ArtistName.clean(typed, track.artistName)
-                    foundArtist = artist
-                    artistGenre = track.primaryGenreName?.let { Genre.fromITunes(it) }
-                    artistSongs = TrackPicker.artistSongs(results, artist)
-                    showArtistCard(track.primaryGenreName.orEmpty())
-                    track.artworkUrl100?.let { url ->
-                        ImageLoader.load(ImageLoader.bigCover(url))?.let { binding.imgArtist.setImageBitmap(it) }
-                    }
+
+            val deezerArtist = networkOrNull { DiscoveryRepository.findArtist(typed) }
+            val tracks = networkOrNull {
+                RetrofitClient.itunes.search(deezerArtist?.name ?: typed, limit = ARTIST_SEARCH_LIMIT).results
+            }.orEmpty()
+            val name = deezerArtist?.name
+                ?: tracks.firstOrNull()?.artistName?.let { ArtistName.clean(typed, it) }
+
+            if (name == null) {
+                showArtistNotFound()   // sem internet ou sem resultado: segue só com o texto digitado
+            } else {
+                val track = TrackPicker.bestMatch(tracks, name)
+                foundArtist = name
+                artistGenre = track?.primaryGenreName?.let { Genre.fromITunes(it) }
+                artistSongs = TrackPicker.artistSongs(tracks, name)
+                relatedArtists = deezerArtist
+                    ?.let { networkOrNull { DiscoveryRepository.relatedArtists(it.id) } }
+                    .orEmpty()
+                showArtistCard(track?.primaryGenreName)
+
+                val photo = deezerArtist?.picture ?: track?.artworkUrl100?.let { ImageLoader.bigCover(it) }
+                photo?.let { url ->
+                    networkOrNull { ImageLoader.load(url) }?.let { binding.imgArtist.setImageBitmap(it) }
                 }
-            } catch (e: IOException) {
-                showArtistNotFound()   // sem internet: segue só com o que a pessoa digitou
-            } catch (e: HttpException) {
-                showArtistNotFound()
-            } finally {
-                artistSearched = true
-                binding.progressArtist.visibility = View.GONE
-                binding.btnNext.isEnabled = true
-                updateNextButton()
             }
+
+            artistSearched = true
+            binding.progressArtist.visibility = View.GONE
+            binding.btnNext.isEnabled = true
+            updateNextButton()
         }
     }
 
-    private fun showArtistCard(iTunesGenre: String) {
+    // A pílula mostra o gênero do iTunes; sem ele (iTunes fora do ar), ela some.
+    private fun showArtistCard(iTunesGenre: String?) {
         binding.tvArtistName.text = foundArtist
+        binding.tvArtistGenre.visibility = if (iTunesGenre.isNullOrBlank()) View.GONE else View.VISIBLE
         binding.tvArtistGenre.text = if (artistGenre != null) {
             iTunesGenre
         } else {
-            getString(R.string.artist_genre_unknown, iTunesGenre)
+            getString(R.string.artist_genre_unknown, iTunesGenre.orEmpty())
         }
         // Contorno e pílula na cor do perfil do artista (ciano se o gênero não entrou em nenhum)
         val color = ContextCompat.getColor(this, artistGenre?.colorRes ?: R.color.neon_cyan)
@@ -221,9 +210,7 @@ class UserProfileActivity : AppCompatActivity() {
     }
 
     private fun showArtistNotFound() {
-        foundArtist = null
-        artistGenre = null
-        artistSongs = emptyList()
+        clearArtist()
         binding.cardArtist.visibility = View.GONE
         binding.tvArtistNotFound.visibility = View.VISIBLE
     }
@@ -231,13 +218,18 @@ class UserProfileActivity : AppCompatActivity() {
     private fun resetArtistSearch() {
         if (!artistSearched) return
         artistSearched = false
-        foundArtist = null
-        artistGenre = null
-        artistSongs = emptyList()
+        clearArtist()
         binding.imgArtist.setImageResource(R.drawable.ic_vinyl)
         binding.cardArtist.visibility = View.GONE
         binding.tvArtistNotFound.visibility = View.GONE
         updateNextButton()
+    }
+
+    private fun clearArtist() {
+        foundArtist = null
+        artistGenre = null
+        artistSongs = emptyList()
+        relatedArtists = emptyList()
     }
 
     private fun hideKeyboard() {
@@ -250,9 +242,10 @@ class UserProfileActivity : AppCompatActivity() {
             name = binding.etName.text.toString().trim(),
             favoriteArtist = foundArtist ?: binding.etArtist.text.toString().trim(),
             situation = situationChips.getValue(binding.chipGroupSituation.checkedChipId),
-            instrument = instrumentChips[binding.chipGroupInstrument.checkedChipId],
+            instrument = null,
             artistGenre = artistGenre,
-            artistSongs = artistSongs
+            artistSongs = artistSongs,
+            relatedArtists = relatedArtists
         )
         val intent = Intent(this, SoundQuizActivity::class.java)
             .putExtra(SoundQuizActivity.EXTRA_PROFILE, profile)
@@ -263,8 +256,7 @@ class UserProfileActivity : AppCompatActivity() {
         private const val STEP_NAME = 0
         private const val STEP_ARTIST = 1
         private const val STEP_SITUATION = 2
-        private const val STEP_INSTRUMENT = 3
-        private const val SUN_STEP_DP = 18f
+        private const val SUN_STEP_DP = 27f
         private const val ARTIST_SEARCH_LIMIT = 25
     }
 }

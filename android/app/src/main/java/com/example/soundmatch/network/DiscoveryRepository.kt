@@ -8,8 +8,6 @@ import com.example.soundmatch.model.DeezerTrack
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import retrofit2.HttpException
-import java.io.IOException
 
 // Junta o Deezer e o ReccoBeats: acha o artista, os parecidos
 // e as músicas candidatas já com as características do som.
@@ -20,7 +18,7 @@ object DiscoveryRepository {
     private val reccoBeats get() = RetrofitClient.reccoBeats
 
     suspend fun findArtist(name: String): DeezerArtist? =
-        DiscoveryRules.mostFamous(deezer.searchArtist(name).data)
+        DiscoveryRules.pickArtist(name, deezer.searchArtist(name).data)
 
     suspend fun relatedArtists(artistId: Long): List<DeezerArtist> =
         deezer.relatedArtists(artistId).data
@@ -41,15 +39,11 @@ object DiscoveryRepository {
     private suspend fun audioFeatures(tracks: List<DeezerTrack>): List<AudioFeatures> {
         val isrcs = tracks.mapNotNull { it.isrc }
         if (isrcs.isEmpty()) return emptyList()
-        return try {
+        return networkOrNull {
             isrcs.chunked(ISRCS_PER_CALL).flatMap { chunk ->
                 reccoBeats.audioFeatures(chunk.joinToString(",")).content
             }
-        } catch (e: IOException) {
-            emptyList()
-        } catch (e: HttpException) {
-            emptyList()
-        }
+        }.orEmpty()
     }
 
     private const val TRACKS_PER_ARTIST = 5
