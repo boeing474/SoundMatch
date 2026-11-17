@@ -126,7 +126,7 @@ Código copiado da internet ou de colegas leva nota zero, e eu preciso demonstra
 
 ### As 5 telas (Activities)
 1. **MainActivity:** vinil nascendo no horizonte e girando (camadas `synth_sky`/`synth_sun`/`synth_ground`), título neon, frase curta ("descubra uma música nova, do estilo que é a sua cara") e 2 botões ("Descobrir Meu Som" e "Minhas Descobertas"). Intents explícitas.
-2. **UserProfileActivity: "conversa", uma pergunta por vez** (mesma Activity, 4 blocos `step*` no XML e o Kotlin troca a visibilidade; "Passo X de 4" + ProgressBar; Voltar/Continuar; o voltar do celular volta um passo):
+2. **UserProfileActivity: "conversa", uma pergunta por vez** (mesma Activity, 3 blocos `step*` no XML e o Kotlin troca a visibilidade; "Passo X de 3" + ProgressBar; Voltar/Continuar; o voltar do celular volta um passo). **Desde 17/11 são 3 passos: o do instrumento (item 4 abaixo) saiu, e a busca do artista usa o Deezer (nome oficial, foto, parecidos) com o iTunes dando o gênero/cor do card e servindo de reserva:**
    1. "Como você se chama?" (`TextInputLayout`)
    2. "Qual artista você mais ouve?" → botão "Buscar artista" consulta o **iTunes** e mostra um card (capa, nome oficial via `logic/ArtistName.kt`, gênero do iTunes). Sem internet ou não encontrado: aviso e segue só com o texto digitado (`artistGenre = null`).
    3. "Quando você mais ouve música?" (`ChipGroup`: Relaxando em casa, Academia, Na rua, Festa com amigos, Estudando)
@@ -183,6 +183,13 @@ Código copiado da internet ou de colegas leva nota zero, e eu preciso demonstra
 - **Escolha:** entre as top músicas dos parecidos não conhecidos, a mais perto do alvo. **% de match** = proximidade do clima pedido.
 - **Reserva:** sem Deezer → iTunes + catálogo atual; sem ReccoBeats → escolhe pela popularidade e a energia fica só na explicação. API própria (CRUD, Swagger, banco) não muda.
 - **Etapas (um commit cada):** 1) rede (Deezer + ReccoBeats + testes); 2) perfil; 3) quiz; 4) motor; 5) resultado/histórico, build, celular, README e guia.
+- **Andamento:**
+  - ✅ **Etapa 1** (`15566f7`): `model/DeezerModels.kt` (`DeezerList`, `DeezerArtist` Serializable, `DeezerAlbum`, `DeezerTrack`), `model/AudioFeatures.kt`, `model/Candidate.kt` (música do Deezer + features ou null), `network/DeezerApi.kt`, `network/ReccoBeatsApi.kt`, `network/DiscoveryRepository.kt` (`findArtist`, `relatedArtists`, `candidates` com `async` em paralelo; falha do ReccoBeats vira lista vazia), `logic/DiscoveryRules.kt` + `DiscoveryRulesTest.kt` (6 testes).
+  - ✅ **Etapa 2** (`6909c9e`): perfil com 3 passos; `searchArtist()` faz Deezer + iTunes; `network/NetworkCall.kt` com `networkOrNull` (falha de rede vira null, evita repetir try/catch); `UserProfile.relatedArtists` leva os parecidos para o quiz; `DiscoveryRules.pickArtist` (entre os de nome igual ao digitado, sem acento/maiúscula, o de mais fãs; sem nome igual, o 1º resultado: "Queen" de verdade é o 5º resultado do Deezer e "Matuê" o 2º). Testado no emulador (Wesley Safadao → card com foto e "Brasileira"). **26 testes passando.** Commits das etapas 1 e 2 ainda **sem push**.
+  - ⏳ **Etapa 3 (quiz), decidido:** pergunta 1 com **chips com a foto redonda** (opção A do mockup https://claude.ai/artifact/96VMHxHZXv7AGX9ZDDbuag; estilo `Widget.SoundMatch.Chip` com a foto no `chipIcon`); "Hit do momento / Pérola escondida" no mesmo formato das energias (nome em negrito + linha explicando); Switch "Quero me arriscar". **Falta o estudante responder:** quiz reserva (proposta: sem parecidos do Deezer, o quiz mostra só o clima + os "outros estilos" de hoje e a música vem do catálogo fixo).
+  - Etapa 4: o campo `UserProfile.instrument` segue no código sempre null (e `model/Instrument.kt` existe) só para o build não quebrar; remover junto com a reforma do motor. O quiz e o motor atuais ainda são os antigos.
+- **Aprendido nos testes:** ReccoBeats aceita **no máximo 40 ISRCs** por chamada (`ISRCS_PER_CALL`) e pode devolver mais de um item por ISRC; aceita o cliente OkHttp (bloqueia o `Python-urllib`, usar `curl` para testar). Achados do `/code-review` deixados de lado: "(Taylor's Version)" e "feat. Oliver" descartados pelo `TrackPicker.isAlternateVersion`, rotação da tela apaga respostas do quiz e permite salvar 2 vezes (nenhuma tela trava em retrato), `contains` com nomes curtos ("IU", "Ana").
+- **Emulador:** AVD `Pixel_9_Pro_XL` (1344x2992). O PC tem 16 GB e fica com ~0,5 GB livre com ele aberto: abrir com `emulator.exe -avd Pixel_9_Pro_XL -no-window -no-audio -no-boot-anim -no-snapshot-load`, testar com `adb -s emulator-5554` (`uiautomator dump` funciona fora da MainActivity) e fechar com `adb emu kill`. O estudante também usa o Remote Control pelo celular, que só aparece no `adb` com cabo.
 
 ## 6. Status das Etapas
 0. ✅ `.gitignore` + backend
@@ -193,4 +200,5 @@ Código copiado da internet ou de colegas leva nota zero, e eu preciso demonstra
 5. ✅ README.md + GUIA_APRESENTACAO.md (atualizados em 16/11)
 7. ✅ Redesign A/B/C (synthwave contido, Histórico em lista, Perfil com pôr do sol) com prints novos e push.
 8. ✅ Quiz novo (músicas do artista + 6 energias + Me surpreenda + `surprise` na API) com push e prints novos no README.
+9. ⏳ Recomendação por artistas parecidos (Deezer + ReccoBeats): etapas 1 (rede) e 2 (perfil) com commit; faltam 3 (quiz), 4 (motor) e 5 (resultado, prints, README e guia). Detalhes na seção "Recomendação por artistas parecidos".
 6. ✅ Reforma de 16/11 (gêneros + votação + % de match + perfil em passos + Curti/Não curti) com commit, build e testes passando. Perguntas do quiz refeitas depois (ver item 8).
