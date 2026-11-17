@@ -17,7 +17,7 @@ Você é meu parceiro de desenvolvimento (Pair Programmer) e mentor técnico.
 ---
 
 ## 3. Requisitos Obrigatórios do Professor (Não podemos esquecer nenhum)
-**Trabalho individual e autoral.** Entrega e apresentação oral em **16/11**, em aula. Deve ser entregue o link de um repositório **público** no GitHub, e o app precisa estar **funcionando na apresentação**.
+**Trabalho individual e autoral.** Entrega e apresentação oral em **17/11** (adiada de 16/11), em aula. Deve ser entregue o link de um repositório **público** no GitHub, e o app precisa estar **funcionando na apresentação**.
 
 Nosso projeto precisa obrigatoriamente cumprir todos os itens abaixo:
 
@@ -170,7 +170,19 @@ Código copiado da internet ou de colegas leva nota zero, e eu preciso demonstra
 4. ✅ Commit e push da reforma e da documentação (repositório público). API publicada no Render em 16/11 e app apontando para ela.
 5. ✅ Mockup do novo Perfil (https://claude.ai/artifact/B7KUviGeVDxj1Vw9NfRrFj) implementado.
 6. ✅ "Passo 2 de 2" virou "Última parte"; "outros estilos" não repete mais o perfil vencedor.
+7. ✅ `/code-review` (17/11): achados de casos raros (Taylor's Version, "Queen" x ABBA, rotação) ficaram de lado; o estudante quer resolver a causa maior, a recomendação pouco pessoal.
+8. ⏳ **Recomendação por artistas parecidos (17/11, aprovada):** ver seção abaixo.
 - Adiado: Top 3 músicas favoritas, swipe estilo Tinder.
+
+### Recomendação por artistas parecidos (aprovada em 17/11, em andamento)
+- **Problema:** 5 gêneros + catálogo fixo de 60 músicas não personalizam (forró caía em "Música Brasileira" com Sepultura e Tom Jobim; a 1ª pergunta só repetia o gênero do artista).
+- **Deezer** (público, sem chave): `search/artist` (escolher o de mais fãs, `nb_fan`, ex.: há vários "BTS"), `artist/{id}/related`, `artist/{id}/top` (tem `rank`, capa, `preview`; **não** traz ISRC), `track/{id}` (traz `isrc`). O BPM do Deezer vem 0 quase sempre e o `gain` não separa calmo de pesado (testado), por isso não usar.
+- **ReccoBeats** (grátis, sem chave): `GET https://api.reccobeats.com/v1/audio-features?ids=<ISRC,ISRC...>` aceita ISRC em lote e devolve `energy`, `valence`, `danceability`, `acousticness`, `instrumentalness`, `tempo`. Testado: Slipknot 0.98 de energia, Cais 0.20, Garota de Ipanema acústica 0.93.
+- **Perfil:** nome → artista (Deezer) → quando ouve (a situação ajusta o alvo: Academia mais energia, Estudando mais calmo/acústico, Festa mais dançante). **Instrumento saiu.**
+- **Quiz:** 1) "Desses parecidos com X, quais você já conhece?" (chips com foto; os conhecidos saem da disputa); 2) clima = as 6 energias (alvo nos números do ReccoBeats; Sofrência usa `valence` baixa, Viajada música longa e pouco dançante, Pra cantar junto alegria alta + mais tocada); 3) "Hit do momento ou pérola escondida?" (`rank` do Deezer); 4) **Switch "Quero me arriscar"** (parecidos dos parecidos), no lugar do Me surpreenda. "Outros estilos" sai.
+- **Escolha:** entre as top músicas dos parecidos não conhecidos, a mais perto do alvo. **% de match** = proximidade do clima pedido.
+- **Reserva:** sem Deezer → iTunes + catálogo atual; sem ReccoBeats → escolhe pela popularidade e a energia fica só na explicação. API própria (CRUD, Swagger, banco) não muda.
+- **Etapas (um commit cada):** 1) rede (Deezer + ReccoBeats + testes); 2) perfil; 3) quiz; 4) motor; 5) resultado/histórico, build, celular, README e guia.
 
 ## 6. Status das Etapas
 0. ✅ `.gitignore` + backend
@@ -180,5 +192,5 @@ Código copiado da internet ou de colegas leva nota zero, e eu preciso demonstra
 4. ✅ Retrofit (POST/GET/PUT/DELETE) + HistoryActivity/HistoryAdapter com AlertDialog
 5. ✅ README.md + GUIA_APRESENTACAO.md (atualizados em 16/11)
 7. ✅ Redesign A/B/C (synthwave contido, Histórico em lista, Perfil com pôr do sol) com prints novos e push.
-8. ✅ Quiz novo (músicas do artista + 6 energias + Me surpreenda + `surprise` na API) com push. Faltam os prints novos do quiz/resultado no README.
+8. ✅ Quiz novo (músicas do artista + 6 energias + Me surpreenda + `surprise` na API) com push e prints novos no README.
 6. ✅ Reforma de 16/11 (gêneros + votação + % de match + perfil em passos + Curti/Não curti) com commit, build e testes passando. Perguntas do quiz refeitas depois (ver item 8).
