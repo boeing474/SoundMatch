@@ -50,13 +50,24 @@ object DiscoveryEngine {
 
     // Devolve null quando não dá para escolher pelo clima (nenhuma candidata, ou nenhuma
     // com os números do som). Aí a tela usa o motor reserva, o SoundMatchEngine.
-    fun recommend(profile: UserProfile, answers: QuizAnswers, candidates: List<Candidate>): SoundResult? {
+    // alreadyShown: as músicas que já saíram desde que o app abriu (ver ShownSongs).
+    fun recommend(
+        profile: UserProfile,
+        answers: QuizAnswers,
+        candidates: List<Candidate>,
+        alreadyShown: Set<String> = emptySet()
+    ): SoundResult? {
         val measured = newToUser(candidates, profile, answers)
             .mapNotNull { candidate -> candidate.features?.let { candidate.track to it } }
         if (measured.isEmpty()) return null
 
+        // Para não repetir, saem as que já foram recomendadas. Se todas já saíram, vale a lista inteira de novo.
+        val notShown = measured.filterNot { (track, _) -> songKey(track.title, track.artist.name) in alreadyShown }
+        val skippedSome = notShown.isNotEmpty() && notShown.size < measured.size
+
         val target = targetFor(answers.energy)
-        val (track, features) = popularityHalf(measured, answers.popularity).maxBy { (track, features) ->
+        val pool = popularityHalf(notShown.ifEmpty { measured }, answers.popularity)
+        val (track, features) = pool.maxBy { (track, features) ->
             closeness(track, features, target) + SITUATION_WEIGHT * situationBonus(profile.situation, features)
         }
         val song = Song(track.title, track.artist.name, answers.energy, track.album?.title, track.album?.cover)
@@ -66,7 +77,7 @@ object DiscoveryEngine {
             match = matchPercent(closeness(track, features, target)),
             genre = profile.artistGenre,
             song = song,
-            reason = buildReason(profile, answers, song),
+            reason = buildReason(profile, answers, song, skippedSome),
             likedGenres = emptyList(),
             surprise = false,
             fromSimilarArtists = true,
@@ -80,8 +91,11 @@ object DiscoveryEngine {
         val known = (answers.knownArtists.map { it.name } + profile.favoriteArtist).map { it.trim().lowercase() }
         return candidates
             .filterNot { it.track.artist.name.trim().lowercase() in known }
-            .distinctBy { "${it.track.title}|${it.track.artist.name}".lowercase() }
+            .distinctBy { songKey(it.track.title, it.track.artist.name) }
     }
+
+    // Identifica uma música pelo título e pelo artista, sem diferenciar maiúsculas.
+    fun songKey(title: String, artist: String): String = "$title|$artist".lowercase()
 
     // Ordena pela popularidade no Deezer e corta no meio: hit fica com a metade
     // mais tocada, pérola com a outra.
@@ -120,7 +134,13 @@ object DiscoveryEngine {
     fun matchPercent(closeness: Double): Int =
         (closeness * 100).roundToInt().coerceIn(MIN_MATCH, MAX_MATCH)
 
-    fun buildReason(profile: UserProfile, answers: QuizAnswers, song: Song): String = buildString {
+    // skippedSome: havia músicas mais perto do clima, mas elas já tinham sido recomendadas.
+    fun buildReason(
+        profile: UserProfile,
+        answers: QuizAnswers,
+        song: Song,
+        skippedSome: Boolean = false
+    ): String = buildString {
         val name = profile.name
         val favorite = profile.favoriteArtist
         when {
@@ -133,6 +153,7 @@ object DiscoveryEngine {
         }
         append(" Você pediu uma música ${answers.energy.phrase} pra ouvir ${profile.situation.context}")
         answers.popularity?.let { append(", ${it.phrase}") }
-        append(": ${song.title} foi a que chegou mais perto.")
+        append(": ${song.title} foi a que chegou mais perto")
+        append(if (skippedSome) ", sem repetir as que você já recebeu." else ".")
     }
 }

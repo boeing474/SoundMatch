@@ -94,7 +94,7 @@ SoundMatch/
     ├── adapter/                 HistoryAdapter (RecyclerView)
     ├── network/                 Retrofit (SoundMatchApi, DeezerApi, ReccoBeatsApi, ITunesApi), DiscoveryRepository e ImageLoader
     ├── model/                   dados (UserProfile, QuizAnswers, SoundResult, Energy, Popularity, respostas das APIs)
-    └── logic/                   regra de negócio (DiscoveryEngine, DiscoveryRules, SoundMatchEngine, SongCatalog)
+    └── logic/                   regra de negócio (DiscoveryEngine, DiscoveryRules, ShownSongs, SoundMatchEngine, SongCatalog)
 ```
 
 ---
@@ -197,7 +197,7 @@ users (1) ────────< (N) recommendations
 
 ## Lógica de recomendação
 
-O código fica em `logic/DiscoveryEngine.kt`, sem nada de Android, e é coberto por testes unitários (38 no total, em `DiscoveryEngineTest`, `DiscoveryRulesTest`, `SoundMatchEngineTest` e `TrackPickerTest`). Em uma frase: **das músicas mais tocadas dos artistas parecidos que a pessoa não marcou, fica a metade pedida (hits ou pérolas) e ganha a que chega mais perto do clima.**
+O código fica em `logic/DiscoveryEngine.kt`, sem nada de Android, e é coberto por testes unitários (41 no total, em `DiscoveryEngineTest`, `DiscoveryRulesTest`, `SoundMatchEngineTest` e `TrackPickerTest`). Em uma frase: **das músicas mais tocadas dos artistas parecidos que a pessoa não marcou, fica a metade pedida (hits ou pérolas) e ganha a que chega mais perto do clima.**
 
 1. **Quem entra.** As 4 músicas mais tocadas de cada parecido que a pessoa não marcou em "Outros artistas que você curte" (até 8 artistas). O artista favorito e os marcados ficam de fora.
 2. **Quero me arriscar.** Em vez dos parecidos, entram os parecidos deles (fora os que já eram parecidos diretos). O mesmo acontece se a pessoa marcar todos.
@@ -215,7 +215,8 @@ O código fica em `logic/DiscoveryEngine.kt`, sem nada de Android, e é coberto 
 
 5. **Situação.** Só desempata: na academia ganha a mais enérgica, na festa a mais dançante, estudando ou relaxando a mais calma.
 6. **% de match** = 100 menos a distância média até o alvo. Exemplo: quem pede Sofrência entre artistas de forró recebe por volta de 60%, porque quase não há música triste ali, e o número mostra isso.
-7. **Explicação.** Exemplo: "Pedro, você ouve Metallica, e Iron Maiden tem um som parecido. Você pediu uma música porradeira pra ouvir na academia, entre as menos conhecidas: Wasted Years (2015 Remaster) foi a que chegou mais perto."
+7. **Sem repetir.** O app guarda as músicas que já recomendou enquanto está aberto (`logic/ShownSongs.kt`) e tira essas da disputa. Refazendo o quiz com as mesmas respostas, vem a próxima mais perto do clima; quando todas já saíram, a lista recomeça.
+8. **Explicação.** Exemplo: "Pedro, você ouve Metallica, e Iron Maiden tem um som parecido. Você pediu uma música porradeira pra ouvir na academia, entre as menos conhecidas: Wasted Years (2015 Remaster) foi a que chegou mais perto."
 
 ### Reserva
 

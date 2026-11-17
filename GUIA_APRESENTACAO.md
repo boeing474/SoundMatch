@@ -62,7 +62,7 @@ A API está no Render (https://soundmatch-api-dnh5.onrender.com). Não precisa d
    - Tocar na **lixeira** para excluir, com confirmação em `AlertDialog` (**DELETE**).
 7. **Código**
    - Abrir `logic/DiscoveryEngine.kt` e explicar `recommend`: quem entra, hit ou pérola, o alvo do clima e o % de match.
-   - Mostrar os 38 testes passando (`DiscoveryEngineTest` e os outros, botão Run).
+   - Mostrar os 41 testes passando (`DiscoveryEngineTest` e os outros, botão Run).
 
 ---
 
@@ -159,6 +159,7 @@ E o caminho da recomendação, antes disso:
 | `model/ApiModels`, `ITunesModels` | Espelho do JSON da nossa API e do iTunes (`@SerializedName`) |
 | `logic/DiscoveryEngine` | **Regra de negócio**: quem entra na disputa, hit ou pérola, alvo de cada clima, % de match e explicação |
 | `logic/DiscoveryRules` | Regras menores: escolher o artista certo entre homônimos, tirar os artistas marcados, decidir quando ir aos parecidos dos parecidos, ligar música e características pelo ISRC |
+| `logic/ShownSongs` | Guarda as músicas já recomendadas enquanto o app está aberto, para o quiz não repetir |
 | `logic/SoundMatchEngine` | Motor reserva: votação por estilo e música do catálogo fixo |
 | `logic/SongCatalog` | Catálogo reserva: 60 músicas, 12 por estilo, 2 de cada clima |
 | `logic/TrackPicker` | Escolhe a faixa certa entre os resultados do iTunes (artista certo, versão de estúdio) |
@@ -259,8 +260,14 @@ São 3 perguntas curtas do mesmo formulário. Os 3 blocos ficam no mesmo XML, e 
 **E o quiz, como mostra uma pergunta por vez?**
 Do mesmo jeito. Cada passo é um `Step`: a lista de cards que aparecem nele e, se houver, a pergunta de escolha única que precisa de resposta. O `showStep` deixa visíveis só os cards do passo, e o `updateNextButton` trava o botão enquanto a pergunta não tem resposta. A lista de passos muda conforme o modo: 3 passos na descoberta, 2 no quiz reserva.
 
-**As mesmas respostas dão sempre a mesma música?**
-Sim, enquanto as APIs devolverem os mesmos dados: o motor não sorteia nada. O ReccoBeats manda várias medições da mesma gravação, com números um pouco diferentes, e o app fica com a média (`DiscoveryRules.average`), para não depender de qual delas veio por último. A música pode mudar se a popularidade no Deezer mudar ou se alguma chamada falhar.
+**Se eu refizer o quiz com as mesmas respostas, vem a mesma música?**
+Não. O motor não sorteia nada, ele sempre pega a mais perto do clima; por isso o app guarda o que já recomendou (`logic/ShownSongs`, um `object` com um conjunto de músicas) e passa essa lista para o `DiscoveryEngine.recommend`, que tira essas da disputa. Vem então a segunda mais perto, depois a terceira. Quando todas já saíram, a lista recomeça. Ela vale enquanto o app está aberto: fechando o app, zera.
+
+**Por que a segunda música pode ter um % maior que a primeira?**
+Porque a situação desempata. Na academia, entre duas músicas quase igualmente perto do clima, a primeira escolhida é a mais enérgica, mesmo que a outra esteja um ponto mais perto do alvo. O % mostra só a distância até o clima.
+
+**Por que tirar a média das medições do ReccoBeats?**
+Ele manda várias medições da mesma gravação, com números um pouco diferentes. Ficando com a média (`DiscoveryRules.average`), o resultado não depende de qual delas veio por último.
 
 **Por que as colunas se chamam `score`, `archetype` e `subgenres`?**
 Os nomes vêm da primeira versão do projeto. Hoje:

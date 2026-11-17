@@ -148,6 +148,41 @@ class DiscoveryEngineTest {
         assertNull(DiscoveryEngine.recommend(fan, answers(), listOf(candidate("Sem dados", 900, features = null))))
     }
 
+    // Sem repetir
+
+    @Test
+    fun `musica que ja saiu da lugar para a proxima mais perto do clima`() {
+        val heavy = answers(Energy.HEAVY, Popularity.HIT)
+        val shown = setOf(DiscoveryEngine.songKey("Hit pesado", "Zé Vaqueiro"))
+
+        val result = DiscoveryEngine.recommend(fan, heavy, fourSongs, shown)!!
+
+        assertEquals("Pérola pesada", result.song.title)   // das 3 que sobraram, os hits são "Hit calmo" e "Pérola pesada"
+        assertTrue(result.reason.contains("sem repetir as que você já recebeu"))
+    }
+
+    @Test
+    fun `quando todas ja sairam a lista vale de novo`() {
+        val shown = fourSongs.map { DiscoveryEngine.songKey(it.track.title, it.track.artist.name) }.toSet()
+        val result = DiscoveryEngine.recommend(fan, answers(Energy.HEAVY, Popularity.HIT), fourSongs, shown)!!
+        assertEquals("Hit pesado", result.song.title)
+    }
+
+    @Test
+    fun `a lista de musicas mostradas recomeca quando uma musica se repete`() {
+        ShownSongs.clear()
+        val first = DiscoveryEngine.recommend(fan, answers(), fourSongs)!!.song
+        val second = DiscoveryEngine.recommend(fan, answers(Energy.CHILL), fourSongs)!!.song
+
+        ShownSongs.remember(first)
+        ShownSongs.remember(second)
+        assertEquals(2, ShownSongs.all.size)
+
+        ShownSongs.remember(first)   // repetiu: todas já tinham saído
+        assertEquals(setOf(DiscoveryEngine.songKey(first.title, first.artist)), ShownSongs.all)
+        ShownSongs.clear()
+    }
+
     // Explicação
 
     @Test

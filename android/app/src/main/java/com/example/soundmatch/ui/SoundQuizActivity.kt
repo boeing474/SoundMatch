@@ -22,6 +22,7 @@ import com.example.soundmatch.R
 import com.example.soundmatch.databinding.ActivitySoundQuizBinding
 import com.example.soundmatch.databinding.ItemArtistCardBinding
 import com.example.soundmatch.logic.DiscoveryEngine
+import com.example.soundmatch.logic.ShownSongs
 import com.example.soundmatch.logic.SoundMatchEngine
 import com.example.soundmatch.model.DeezerArtist
 import com.example.soundmatch.model.Energy
@@ -199,14 +200,15 @@ class SoundQuizActivity : AppCompatActivity() {
         if (hasRelatedArtists) discover(answers) else recommendFromCatalog(answers)
     }
 
-    // Busca as músicas dos artistas parecidos e escolhe a mais perto do clima.
+    // Busca as músicas dos artistas parecidos e escolhe a mais perto do clima que ainda não saiu.
     // Se a busca falhar ou não vier nada que dê para medir, a música sai do catálogo fixo.
     private fun discover(answers: QuizAnswers) {
         lifecycleScope.launch {
             setSearching(true)
             val candidates = networkOrNull { DiscoveryRepository.candidatesFor(profile, answers) }.orEmpty()
-            val result = DiscoveryEngine.recommend(profile, answers, candidates)
+            val result = DiscoveryEngine.recommend(profile, answers, candidates, ShownSongs.all)
                 ?: SoundMatchEngine.recommend(profile, answers)
+            ShownSongs.remember(result.song)   // para o próximo quiz não repetir esta música
             setSearching(false)
             openResult(result)
         }
