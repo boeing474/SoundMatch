@@ -12,6 +12,8 @@ object RetrofitClient {
     private const val BASE_URL = "https://soundmatch-api-dnh5.onrender.com/"
 
     private const val ITUNES_URL = "https://itunes.apple.com/"
+    private const val DEEZER_URL = "https://api.deezer.com/"
+    private const val RECCOBEATS_URL = "https://api.reccobeats.com/"
 
     // No plano grátis, o Render "dorme" a API e leva até ~1 min para acordar.
     // O padrão do OkHttp (10 s) desistiria antes disso.
@@ -24,6 +26,10 @@ object RetrofitClient {
 
     // O iTunes fica com o tempo padrão: se demorar, o app segue sem capa.
     val itunes: ITunesApi by lazy { create(ITUNES_URL, OkHttpClient()) }
+
+    // Deezer e ReccoBeats também ficam com o tempo padrão: se falharem, o app usa a reserva.
+    val deezer: DeezerApi by lazy { create(DEEZER_URL, OkHttpClient()) }
+    val reccoBeats: ReccoBeatsApi by lazy { create(RECCOBEATS_URL, OkHttpClient()) }
 
     private inline fun <reified T> create(baseUrl: String, client: OkHttpClient): T =
         Retrofit.Builder()
