@@ -65,6 +65,7 @@
     <string name="btn_see_result">Ver Minha Música</string>
     <string name="quiz_hint_discovery">Escolha o clima e hit ou pérola para continuar</string>
     <string name="quiz_hint_reserve">Escolha o clima para continuar</string>
+    <string name="quiz_searching">Procurando a sua música entre os artistas parecidos</string>
     <string name="quiz_progress">Respondidas: %1$d de %2$d</string>
 
     <!-- ===== ResultActivity ===== -->
@@ -72,6 +73,7 @@
     <string name="result_header_label">SEU PERFIL SONORO</string>
     <string name="result_match_suffix" formatted="false">% de match</string>
     <string name="result_match_hint">É quanto das suas respostas apontou para esse estilo, contando o seu artista favorito.</string>
+    <string name="result_match_hint_mood">É o quanto essa música chega perto do clima que você pediu.</string>
     <string name="result_surprise_title">Fora da sua zona de conforto</string>
     <string name="result_surprise_hint" formatted="false">Você quis se arriscar, então aqui não tem %: a música vem de um estilo que você marcou, fora do seu de sempre.</string>
     <string name="result_reason_label">Por que essa música?</string>

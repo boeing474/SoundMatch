@@ -3,8 +3,12 @@ package com.example.soundmatch.logic
 import com.example.soundmatch.model.AudioFeatures
 import com.example.soundmatch.model.DeezerArtist
 import com.example.soundmatch.model.DeezerTrack
+import com.example.soundmatch.model.Energy
+import com.example.soundmatch.model.QuizAnswers
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class DiscoveryRulesTest {
@@ -41,6 +45,22 @@ class DiscoveryRulesTest {
     @Test
     fun `busca vazia nao acha artista`() {
         assertNull(DiscoveryRules.pickArtist("bts", emptyList()))
+    }
+
+    @Test
+    fun `artistas novos nao incluem o favorito, os conhecidos nem repetidos`() {
+        val xand = artist(1, "Xand Avião", null)
+        val found = listOf(xand, artist(2, "NATTAN", null), artist(3, "Wesley Safadão", null), artist(2, "NATTAN", null))
+        val fresh = DiscoveryRules.newArtists(found, "wesley safadao", known = listOf(xand))
+        assertEquals(listOf(2L), fresh.map { it.id })
+    }
+
+    @Test
+    fun `a busca vai um passo alem para quem se arrisca ou ja conhece todos`() {
+        val related = listOf(artist(1, "Xand Avião", null), artist(2, "NATTAN", null))
+        assertFalse(DiscoveryRules.goesFarther(related, QuizAnswers(Energy.DANCE, knownArtists = related.take(1))))
+        assertTrue(DiscoveryRules.goesFarther(related, QuizAnswers(Energy.DANCE, knownArtists = related)))
+        assertTrue(DiscoveryRules.goesFarther(related, QuizAnswers(Energy.DANCE, surprise = true)))
     }
 
     @Test

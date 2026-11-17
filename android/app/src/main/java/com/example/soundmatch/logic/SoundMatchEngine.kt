@@ -8,9 +8,10 @@ import com.example.soundmatch.model.SoundResult
 import com.example.soundmatch.model.UserProfile
 import kotlin.math.roundToInt
 
-// Regra de negócio do app, sem nada de Android (por isso dá para testar com JUnit puro).
-// Em uma frase: o artista e as respostas votam no estilo, o "Me surpreenda" decide
-// se a pessoa fica nele, e a energia escolhe a música.
+// O motor reserva, sem nada de Android (por isso dá para testar com JUnit puro).
+// Entra quando não há artistas parecidos para procurar (ver DiscoveryEngine).
+// Em uma frase: o artista e os estilos marcados votam no estilo, o "Quero me arriscar"
+// decide se a pessoa fica nele, e o clima escolhe a música no catálogo fixo.
 object SoundMatchEngine {
 
     // O gênero do artista favorito (vindo do iTunes) vale mais que uma resposta do quiz.
@@ -21,7 +22,7 @@ object SoundMatchEngine {
 
     fun recommend(profile: UserProfile, answers: QuizAnswers): SoundResult {
         val votes = countVotes(profile, answers)
-        val usualGenre = pickGenre(votes, profile.artistGenre, answers.firstPick)
+        val usualGenre = pickGenre(votes, profile.artistGenre)
         val genre = if (answers.surprise) {
             surpriseGenre(votes, usualGenre, answers.likedGenres) ?: usualGenre
         } else {
@@ -40,20 +41,19 @@ object SoundMatchEngine {
         )
     }
 
-    // Artista favorito: 3 votos. Música da 1ª pergunta: 1 voto. Cada estilo marcado: 1 voto.
+    // Artista favorito: 3 votos. Cada estilo marcado: 1 voto.
     fun countVotes(profile: UserProfile, answers: QuizAnswers): Map<Genre, Int> {
         val votes = Genre.entries.associateWith { 0 }.toMutableMap()
         profile.artistGenre?.let { votes[it] = votes.getValue(it) + ARTIST_VOTES }
-        answers.firstPick?.let { votes[it] = votes.getValue(it) + 1 }
         answers.likedGenres.forEach { votes[it] = votes.getValue(it) + 1 }
         return votes
     }
 
-    // Empate: ganha o gênero do artista; depois, o da música da 1ª pergunta.
-    fun pickGenre(votes: Map<Genre, Int>, artistGenre: Genre?, firstPick: Genre?): Genre {
+    // Empate: ganha o gênero do artista; sem ele, o primeiro na ordem do enum Genre.
+    fun pickGenre(votes: Map<Genre, Int>, artistGenre: Genre?): Genre {
         val most = votes.values.max()
         val tied = Genre.entries.filter { votes[it] == most }
-        return listOfNotNull(artistGenre, firstPick).firstOrNull { it in tied } ?: tied.first()
+        return artistGenre?.takeIf { it in tied } ?: tied.first()
     }
 
     // Entre os estilos marcados, o mais votado que não seja o de sempre.
@@ -68,17 +68,14 @@ object SoundMatchEngine {
         return percent.roundToInt().coerceIn(MIN_MATCH, MAX_MATCH)
     }
 
-    // Fica só com as músicas da energia pedida e tira o artista favorito (a ideia é descobrir
-    // algo novo). Quem toca recebe a música em que o seu instrumento se destaca; os outros
-    // recebem uma escolha fixa pelo nome: pessoas diferentes ganham músicas diferentes,
+    // Fica só com as músicas do clima pedido e tira o artista favorito (a ideia é descobrir
+    // algo novo). A escolha é fixa pelo nome: pessoas diferentes ganham músicas diferentes,
     // mas a mesma pessoa sempre ganha a mesma.
     fun pickSong(genre: Genre, energy: Energy, profile: UserProfile): Song {
         val catalog = SongCatalog.songsFor(genre).filter { it.energy == energy }
         val newToUser = catalog
             .filterNot { isSameArtist(it.artist, profile.favoriteArtist) }
             .ifEmpty { catalog }
-
-        newToUser.firstOrNull { it.featured == profile.instrument }?.let { return it }
 
         val index = profile.name.trim().lowercase().hashCode().mod(newToUser.size)
         return newToUser[index]
@@ -97,21 +94,12 @@ object SoundMatchEngine {
                 append("$name, você quis sair da zona de conforto: em vez de ${usualGenre.title}, ")
                 append("a descoberta vem de ${genre.title}, um dos estilos que você marcou.")
             }
-            profile.artistGenre == genre && answers.firstPickSong != null -> {
-                append("$name, você ouve ${profile.favoriteArtist} e colocaria ${answers.firstPickSong} ")
-                append("pra tocar ${profile.situation.context}: seu perfil é ${genre.title}.")
-            }
-            profile.artistGenre == genre -> {
-                append("$name, você ouve ${profile.favoriteArtist} e suas respostas confirmaram: ")
-                append("seu perfil é ${genre.title}.")
-            }
+            profile.artistGenre == genre ->
+                append("$name, você ouve ${profile.favoriteArtist}: seu perfil é ${genre.title}.")
             else -> append("$name, suas respostas apontaram para ${genre.title}.")
         }
-        append(" Você pediu uma música ${answers.energy.phrase}, então a descoberta é ")
-        append("${song.title}, de ${song.artist}.")
-        profile.instrument?.let {
-            append(" Você ${it.practice}: repare ${it.focus} de ${song.title}.")
-        }
+        append(" Você pediu uma música ${answers.energy.phrase} pra ouvir ${profile.situation.context}, ")
+        append("então a descoberta é ${song.title}, de ${song.artist}.")
     }
 
     // "ac/dc" e "AC/DC " contam como o mesmo artista.

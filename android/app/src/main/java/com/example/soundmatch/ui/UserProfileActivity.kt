@@ -16,7 +16,6 @@ import com.example.soundmatch.R
 import com.example.soundmatch.databinding.ActivityUserProfileBinding
 import com.example.soundmatch.logic.ArtistName
 import com.example.soundmatch.logic.TrackPicker
-import com.example.soundmatch.model.ArtistSong
 import com.example.soundmatch.model.DeezerArtist
 import com.example.soundmatch.model.Genre
 import com.example.soundmatch.model.Situation
@@ -38,7 +37,6 @@ class UserProfileActivity : AppCompatActivity() {
     // Resultado da busca do artista. Fica null (ou vazio) até a busca terminar.
     private var foundArtist: String? = null
     private var artistGenre: Genre? = null
-    private var artistSongs: List<ArtistSong> = emptyList()
     private var relatedArtists: List<DeezerArtist> = emptyList()
     private var artistSearched = false
 
@@ -173,7 +171,6 @@ class UserProfileActivity : AppCompatActivity() {
                 val track = TrackPicker.bestMatch(tracks, name)
                 foundArtist = name
                 artistGenre = track?.primaryGenreName?.let { Genre.fromITunes(it) }
-                artistSongs = TrackPicker.artistSongs(tracks, name)
                 relatedArtists = deezerArtist
                     ?.let { networkOrNull { DiscoveryRepository.relatedArtists(it.id) } }
                     .orEmpty()
@@ -228,7 +225,6 @@ class UserProfileActivity : AppCompatActivity() {
     private fun clearArtist() {
         foundArtist = null
         artistGenre = null
-        artistSongs = emptyList()
         relatedArtists = emptyList()
     }
 
@@ -242,9 +238,7 @@ class UserProfileActivity : AppCompatActivity() {
             name = binding.etName.text.toString().trim(),
             favoriteArtist = foundArtist ?: binding.etArtist.text.toString().trim(),
             situation = situationChips.getValue(binding.chipGroupSituation.checkedChipId),
-            instrument = null,
             artistGenre = artistGenre,
-            artistSongs = artistSongs,
             relatedArtists = relatedArtists
         )
         val intent = Intent(this, SoundQuizActivity::class.java)

@@ -19,13 +19,16 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.example.soundmatch.R
 import com.example.soundmatch.databinding.ActivitySoundQuizBinding
+import com.example.soundmatch.logic.DiscoveryEngine
 import com.example.soundmatch.logic.SoundMatchEngine
 import com.example.soundmatch.model.DeezerArtist
 import com.example.soundmatch.model.Energy
 import com.example.soundmatch.model.Genre
 import com.example.soundmatch.model.Popularity
 import com.example.soundmatch.model.QuizAnswers
+import com.example.soundmatch.model.SoundResult
 import com.example.soundmatch.model.UserProfile
+import com.example.soundmatch.network.DiscoveryRepository
 import com.example.soundmatch.network.ImageLoader
 import com.example.soundmatch.network.networkOrNull
 import com.google.android.material.chip.Chip
@@ -148,23 +151,48 @@ class SoundQuizActivity : AppCompatActivity() {
 
     private fun showResult() {
         val answers = QuizAnswers(
-            firstPick = null,
-            firstPickSong = null,
             energy = Energy.entries[selectedIndex(binding.rgEnergy)],
             likedGenres = styleChecks.filterKeys { it.isChecked }.values.toList(),
             surprise = binding.switchRisk.isChecked,
             knownArtists = artistChips.filterKeys { it.isChecked }.values.toList(),
             popularity = Popularity.entries.getOrNull(selectedIndex(binding.rgPopularity))
         )
+        if (hasRelatedArtists) discover(answers) else recommendFromCatalog(answers)
+    }
+
+    // Busca as músicas dos artistas parecidos e escolhe a mais perto do clima.
+    // Se a busca falhar ou não vier nada que dê para medir, a música sai do catálogo fixo.
+    private fun discover(answers: QuizAnswers) {
+        lifecycleScope.launch {
+            setSearching(true)
+            val candidates = networkOrNull { DiscoveryRepository.candidatesFor(profile, answers) }.orEmpty()
+            val result = DiscoveryEngine.recommend(profile, answers, candidates)
+                ?: SoundMatchEngine.recommend(profile, answers)
+            setSearching(false)
+            openResult(result)
+        }
+    }
+
+    private fun recommendFromCatalog(answers: QuizAnswers) {
         val result = SoundMatchEngine.recommend(profile, answers)
 
-        // No quiz reserva, quem quer se arriscar precisa marcar um estilo além do de sempre.
-        if (!hasRelatedArtists && answers.surprise && !result.surprise) {
+        // Quem quer se arriscar precisa marcar um estilo além do de sempre.
+        if (answers.surprise && !result.surprise) {
             val message = getString(R.string.toast_surprise_needs_style, result.genre.title)
             Toast.makeText(this, message, Toast.LENGTH_LONG).show()
             return
         }
+        openResult(result)
+    }
 
+    private fun setSearching(searching: Boolean) {
+        binding.progressSearch.isVisible = searching
+        binding.btnSeeResult.isEnabled = !searching
+        binding.tvQuizHint.isVisible = searching
+        if (searching) binding.tvQuizHint.setText(R.string.quiz_searching)
+    }
+
+    private fun openResult(result: SoundResult) {
         val intent = Intent(this, ResultActivity::class.java)
             .putExtra(ResultActivity.EXTRA_RESULT, result)
         startActivity(intent)

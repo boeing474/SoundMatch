@@ -250,6 +250,16 @@
                 android:enabled="false"
                 android:text="@string/btn_see_result" />
 
+            <!-- Aparece enquanto o app busca as músicas dos artistas parecidos -->
+            <ProgressBar
+                android:id="@+id/progressSearch"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"
+                android:indeterminateTint="@color/neon_cyan"
+                android:visibility="gone" />
+
             <TextView
                 android:id="@+id/tvQuizHint"
                 style="@style/Widget.SoundMatch.Caption"

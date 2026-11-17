@@ -61,6 +61,9 @@ class ResultActivity : AppCompatActivity() {
             tvReason.text = result.reason
             tvLikedGenres.text = result.likedGenresLabel.ifEmpty { getString(R.string.result_no_styles) }
 
+            // Na descoberta por artistas parecidos, o % mede outra coisa: o clima.
+            if (result.fromSimilarArtists) tvMatchHint.setText(R.string.result_match_hint_mood)
+
             // Na surpresa o % não faz sentido (o estilo não foi o mais votado): mostra uma frase.
             if (result.surprise) {
                 layoutMatch.visibility = View.GONE

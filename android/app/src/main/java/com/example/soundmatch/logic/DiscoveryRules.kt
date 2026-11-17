@@ -4,6 +4,7 @@ import com.example.soundmatch.model.AudioFeatures
 import com.example.soundmatch.model.Candidate
 import com.example.soundmatch.model.DeezerArtist
 import com.example.soundmatch.model.DeezerTrack
+import com.example.soundmatch.model.QuizAnswers
 import java.text.Normalizer
 
 // Regras que não dependem da rede, separadas para poder testar sem internet.
@@ -25,6 +26,19 @@ object DiscoveryRules {
 
     // Junta cada música com as características do som, ligando as duas pelo ISRC.
     // Música sem ISRC ou que o ReccoBeats não conhece fica com features = null.
+    // Tira da lista o artista favorito, os que a pessoa já conhece e os repetidos.
+    fun newArtists(artists: List<DeezerArtist>, favorite: String, known: List<DeezerArtist>): List<DeezerArtist> {
+        val knownIds = known.map { it.id }.toSet()
+        return artists
+            .filterNot { it.id in knownIds || normalize(it.name) == normalize(favorite) }
+            .distinctBy { it.id }
+    }
+
+    // A busca vai um passo além (os parecidos dos parecidos) quando a pessoa quer
+    // se arriscar ou quando já conhece todos os parecidos.
+    fun goesFarther(related: List<DeezerArtist>, answers: QuizAnswers): Boolean =
+        answers.surprise || answers.knownArtists.size >= related.size
+
     fun attachFeatures(tracks: List<DeezerTrack>, features: List<AudioFeatures>): List<Candidate> {
         val byIsrc = features.filter { it.isrc != null }.associateBy { it.isrc!!.uppercase() }
         return tracks.map { track -> Candidate(track, track.isrc?.let { byIsrc[it.uppercase()] }) }
