@@ -1,24 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Uma pergunta por vez: cada card é um passo e o Kotlin troca qual fica visível.
+     Os botões ficam fixos embaixo, fora da área que rola. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
     android:fitsSystemWindows="true"
+    android:orientation="vertical"
     tools:context=".ui.SoundQuizActivity">
 
-    <LinearLayout
+    <ScrollView
+        android:id="@+id/scrollQuiz"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="32dp">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="24dp">
+            android:paddingHorizontal="24dp"
+            android:paddingBottom="16dp">
 
             <TextView
                 style="@style/Widget.SoundMatch.ScreenTitle"
@@ -28,34 +32,25 @@
                 android:text="@string/quiz_title" />
 
             <TextView
+                android:id="@+id/tvProgress"
                 style="@style/Widget.SoundMatch.Caption"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="@string/quiz_step" />
+                tools:text="Pergunta 1 de 3" />
 
             <ProgressBar
                 android:id="@+id/progressQuiz"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
-                android:layout_height="8dp"
-                android:layout_marginTop="20dp"
-                android:max="2"
-                android:progress="0"
+                android:layout_height="4dp"
+                android:layout_marginTop="12dp"
                 android:progressBackgroundTint="@color/night_card"
-                android:progressTint="@color/neon_magenta" />
+                android:progressTint="@color/neon_magenta"
+                tools:max="3"
+                tools:progress="1" />
 
-            <TextView
-                android:id="@+id/tvProgress"
-                style="@style/Widget.SoundMatch.Caption"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:gravity="end"
-                android:textSize="12sp"
-                tools:text="Respondidas: 0 de 2" />
-
-            <!-- Artistas parecidos com o favorito (só quando o Deezer achou). Chips criados no Kotlin. -->
+            <!-- Artistas parecidos com o favorito (só quando o Deezer achou). Cards criados no Kotlin. -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardKnown"
                 style="@style/Widget.SoundMatch.Card"
@@ -69,24 +64,27 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/tvKnownTitle"
                         style="@style/Widget.SoundMatch.QuestionTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        tools:text="@string/known_title" />
+                        android:text="@string/known_title" />
 
                     <TextView
+                        android:id="@+id/tvKnownHint"
                         style="@style/Widget.SoundMatch.Caption"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/known_hint"
-                        android:textSize="13sp" />
+                        android:textSize="13sp"
+                        tools:text="@string/known_hint" />
 
-                    <com.google.android.material.chip.ChipGroup
-                        android:id="@+id/chipsKnown"
+                    <!-- Grade de 2 colunas; cada card vem de item_artist_card.xml -->
+                    <GridLayout
+                        android:id="@+id/gridArtists"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp" />
+                        android:layout_marginHorizontal="-4dp"
+                        android:layout_marginTop="8dp"
+                        android:columnCount="2" />
 
                     <TextView
                         android:id="@+id/tvKnownCount"
@@ -102,6 +100,7 @@
 
             <!-- O clima: uma opção por item do enum Energy. -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardEnergy"
                 style="@style/Widget.SoundMatch.Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -207,8 +206,9 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Quero me arriscar -->
+            <!-- Quero me arriscar: aparece junto com a última pergunta -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardRisk"
                 style="@style/Widget.SoundMatch.Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -240,34 +240,59 @@
                         tools:text="@string/risk_hint" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
-            <Button
-                android:id="@+id/btnSeeResult"
-                style="@style/Widget.SoundMatch.Button.Primary"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:enabled="false"
-                android:text="@string/btn_see_result" />
-
-            <!-- Aparece enquanto o app busca as músicas dos artistas parecidos -->
-            <ProgressBar
-                android:id="@+id/progressSearch"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="12dp"
-                android:indeterminateTint="@color/neon_cyan"
-                android:visibility="gone" />
-
-            <TextView
-                android:id="@+id/tvQuizHint"
-                style="@style/Widget.SoundMatch.Caption"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="center"
-                tools:text="@string/quiz_hint_discovery" />
         </LinearLayout>
+    </ScrollView>
+
+    <!-- Aparece enquanto o app busca as músicas dos artistas parecidos -->
+    <LinearLayout
+        android:id="@+id/layoutSearching"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingHorizontal="24dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <ProgressBar
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:indeterminateTint="@color/neon_cyan" />
+
+        <TextView
+            style="@style/Widget.SoundMatch.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="@string/quiz_searching"
+            android:textSize="13sp" />
     </LinearLayout>
-</ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="16dp">
+
+        <Button
+            android:id="@+id/btnBack"
+            style="@style/Widget.SoundMatch.Button.Outlined"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:layout_weight="1"
+            android:text="@string/btn_back"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <Button
+            android:id="@+id/btnNext"
+            style="@style/Widget.SoundMatch.Button.Primary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text="@string/btn_next" />
+    </LinearLayout>
+</LinearLayout>

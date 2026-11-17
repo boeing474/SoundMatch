@@ -75,6 +75,13 @@ class DiscoveryRulesTest {
     }
 
     @Test
+    fun `varias medicoes da mesma gravacao viram a media`() {
+        val found = listOf(features("BRAAA0000001", 0.6), features("BRAAA0000001", 0.8))
+        val candidate = DiscoveryRules.attachFeatures(listOf(track(1, "BRAAA0000001")), found).single()
+        assertEquals(0.7, candidate.features!!.energy, 0.0001)
+    }
+
+    @Test
     fun `musica sem ISRC ou desconhecida continua, mas sem caracteristicas`() {
         val tracks = listOf(track(1, null), track(2, "BRCCC0000003"))
         val candidates = DiscoveryRules.attachFeatures(tracks, listOf(features(null, 0.7)))

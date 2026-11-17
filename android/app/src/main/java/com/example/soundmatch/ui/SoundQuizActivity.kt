@@ -5,13 +5,14 @@ import android.os.Bundle
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
 import android.view.View
+import android.widget.ImageView
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
-import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.core.text.bold
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
@@ -19,6 +20,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.example.soundmatch.R
 import com.example.soundmatch.databinding.ActivitySoundQuizBinding
+import com.example.soundmatch.databinding.ItemArtistCardBinding
 import com.example.soundmatch.logic.DiscoveryEngine
 import com.example.soundmatch.logic.SoundMatchEngine
 import com.example.soundmatch.model.DeezerArtist
@@ -31,25 +33,46 @@ import com.example.soundmatch.model.UserProfile
 import com.example.soundmatch.network.DiscoveryRepository
 import com.example.soundmatch.network.ImageLoader
 import com.example.soundmatch.network.networkOrNull
-import com.google.android.material.chip.Chip
+import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.launch
 
+// Quiz com uma pergunta por vez, na mesma Activity (como o perfil).
+// Os cards das perguntas estão no XML e aqui só trocamos quais ficam visíveis.
 class SoundQuizActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySoundQuizBinding
     private lateinit var profile: UserProfile
+    private var currentStep = 0
+
+    // Um passo do quiz: os cards que aparecem nele e, se houver, a pergunta
+    // de escolha única que precisa de resposta para liberar o botão.
+    private class Step(val cards: List<View>, val question: RadioGroup? = null)
 
     // Com artistas parecidos (vindos do Deezer), o quiz é o da descoberta.
     // Sem eles fica o quiz reserva: clima + outros estilos, e a música sai do catálogo fixo.
     private val hasRelatedArtists: Boolean get() = profile.relatedArtists.isNotEmpty()
 
-    // As perguntas de escolha única: todas precisam de resposta para liberar o botão.
-    private val questionGroups: List<RadioGroup> by lazy {
-        if (hasRelatedArtists) listOf(binding.rgEnergy, binding.rgPopularity) else listOf(binding.rgEnergy)
+    private val steps: List<Step> by lazy {
+        if (hasRelatedArtists) {
+            listOf(
+                Step(listOf(binding.cardKnown)),
+                Step(listOf(binding.cardEnergy), binding.rgEnergy),
+                Step(listOf(binding.cardPopularity, binding.cardRisk), binding.rgPopularity)
+            )
+        } else {
+            listOf(
+                Step(listOf(binding.cardEnergy), binding.rgEnergy),
+                Step(listOf(binding.cardStyles, binding.cardRisk))
+            )
+        }
     }
 
-    // Cada chip da pergunta dos parecidos e o artista que ele representa.
-    private val artistChips = mutableMapOf<Chip, DeezerArtist>()
+    private val allCards: List<View> by lazy {
+        listOf(binding.cardKnown, binding.cardEnergy, binding.cardPopularity, binding.cardStyles, binding.cardRisk)
+    }
+
+    // Cada card da pergunta dos parecidos e o artista que ele representa.
+    private val artistCards = mutableMapOf<MaterialCardView, DeezerArtist>()
 
     private val styleChecks by lazy {
         mapOf(
@@ -69,56 +92,82 @@ class SoundQuizActivity : AppCompatActivity() {
         profile = IntentCompat.getSerializableExtra(intent, EXTRA_PROFILE, UserProfile::class.java)
             ?: run { finish(); return }
 
-        showQuizMode()
         if (hasRelatedArtists) showKnownQuestion()
         Energy.entries.forEach { addOption(binding.rgEnergy, it.label, it.hint) }
         Popularity.entries.forEach { addOption(binding.rgPopularity, it.label, it.hint) }
-
-        questionGroups.forEach { group ->
-            group.setOnCheckedChangeListener { _, _ -> updateProgress() }
-        }
-        binding.btnSeeResult.setOnClickListener { showResult() }
-        updateProgress()
-    }
-
-    // Mostra só os cards do modo em que o quiz está e ajusta os textos que mudam.
-    private fun showQuizMode() {
-        binding.cardKnown.isVisible = hasRelatedArtists
-        binding.cardPopularity.isVisible = hasRelatedArtists
-        binding.cardStyles.isVisible = !hasRelatedArtists
         binding.tvRiskHint.setText(if (hasRelatedArtists) R.string.risk_hint else R.string.risk_hint_reserve)
-        binding.tvQuizHint.setText(
-            if (hasRelatedArtists) R.string.quiz_hint_discovery else R.string.quiz_hint_reserve
-        )
-        binding.progressQuiz.max = questionGroups.size
+        binding.progressQuiz.max = steps.size
+
+        // Respondeu a pergunta do passo: libera o botão.
+        listOf(binding.rgEnergy, binding.rgPopularity).forEach { group ->
+            group.setOnCheckedChangeListener { _, _ -> updateNextButton() }
+        }
+        binding.btnNext.setOnClickListener { onNextClicked() }
+        binding.btnBack.setOnClickListener { showStep(currentStep - 1) }
+
+        // O "voltar" do celular volta uma pergunta antes de sair da tela.
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (currentStep > 0) showStep(currentStep - 1) else finish()
+            }
+        })
+
+        showStep(0)
     }
 
-    // "Desses parecidos com BTS, quais você já conhece?": um chip com foto para cada artista.
+    // Esconde todos os cards e mostra só os do passo pedido.
+    private fun showStep(step: Int) {
+        currentStep = step
+        allCards.forEach { it.isVisible = it in steps[step].cards }
+
+        binding.tvProgress.text = getString(R.string.quiz_progress, step + 1, steps.size)
+        binding.progressQuiz.progress = step + 1
+        binding.btnBack.isVisible = step > 0
+        binding.scrollQuiz.scrollTo(0, 0)
+        updateNextButton()
+    }
+
+    // No último passo o botão vira "Ver Minha Música". Enquanto a pergunta
+    // do passo não tem resposta, ele fica desabilitado.
+    private fun updateNextButton() {
+        val question = steps[currentStep].question
+        binding.btnNext.isEnabled = question == null || question.checkedRadioButtonId != View.NO_ID
+        binding.btnNext.setText(if (currentStep == steps.lastIndex) R.string.btn_see_result else R.string.btn_next)
+    }
+
+    private fun onNextClicked() {
+        if (currentStep == steps.lastIndex) showResult() else showStep(currentStep + 1)
+    }
+
+    // "Outros artistas que você curte": um card com foto para cada parecido com o favorito.
+    // O card marcado ganha o contorno ciano e o ícone de confirmação (isChecked do MaterialCardView).
     private fun showKnownQuestion() {
-        binding.tvKnownTitle.text = getString(R.string.known_title, profile.favoriteArtist)
+        binding.tvKnownHint.text = getString(R.string.known_hint, profile.favoriteArtist)
         profile.relatedArtists.forEach { artist ->
-            val chip = layoutInflater.inflate(R.layout.item_artist_chip, binding.chipsKnown, false) as Chip
-            chip.text = artist.name
-            chip.setOnCheckedChangeListener { _, _ -> updateKnownCount() }
-            binding.chipsKnown.addView(chip)
-            artistChips[chip] = artist
-            artist.picture?.let { loadPhoto(chip, it) }
+            val item = ItemArtistCardBinding.inflate(layoutInflater, binding.gridArtists, false)
+            item.tvArtist.text = artist.name
+            item.root.setOnClickListener {
+                item.root.isChecked = !item.root.isChecked
+                updateKnownCount()
+            }
+            binding.gridArtists.addView(item.root)
+            artistCards[item.root] = artist
+            artist.picture?.let { loadPhoto(item.imgArtist, it) }
         }
         updateKnownCount()
     }
 
-    // A foto vem da internet e é recortada em círculo. Se o download falhar, o chip fica com o vinil.
-    private fun loadPhoto(chip: Chip, url: String) {
+    // A foto vem da internet. Se o download falhar, o card fica com o vinil.
+    private fun loadPhoto(image: ImageView, url: String) {
         lifecycleScope.launch {
-            val photo = networkOrNull { ImageLoader.load(url) } ?: return@launch
-            chip.chipIcon = RoundedBitmapDrawableFactory.create(resources, photo).apply { isCircular = true }
+            networkOrNull { ImageLoader.load(url) }?.let { image.setImageBitmap(it) }
         }
     }
 
-    // "2 conhecidos · 8 na disputa", logo abaixo dos chips.
+    // "2 marcados · 6 na disputa", logo abaixo dos cards.
     private fun updateKnownCount() {
-        val known = artistChips.keys.count { it.isChecked }
-        val left = artistChips.size - known
+        val known = artistCards.keys.count { it.isChecked }
+        val left = artistCards.size - known
         binding.tvKnownCount.text = when {
             known == 0 -> getString(R.string.known_none)
             left == 0 -> getString(R.string.known_all)
@@ -139,22 +188,12 @@ class SoundQuizActivity : AppCompatActivity() {
         group.addView(option)
     }
 
-    private fun updateProgress() {
-        val answered = questionGroups.count { it.checkedRadioButtonId != View.NO_ID }
-        val allAnswered = answered == questionGroups.size
-
-        binding.progressQuiz.progress = answered
-        binding.tvProgress.text = getString(R.string.quiz_progress, answered, questionGroups.size)
-        binding.btnSeeResult.isEnabled = allAnswered
-        binding.tvQuizHint.visibility = if (allAnswered) View.GONE else View.VISIBLE
-    }
-
     private fun showResult() {
         val answers = QuizAnswers(
             energy = Energy.entries[selectedIndex(binding.rgEnergy)],
             likedGenres = styleChecks.filterKeys { it.isChecked }.values.toList(),
             surprise = binding.switchRisk.isChecked,
-            knownArtists = artistChips.filterKeys { it.isChecked }.values.toList(),
+            knownArtists = artistCards.filterKeys { it.isChecked }.values.toList(),
             popularity = Popularity.entries.getOrNull(selectedIndex(binding.rgPopularity))
         )
         if (hasRelatedArtists) discover(answers) else recommendFromCatalog(answers)
@@ -185,11 +224,11 @@ class SoundQuizActivity : AppCompatActivity() {
         openResult(result)
     }
 
+    // Durante a busca aparece o aviso com a ProgressBar e os botões ficam travados.
     private fun setSearching(searching: Boolean) {
-        binding.progressSearch.isVisible = searching
-        binding.btnSeeResult.isEnabled = !searching
-        binding.tvQuizHint.isVisible = searching
-        if (searching) binding.tvQuizHint.setText(R.string.quiz_searching)
+        binding.layoutSearching.isVisible = searching
+        binding.btnNext.isEnabled = !searching
+        binding.btnBack.isEnabled = !searching
     }
 
     private fun openResult(result: SoundResult) {

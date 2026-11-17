@@ -17,6 +17,7 @@ import kotlin.math.roundToInt
 // A descoberta por artistas parecidos, sem nada de Android (dá para testar com JUnit puro).
 // Em uma frase: das músicas mais tocadas dos artistas que a pessoa não conhece, fica a metade
 // pedida (hits ou pérolas) e ganha a que chega mais perto do clima.
+// "Não conhece" aqui quer dizer: não é o favorito nem foi marcado no quiz como artista que já curte.
 object DiscoveryEngine {
 
     private const val MIN_MATCH = 10
@@ -126,9 +127,9 @@ object DiscoveryEngine {
             answers.surprise ->
                 append("$name, você quis se arriscar: ${song.artist} fica um passo além dos parecidos com $favorite.")
             DiscoveryRules.goesFarther(profile.relatedArtists, answers) ->
-                append("$name, você já conhece os parecidos com $favorite, então a busca foi um passo além e chegou em ${song.artist}.")
+                append("$name, você já curte os parecidos com $favorite, então a busca foi um passo além e chegou em ${song.artist}.")
             else ->
-                append("$name, você ouve $favorite e ainda não conhece ${song.artist}, que tem um som parecido.")
+                append("$name, você ouve $favorite, e ${song.artist} tem um som parecido.")
         }
         append(" Você pediu uma música ${answers.energy.phrase} pra ouvir ${profile.situation.context}")
         answers.popularity?.let { append(", ${it.phrase}") }

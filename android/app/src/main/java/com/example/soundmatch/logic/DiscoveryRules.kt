@@ -40,7 +40,20 @@ object DiscoveryRules {
         answers.surprise || answers.knownArtists.size >= related.size
 
     fun attachFeatures(tracks: List<DeezerTrack>, features: List<AudioFeatures>): List<Candidate> {
-        val byIsrc = features.filter { it.isrc != null }.associateBy { it.isrc!!.uppercase() }
+        val byIsrc = features
+            .filter { it.isrc != null }
+            .groupBy { it.isrc!!.uppercase() }
+            .mapValues { (_, measures) -> average(measures) }
         return tracks.map { track -> Candidate(track, track.isrc?.let { byIsrc[it.uppercase()] }) }
     }
+
+    // O ReccoBeats devolve várias medições da mesma gravação (uma por lançamento), com números
+    // um pouco diferentes. Fica a média, para o resultado não depender de qual delas veio por último.
+    private fun average(measures: List<AudioFeatures>) = AudioFeatures(
+        isrc = measures.first().isrc,
+        energy = measures.map { it.energy }.average(),
+        valence = measures.map { it.valence }.average(),
+        danceability = measures.map { it.danceability }.average(),
+        acousticness = measures.map { it.acousticness }.average()
+    )
 }

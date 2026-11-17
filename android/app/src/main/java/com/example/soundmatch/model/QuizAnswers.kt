@@ -1,7 +1,7 @@
 package com.example.soundmatch.model
 
 // surprise: a pessoa ligou o "Quero me arriscar".
-// knownArtists: os parecidos que a pessoa já conhece (saem da disputa).
+// knownArtists: os parecidos que a pessoa marcou porque já curte (saem da disputa).
 // popularity: hit ou pérola (null no quiz reserva, que não tem essa pergunta).
 // likedGenres: os "outros estilos" marcados (só no quiz reserva).
 data class QuizAnswers(

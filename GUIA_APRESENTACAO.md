@@ -31,7 +31,7 @@ A API está no Render (https://soundmatch-api-dnh5.onrender.com). Não precisa d
    - Tocar em **"Descobrir Meu Som"** → *Intent explícita*.
 2. **Perfil (uma pergunta por vez)**
    - Tentar continuar com o nome vazio: o campo fica em erro (**feedback visual**).
-   - Digitar um artista (ex.: Metallica) e tocar em **"Buscar artista"**:
+   - Em "Qual seu cantor ou banda favorita?", digitar um artista (ex.: Metallica) e tocar em **"Buscar artista"**:
      - o app consulta o **Deezer** (nome oficial, foto e artistas parecidos) e o **iTunes** (estilo);
      - aparece um card com a foto, o nome oficial e o estilo ("Metal"), com contorno na cor do estilo.
    - Escolher a situação nos chips (o `Chip` é subclasse de `CheckBox`).
@@ -39,9 +39,10 @@ A API está no Render (https://soundmatch-api-dnh5.onrender.com). Não precisa d
    - Mostrar a frase que usa a resposta anterior ("Prazer, Pedro.") e o sol do rodapé subindo a cada passo (`moveSun`, com `animate().translationY`).
    - Avançar → *Intent explícita com `putExtra`* levando o `UserProfile` (com os artistas parecidos dentro).
 3. **Quiz**
-   - Mostrar que a 1ª pergunta usa o perfil: os parecidos com o artista, cada um num chip com foto. Marcar um ou dois: o contador muda ("2 conhecidos · 6 na disputa").
-   - Escolher o clima (ex.: Porradeira) e hit ou pérola: a `ProgressBar` avança, e o botão só habilita com as 2 respostas.
-   - (Opcional) Mostrar o Switch **Quero me arriscar**: a busca passa a ser nos parecidos dos parecidos.
+   - Mostrar que o quiz também é uma pergunta por vez ("Pergunta X de 3", Voltar / Continuar, e o voltar do celular volta uma pergunta).
+   - A 1ª pergunta usa o perfil: "Outros artistas que você curte" traz os parecidos com o artista, cada um num card com foto. Marcar um ou dois: o card ganha o contorno ciano e o contador muda ("2 marcados · 6 na disputa"). Os marcados saem da disputa.
+   - Na 2ª, escolher o clima (ex.: Porradeira): o botão Continuar só habilita depois da resposta, e a `ProgressBar` avança a cada pergunta.
+   - Na 3ª, escolher hit ou pérola. (Opcional) Mostrar o Switch **Quero me arriscar**: a busca passa a ser nos parecidos dos parecidos.
    - Tocar em **"Ver Minha Música"**: aparece a `ProgressBar` enquanto o app busca as músicas no Deezer e as características no ReccoBeats.
 4. **Resultado**
    - Mostrar a capa em destaque, a música e o card **"Parecido com Metallica"** com o **% de match**.
@@ -61,7 +62,7 @@ A API está no Render (https://soundmatch-api-dnh5.onrender.com). Não precisa d
    - Tocar na **lixeira** para excluir, com confirmação em `AlertDialog` (**DELETE**).
 7. **Código**
    - Abrir `logic/DiscoveryEngine.kt` e explicar `recommend`: quem entra, hit ou pérola, o alvo do clima e o % de match.
-   - Mostrar os 37 testes passando (`DiscoveryEngineTest` e os outros, botão Run).
+   - Mostrar os 38 testes passando (`DiscoveryEngineTest` e os outros, botão Run).
 
 ---
 
@@ -75,7 +76,7 @@ Para achar rápido no Android Studio: Ctrl+Shift+F (busca no projeto) ou Ctrl+N 
 | Intent explícita | `MainActivity.setupNavigation()`, `UserProfileActivity.openQuiz()`, `SoundQuizActivity.openResult()` |
 | Intent implícita | `ResultActivity.openYoutube()` e `openSpotify()` (`ACTION_VIEW`), `shareProfile()` (`ACTION_SEND`) |
 | Views (10 tipos) | Veja a lista abaixo |
-| Feedback visual | erro no campo + `Toast` (Perfil), `ProgressBar` na busca do artista, contador de conhecidos, botão desabilitado e `ProgressBar` na busca das músicas (Quiz), `ProgressBar` + `Toast` (Resultado e Histórico) |
+| Feedback visual | erro no campo + `Toast` (Perfil), `ProgressBar` na busca do artista, card marcado e contador de artistas, botão desabilitado e `ProgressBar` na busca das músicas (Quiz), `ProgressBar` + `Toast` (Resultado e Histórico) |
 | API REST + Swagger | `backend/main.py` (os `summary` e `tags` aparecem no `/docs`) |
 | CRUD Retrofit | `network/SoundMatchApi.kt` + chamadas em `ResultActivity.saveRecommendation()` e `HistoryActivity` (`loadHistory`, `updateRating`, `deleteRecommendation`) |
 | APIs externas (extra) | `network/DeezerApi.kt`, `ReccoBeatsApi.kt` e `ITunesApi.kt`, usadas por `network/DiscoveryRepository.kt`, `UserProfileActivity.searchArtist()` e `SoundQuizActivity.discover()` |
@@ -85,7 +86,7 @@ Para achar rápido no Android Studio: Ctrl+Shift+F (busca no projeto) ou Ctrl+N 
 Onde está cada tipo de View:
 - `TextView`, `ImageView` e `Button`: `activity_main.xml`;
 - `EditText` (`TextInputEditText`), `Chip` (subclasse de `CheckBox`), `CardView` e `ProgressBar`: `activity_user_profile.xml`;
-- `RadioButton` (criados no Kotlin a partir de `item_quiz_option.xml`), `Chip` com foto (`item_artist_chip.xml`), `CheckBox` e `Switch`: `activity_sound_quiz.xml`;
+- `RadioButton` (criados no Kotlin a partir de `item_quiz_option.xml`), cards dos artistas (`item_artist_card.xml`: `MaterialCardView` + `ImageView`, dentro de um `GridLayout` de 2 colunas), `CheckBox` e `Switch`: `activity_sound_quiz.xml`;
 - `RecyclerView`: `activity_history.xml`.
 
 ---
@@ -135,7 +136,7 @@ E o caminho da recomendação, antes disso:
 |---|---|
 | `ui/MainActivity` | Tela inicial: animações e navegação para o Perfil e o Histórico |
 | `ui/UserProfileActivity` | Perfil em 3 passos na mesma tela (troca a visibilidade dos blocos), busca o artista no Deezer e no iTunes e envia o `UserProfile` para o quiz |
-| `ui/SoundQuizActivity` | Monta os chips dos parecidos, lê as respostas, busca as candidatas e chama o `DiscoveryEngine` (ou o motor reserva) |
+| `ui/SoundQuizActivity` | Quiz em passos na mesma tela (troca quais cards ficam visíveis), monta os cards dos parecidos, lê as respostas, busca as candidatas e chama o `DiscoveryEngine` (ou o motor reserva) |
 | `ui/ResultActivity` | Exibe o resultado e a capa, faz o POST na API e dispara as Intents implícitas |
 | `ui/HistoryActivity` | GET, PUT (muda a avaliação) e DELETE (com confirmação em AlertDialog) |
 | `adapter/HistoryAdapter` | Transforma cada registro da API em um card do RecyclerView (`ListAdapter` + `DiffUtil`) |
@@ -157,7 +158,7 @@ E o caminho da recomendação, antes disso:
 | `model/DeezerModels`, `AudioFeatures`, `Candidate` | Respostas do Deezer e do ReccoBeats; `Candidate` é uma música do Deezer com as características (ou `null`) |
 | `model/ApiModels`, `ITunesModels` | Espelho do JSON da nossa API e do iTunes (`@SerializedName`) |
 | `logic/DiscoveryEngine` | **Regra de negócio**: quem entra na disputa, hit ou pérola, alvo de cada clima, % de match e explicação |
-| `logic/DiscoveryRules` | Regras menores: escolher o artista certo entre homônimos, tirar os conhecidos, decidir quando ir aos parecidos dos parecidos, ligar música e características pelo ISRC |
+| `logic/DiscoveryRules` | Regras menores: escolher o artista certo entre homônimos, tirar os artistas marcados, decidir quando ir aos parecidos dos parecidos, ligar música e características pelo ISRC |
 | `logic/SoundMatchEngine` | Motor reserva: votação por estilo e música do catálogo fixo |
 | `logic/SongCatalog` | Catálogo reserva: 60 músicas, 12 por estilo, 2 de cada clima |
 | `logic/TrackPicker` | Escolhe a faixa certa entre os resultados do iTunes (artista certo, versão de estúdio) |
@@ -190,7 +191,7 @@ E o caminho da recomendação, antes disso:
 
 **Como a música é escolhida?**
 Em quatro passos, todos em `DiscoveryEngine.recommend`:
-1. entram as 4 músicas mais tocadas de cada artista parecido que a pessoa não marcou como conhecido (`newToUser` tira o favorito, os conhecidos e as repetidas);
+1. entram as 4 músicas mais tocadas de cada artista parecido que a pessoa não marcou (`newToUser` tira o favorito, os marcados e as repetidas);
 2. só ficam as que têm as características do som;
 3. `popularityHalf` ordena pela popularidade e corta no meio: hit fica com a metade de cima, pérola com a de baixo;
 4. ganha a mais perto do alvo do clima (`closeness`), com a situação desempatando (`situationBonus`).
@@ -210,11 +211,17 @@ Pelo ReccoBeats, que devolve números de 0 a 1 para cada gravação: `energy` (e
 **Para que serve a situação (academia, festa...)?**
 Só para desempatar (`situationBonus`, com peso 0,1): na academia ganha a mais enérgica, na festa a mais dançante, estudando ou relaxando a mais calma. Ela não entra no % de match.
 
+**Por que os artistas que eu marco saem da disputa?**
+Porque o app é de descoberta: se a pessoa já curte o artista, uma música dele não é novidade. O que ela marca é guardado em `QuizAnswers.knownArtists` e tirado em `DiscoveryRules.newArtists` (antes da busca) e em `DiscoveryEngine.newToUser` (nas músicas).
+
+**Como os cards dos artistas são montados?**
+No Kotlin (`showKnownQuestion`): para cada parecido, o layout `item_artist_card.xml` é inflado dentro de um `GridLayout` de 2 colunas. O card é um `MaterialCardView` marcável (`isChecked`), e a foto é baixada do Deezer com o `ImageLoader`.
+
 **Como funciona o hit ou pérola?**
 O Deezer dá um `rank` de popularidade para cada música. As candidatas são ordenadas por ele e cortadas no meio (`popularityHalf`).
 
 **Como funciona o Quero me arriscar?**
-A busca vai um passo além: em vez dos parecidos com o artista, entram os parecidos dos 3 primeiros da lista, fora os que já eram parecidos diretos (`DiscoveryRepository.fartherArtists`). O mesmo acontece se a pessoa marcar todos como conhecidos (`DiscoveryRules.goesFarther`).
+A busca vai um passo além: em vez dos parecidos com o artista, entram os parecidos dos 3 primeiros da lista, fora os que já eram parecidos diretos (`DiscoveryRepository.fartherArtists`). O mesmo acontece se a pessoa marcar todos (`DiscoveryRules.goesFarther`).
 
 **Por que só 8 artistas e 4 músicas de cada?**
 O Deezer aceita 50 chamadas a cada 5 segundos. Cada artista custa 1 chamada (as mais tocadas) e cada música mais 1 (para trazer o ISRC): 8 + 32 = 40. Se o limite estourar mesmo assim, a música segue sem ISRC e fica fora da disputa, sem derrubar o app (`withIsrc`).
@@ -229,7 +236,7 @@ A lista de parecidos vem vazia e o quiz muda para o modo reserva: só o clima, o
 Nenhuma candidata terá as características, o `DiscoveryEngine.recommend` devolve `null` e a tela usa o motor reserva. Preferi isso a mostrar um % inventado.
 
 **Como garante que a música é uma "descoberta"?**
-O `newToUser` tira as músicas do artista favorito e dos artistas marcados como conhecidos. No motor reserva, o `pickSong` também tira o artista favorito.
+O `newToUser` tira as músicas do artista favorito e dos artistas marcados em "Outros artistas que você curte". No motor reserva, o `pickSong` também tira o artista favorito.
 
 **Tem vários artistas com o mesmo nome no Deezer. Como escolhe?**
 `DiscoveryRules.pickArtist` compara o nome sem acento e sem maiúscula e, entre os iguais ao digitado, fica com o de mais fãs. Há vários "BTS", por exemplo.
@@ -248,6 +255,12 @@ Ele tenta abrir `spotify:search:<música>`, que só o app do Spotify entende. Se
 
 **Por que o perfil é uma tela só com 3 passos, e não 3 Activities?**
 São 3 perguntas curtas do mesmo formulário. Os 3 blocos ficam no mesmo XML, e o Kotlin mostra só o passo atual (`showStep`). Assim os dados ficam numa Activity só, e o voltar do celular volta um passo (`OnBackPressedCallback`).
+
+**E o quiz, como mostra uma pergunta por vez?**
+Do mesmo jeito. Cada passo é um `Step`: a lista de cards que aparecem nele e, se houver, a pergunta de escolha única que precisa de resposta. O `showStep` deixa visíveis só os cards do passo, e o `updateNextButton` trava o botão enquanto a pergunta não tem resposta. A lista de passos muda conforme o modo: 3 passos na descoberta, 2 no quiz reserva.
+
+**As mesmas respostas dão sempre a mesma música?**
+Sim, enquanto as APIs devolverem os mesmos dados: o motor não sorteia nada. O ReccoBeats manda várias medições da mesma gravação, com números um pouco diferentes, e o app fica com a média (`DiscoveryRules.average`), para não depender de qual delas veio por último. A música pode mudar se a popularidade no Deezer mudar ou se alguma chamada falhar.
 
 **Por que as colunas se chamam `score`, `archetype` e `subgenres`?**
 Os nomes vêm da primeira versão do projeto. Hoje:

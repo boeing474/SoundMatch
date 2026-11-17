@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Contorno do card do artista no quiz: ciano quando marcado -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/neon_cyan" android:state_checked="true" />
+    <item android:color="@color/stroke_subtle" />
+</selector>

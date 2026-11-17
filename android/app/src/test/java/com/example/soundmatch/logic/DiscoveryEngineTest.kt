@@ -153,7 +153,7 @@ class DiscoveryEngineTest {
     @Test
     fun `explicacao cita nome, favorito, artista novo, clima, situacao e popularidade`() {
         val reason = DiscoveryEngine.recommend(fan, answers(Energy.HEAVY, Popularity.GEM), fourSongs)!!.reason
-        assertTrue(reason.contains("Ana, você ouve Wesley Safadão e ainda não conhece Zé Vaqueiro"))
+        assertTrue(reason.contains("Ana, você ouve Wesley Safadão, e Zé Vaqueiro tem um som parecido"))
         assertTrue(reason.contains("uma música porradeira pra ouvir na rua, entre as menos conhecidas"))
         assertTrue(reason.contains("Pérola pesada foi a que chegou mais perto"))
     }
@@ -164,6 +164,6 @@ class DiscoveryEngineTest {
         assertTrue(risk.contains("você quis se arriscar"))
 
         val knowsAll = DiscoveryEngine.recommend(fan, answers(known = listOf(xand, nattan)), fourSongs)!!.reason
-        assertTrue(knowsAll.contains("você já conhece os parecidos com Wesley Safadão"))
+        assertTrue(knowsAll.contains("você já curte os parecidos com Wesley Safadão"))
     }
 }

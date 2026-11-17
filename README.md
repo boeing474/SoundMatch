@@ -3,17 +3,17 @@
 Aplicativo Android nativo (Kotlin + XML Views) integrado a uma **API REST em FastAPI** com **banco de dados relacional SQLite**.
 
 A ideia é recomendar **uma música nova, de um artista parecido com o que a pessoa já ouve e no clima que ela pediu**. Funciona assim:
-- A pessoa conta o nome, o artista que mais ouve e quando mais ouve música.
+- A pessoa conta o nome, o cantor ou banda favorita e quando mais ouve música.
 - O app busca o artista no Deezer e traz os **artistas parecidos** com ele.
-- No quiz, a pessoa marca quais desses parecidos já conhece (a descoberta vem dos outros), escolhe o **clima** que quer agora (Porradeira, Dançante, Pra cantar junto, Sofrência, Viajada ou De boa) e se prefere um **hit do momento** ou uma **pérola escondida**.
-- O app pega as músicas mais tocadas dos parecidos que ela não conhece, consulta as características do som de cada uma (energia, alegria, o quanto é dançante e acústica) e escolhe a que chega mais perto do clima pedido.
+- No quiz, a pessoa marca quais desses parecidos já curte (a descoberta vem dos outros), escolhe o **clima** que quer agora (Porradeira, Dançante, Pra cantar junto, Sofrência, Viajada ou De boa) e se prefere um **hit do momento** ou uma **pérola escondida**.
+- O app pega as músicas mais tocadas dos parecidos que ela não marcou, consulta as características do som de cada uma (energia, alegria, o quanto é dançante e acústica) e escolhe a que chega mais perto do clima pedido.
 - Com o **Quero me arriscar** ligado, a busca vai um passo além: os parecidos dos parecidos.
 - O app mostra:
   - a **música recomendada**, com a capa do álbum;
   - o **% de match**, que é o quanto a música chega perto do clima pedido;
   - uma explicação do porquê da escolha.
 
-Quem coloca Wesley Safadão e pede uma música dançante recebe um forró dançante de um artista que ainda não conhece. Quem coloca Metallica e pede uma porradeira recebe um metal pesado.
+Quem coloca Wesley Safadão e pede uma música dançante recebe um forró dançante de um artista que ela não marcou. Quem coloca Metallica e pede uma porradeira recebe um metal pesado.
 
 A pessoa responde "Curti" ou "Não curti", e a descoberta é salva no banco pela API. Em "Minhas Descobertas" dá para consultar, mudar a avaliação ou excluir.
 
@@ -27,7 +27,7 @@ A pessoa responde "Curti" ou "Não curti", e a descoberta é salva no banco pela
 
 Prints tirados no celular físico (Galaxy S23 FE).
 
-| Início | Perfil (passo 2 de 3) | Quiz |
+| Início | Perfil (passo 2 de 3) | Quiz (pergunta 1 de 3) |
 |---|---|---|
 | <img src="docs/screenshots/01_inicio.png" width="230"> | <img src="docs/screenshots/02_perfil.png" width="230"> | <img src="docs/screenshots/03_quiz.png" width="230"> |
 
@@ -50,7 +50,7 @@ MainActivity ──► UserProfileActivity ──► SoundQuizActivity ──►
 |---|---|---|---|
 | 1 | `MainActivity` | Tela inicial: o disco de vinil nasce no horizonte e gira, e o título neon pulsa | ImageView, TextView, Button |
 | 2 | `UserProfileActivity` | Perfil em formato de conversa, uma pergunta por vez, em 3 passos: nome, artista favorito (buscado no Deezer e mostrado num card com foto e estilo) e quando mais ouve música. Uma frase usa a resposta anterior ("Prazer, Pedro."), e no rodapé o sol sobe a cada passo. Tem "Passo X de 3", barra de progresso e Voltar / Continuar | EditText, Button, CheckBox (Chip), CardView, ImageView, ProgressBar |
-| 3 | `SoundQuizActivity` | "Desses parecidos com Metallica, quais você já conhece?" (um chip com foto para cada artista), o clima da música, hit ou pérola e o Switch "Quero me arriscar". Ao pedir o resultado, busca as músicas candidatas e mostra uma barra de progresso | RadioButton, CheckBox (Chip), Switch, CardView, ProgressBar |
+| 3 | `SoundQuizActivity` | Quiz com uma pergunta por vez, em 3 passos: "Outros artistas que você curte" (uma grade de cards com a foto de cada parecido com o favorito; os marcados saem da disputa), o clima da música e, por último, hit ou pérola com o Switch "Quero me arriscar". Tem "Pergunta X de 3", barra de progresso e Voltar / Continuar. Ao pedir o resultado, busca as músicas candidatas e mostra uma barra de progresso | CardView, ImageView, RadioButton, CheckBox, Switch, ProgressBar |
 | 4 | `ResultActivity` | Estilo "tocando agora": capa do álbum, música, card "Parecido com Metallica" com o % de match e explicação. Curti / Não curti salva na API; abre no Spotify ou no YouTube e compartilha | ImageView, CardView, ProgressBar, Button |
 | 5 | `HistoryActivity` | Lista de músicas salvas, cada uma com a capa. O coração muda a avaliação (PUT) e a lixeira exclui, com confirmação em AlertDialog (DELETE) | RecyclerView, CardView, ProgressBar |
 
@@ -197,10 +197,10 @@ users (1) ────────< (N) recommendations
 
 ## Lógica de recomendação
 
-O código fica em `logic/DiscoveryEngine.kt`, sem nada de Android, e é coberto por testes unitários (37 no total, em `DiscoveryEngineTest`, `DiscoveryRulesTest`, `SoundMatchEngineTest` e `TrackPickerTest`). Em uma frase: **das músicas mais tocadas dos artistas parecidos que a pessoa não conhece, fica a metade pedida (hits ou pérolas) e ganha a que chega mais perto do clima.**
+O código fica em `logic/DiscoveryEngine.kt`, sem nada de Android, e é coberto por testes unitários (38 no total, em `DiscoveryEngineTest`, `DiscoveryRulesTest`, `SoundMatchEngineTest` e `TrackPickerTest`). Em uma frase: **das músicas mais tocadas dos artistas parecidos que a pessoa não marcou, fica a metade pedida (hits ou pérolas) e ganha a que chega mais perto do clima.**
 
-1. **Quem entra.** As 4 músicas mais tocadas de cada parecido que a pessoa não marcou como conhecido (até 8 artistas). O artista favorito e os conhecidos ficam de fora.
-2. **Quero me arriscar.** Em vez dos parecidos, entram os parecidos deles (fora os que já eram parecidos diretos). O mesmo acontece se a pessoa marcar todos como conhecidos.
+1. **Quem entra.** As 4 músicas mais tocadas de cada parecido que a pessoa não marcou em "Outros artistas que você curte" (até 8 artistas). O artista favorito e os marcados ficam de fora.
+2. **Quero me arriscar.** Em vez dos parecidos, entram os parecidos deles (fora os que já eram parecidos diretos). O mesmo acontece se a pessoa marcar todos.
 3. **Hit ou pérola.** As candidatas são ordenadas pela popularidade no Deezer e cortadas no meio: hit fica com a metade mais tocada, pérola com a outra.
 4. **Clima.** Cada clima tem um alvo nos números do som, e ganha a música mais perto dele:
 
@@ -215,7 +215,7 @@ O código fica em `logic/DiscoveryEngine.kt`, sem nada de Android, e é coberto 
 
 5. **Situação.** Só desempata: na academia ganha a mais enérgica, na festa a mais dançante, estudando ou relaxando a mais calma.
 6. **% de match** = 100 menos a distância média até o alvo. Exemplo: quem pede Sofrência entre artistas de forró recebe por volta de 60%, porque quase não há música triste ali, e o número mostra isso.
-7. **Explicação.** Exemplo: "Pedro, você ouve Metallica e ainda não conhece Iron Maiden, que tem um som parecido. Você pediu uma música porradeira pra ouvir na academia, entre as menos conhecidas: Wasted Years (2015 Remaster) foi a que chegou mais perto."
+7. **Explicação.** Exemplo: "Pedro, você ouve Metallica, e Iron Maiden tem um som parecido. Você pediu uma música porradeira pra ouvir na academia, entre as menos conhecidas: Wasted Years (2015 Remaster) foi a que chegou mais perto."
 
 ### Reserva
 

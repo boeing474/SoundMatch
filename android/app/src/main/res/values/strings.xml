@@ -4,7 +4,7 @@
 
     <!-- ===== MainActivity ===== -->
     <string name="main_title">SoundMatch</string>
-    <string name="main_subtitle">Conte como você ouve música, escolha a energia do momento e descubra uma música nova, do estilo que é a sua cara.</string>
+    <string name="main_subtitle">Conte qual é o seu artista favorito, escolha o clima do momento e descubra uma música nova de um artista parecido.</string>
     <string name="btn_discover">Descobrir Meu Som</string>
     <string name="btn_history">Minhas Descobertas</string>
     <string name="cd_vinyl">Disco de vinil girando</string>
@@ -16,7 +16,7 @@
     <string name="step_lead_situation">%1$s, boa escolha.</string>
     <string name="step_name_question">Como você se chama?</string>
     <string name="hint_name">Seu nome</string>
-    <string name="step_artist_question">Qual artista você mais ouve?</string>
+    <string name="step_artist_question">Qual seu cantor ou banda favorita?</string>
     <string name="hint_artist">Artista ou banda</string>
     <string name="step_artist_not_found">Não achamos esse artista agora. Confira o nome ou continue assim mesmo.</string>
     <string name="artist_genre_unknown">%1$s (vamos usar só as suas respostas)</string>
@@ -35,15 +35,14 @@
 
     <!-- ===== SoundQuizActivity ===== -->
     <string name="quiz_title">Quiz Sonoro</string>
-    <string name="quiz_step">Última parte</string>
 
-    <string name="known_title">Desses parecidos com %1$s, quais você já conhece?</string>
-    <string name="known_hint">Marque quem você já ouve. A descoberta vem dos outros.</string>
+    <string name="known_title">Outros artistas que você curte</string>
+    <string name="known_hint">São parecidos com %1$s. Marque quem você já curte: a descoberta vem dos outros.</string>
     <string name="known_none">Nenhum marcado: todos entram na disputa</string>
-    <string name="known_all">Você conhece todos: a descoberta vai buscar um pouco mais longe</string>
+    <string name="known_all">Você curte todos: a descoberta vai buscar um pouco mais longe</string>
     <plurals name="known_count">
-        <item quantity="one">%1$d conhecido · %2$d na disputa</item>
-        <item quantity="other">%1$d conhecidos · %2$d na disputa</item>
+        <item quantity="one">%1$d marcado · %2$d na disputa</item>
+        <item quantity="other">%1$d marcados · %2$d na disputa</item>
     </plurals>
 
     <string name="energy_title">Que clima você quer agora?</string>
@@ -63,10 +62,8 @@
     <string name="toast_surprise_needs_style">Marque outro estilo além de %1$s</string>
 
     <string name="btn_see_result">Ver Minha Música</string>
-    <string name="quiz_hint_discovery">Escolha o clima e hit ou pérola para continuar</string>
-    <string name="quiz_hint_reserve">Escolha o clima para continuar</string>
     <string name="quiz_searching">Procurando a sua música entre os artistas parecidos</string>
-    <string name="quiz_progress">Respondidas: %1$d de %2$d</string>
+    <string name="quiz_progress">Pergunta %1$d de %2$d</string>
 
     <!-- ===== ResultActivity ===== -->
     <string name="result_title">Sua Descoberta</string>

@@ -15,7 +15,7 @@ data class DeezerList<T>(
 data class DeezerArtist(
     val id: Long,
     val name: String,
-    @SerializedName("picture_medium") val picture: String?,
+    @SerializedName("picture_big") val picture: String?,
     @SerializedName("nb_fan") val fans: Int?
 ) : Serializable
 
