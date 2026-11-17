@@ -71,6 +71,8 @@
     <!-- ===== ResultActivity ===== -->
     <string name="result_title">Sua Descoberta</string>
     <string name="result_header_label">SEU PERFIL SONORO</string>
+    <string name="result_header_similar">PARECIDO COM</string>
+    <string name="result_similar_to">Parecido com %1$s</string>
     <string name="result_match_suffix" formatted="false">% de match</string>
     <string name="result_match_hint">É quanto das suas respostas apontou para esse estilo, contando o seu artista favorito.</string>
     <string name="result_match_hint_mood">É o quanto essa música chega perto do clima que você pediu.</string>
@@ -93,6 +95,7 @@
     <string name="share_chooser">Compartilhar via</string>
     <string name="share_text_surprise">%1$s fez o quiz do SoundMatch e pediu uma surpresa: %2$s. Descoberta musical: %3$s</string>
     <string name="share_text">%1$s fez o quiz do SoundMatch! Perfil sonoro: %2$s (%3$d%% de match). Descoberta musical: %4$s</string>
+    <string name="share_text_similar">%1$s fez o quiz do SoundMatch e pediu algo parecido com %2$s. Descoberta musical: %3$s (%4$d%% de match)</string>
 
     <!-- ===== HistoryActivity ===== -->
     <string name="history_title">Minhas Descobertas</string>

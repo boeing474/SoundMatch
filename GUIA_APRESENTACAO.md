@@ -31,25 +31,24 @@ A API está no Render (https://soundmatch-api-dnh5.onrender.com). Não precisa d
    - Tocar em **"Descobrir Meu Som"** → *Intent explícita*.
 2. **Perfil (uma pergunta por vez)**
    - Tentar continuar com o nome vazio: o campo fica em erro (**feedback visual**).
-   - Digitar um artista (ex.: BTS) e tocar em **"Buscar artista"**:
-     - o app consulta o **iTunes**;
-     - aparece um card com a capa, o nome oficial e o gênero ("K-pop"), com contorno na cor do perfil.
-   - Escolher a situação e o instrumento nos chips (o `Chip` é subclasse de `CheckBox`).
-   - Mostrar o "Passo X de 4" com a `ProgressBar`, e que o voltar do celular volta um passo.
+   - Digitar um artista (ex.: Metallica) e tocar em **"Buscar artista"**:
+     - o app consulta o **Deezer** (nome oficial, foto e artistas parecidos) e o **iTunes** (estilo);
+     - aparece um card com a foto, o nome oficial e o estilo ("Metal"), com contorno na cor do estilo.
+   - Escolher a situação nos chips (o `Chip` é subclasse de `CheckBox`).
+   - Mostrar o "Passo X de 3" com a `ProgressBar`, e que o voltar do celular volta um passo.
    - Mostrar a frase que usa a resposta anterior ("Prazer, Pedro.") e o sol do rodapé subindo a cada passo (`moveSun`, com `animate().translationY`).
-   - Avançar → *Intent explícita com `putExtra`* levando o `UserProfile`.
+   - Avançar → *Intent explícita com `putExtra`* levando o `UserProfile` (com os artistas parecidos dentro).
 3. **Quiz**
-   - Mostrar que a 1ª pergunta usa o perfil: músicas reais do artista (vindas do iTunes no passo do artista) para a situação escolhida.
-   - Escolher a energia (ex.: Dançante) e explicar que ela escolhe a música dentro do estilo.
-   - Responder: a `ProgressBar` avança, e o botão só habilita quando as 2 perguntas têm resposta.
-   - (Opcional) Ligar o **Me surpreenda** sem marcar estilo: o app pede para marcar outro estilo (feedback visual).
+   - Mostrar que a 1ª pergunta usa o perfil: os parecidos com o artista, cada um num chip com foto. Marcar um ou dois: o contador muda ("2 conhecidos · 6 na disputa").
+   - Escolher o clima (ex.: Porradeira) e hit ou pérola: a `ProgressBar` avança, e o botão só habilita com as 2 respostas.
+   - (Opcional) Mostrar o Switch **Quero me arriscar**: a busca passa a ser nos parecidos dos parecidos.
+   - Tocar em **"Ver Minha Música"**: aparece a `ProgressBar` enquanto o app busca as músicas no Deezer e as características no ReccoBeats.
 4. **Resultado**
-   - Mostrar a capa em destaque (contorno na cor do perfil), a música e o **% de match**.
-   - Explicar a conta. Exemplo:
-     - BTS = 3 votos para Pop;
-     - Dynamite (gênero K-pop no iTunes) = mais 1 voto para Pop;
-     - marcar Eletrônica = 1 voto para Eletrônica;
-     - total: Pop tem 4 de 5 votos = 80%.
+   - Mostrar a capa em destaque, a música e o card **"Parecido com Metallica"** com o **% de match**.
+   - Explicar a conta com um exemplo:
+     - Porradeira procura energia 0,95 e som acústico 0,05;
+     - para uma música com energia 0,93 e acústico 0,03, as distâncias são 0,02 e 0,02;
+     - a média é 0,02, então o match é 98%.
    - Mostrar o card **"Por que essa música?"** (processamento dos dados).
    - Tocar em **YouTube** ou **Spotify** → *Intent implícita `ACTION_VIEW`*. O Spotify abre direto no app; se ele não estiver instalado, abre no navegador.
    - Tocar em **"Compartilhar"** → *Intent implícita `ACTION_SEND`*.
@@ -57,12 +56,12 @@ A API está no Render (https://soundmatch-api-dnh5.onrender.com). Não precisa d
 5. **Swagger**
    - Abrir https://soundmatch-api-dnh5.onrender.com/docs e mostrar o `GET /recommendations` com o registro que acabou de ser salvo, o que prova a persistência no banco.
 6. **Histórico**
-   - Voltar ao início e abrir **"Minhas Descobertas"** (**GET**). Cada música aparece com a capa contornada na cor do perfil.
+   - Voltar ao início e abrir **"Minhas Descobertas"** (**GET**). Cada música aparece com a capa e a linha "Parecido com Metallica · 98%".
    - Tocar no **coração** para mudar a avaliação (**PUT**).
    - Tocar na **lixeira** para excluir, com confirmação em `AlertDialog` (**DELETE**).
 7. **Código**
-   - Abrir `SoundMatchEngine.kt` e explicar a votação.
-   - Mostrar os 12 testes passando (`SoundMatchEngineTest`, botão Run).
+   - Abrir `logic/DiscoveryEngine.kt` e explicar `recommend`: quem entra, hit ou pérola, o alvo do clima e o % de match.
+   - Mostrar os 37 testes passando (`DiscoveryEngineTest` e os outros, botão Run).
 
 ---
 
@@ -73,20 +72,20 @@ Para achar rápido no Android Studio: Ctrl+Shift+F (busca no projeto) ou Ctrl+N 
 | Requisito | Arquivo |
 |---|---|
 | 5 Activities | `ui/MainActivity.kt`, `UserProfileActivity.kt`, `SoundQuizActivity.kt`, `ResultActivity.kt`, `HistoryActivity.kt` (registradas no `AndroidManifest.xml`) |
-| Intent explícita | `MainActivity.setupNavigation()`, `UserProfileActivity.openQuiz()`, `SoundQuizActivity.showResult()` |
+| Intent explícita | `MainActivity.setupNavigation()`, `UserProfileActivity.openQuiz()`, `SoundQuizActivity.openResult()` |
 | Intent implícita | `ResultActivity.openYoutube()` e `openSpotify()` (`ACTION_VIEW`), `shareProfile()` (`ACTION_SEND`) |
-| Views (9 tipos) | Veja a lista abaixo |
-| Feedback visual | erro no campo + `Toast` (Perfil), `ProgressBar` na busca do artista, botão desabilitado (Quiz), `ProgressBar` + `Toast` (Resultado e Histórico) |
+| Views (10 tipos) | Veja a lista abaixo |
+| Feedback visual | erro no campo + `Toast` (Perfil), `ProgressBar` na busca do artista, contador de conhecidos, botão desabilitado e `ProgressBar` na busca das músicas (Quiz), `ProgressBar` + `Toast` (Resultado e Histórico) |
 | API REST + Swagger | `backend/main.py` (os `summary` e `tags` aparecem no `/docs`) |
 | CRUD Retrofit | `network/SoundMatchApi.kt` + chamadas em `ResultActivity.saveRecommendation()` e `HistoryActivity` (`loadHistory`, `updateRating`, `deleteRecommendation`) |
-| API externa (extra) | `network/ITunesApi.kt` + `UserProfileActivity.searchArtist()` e `ResultActivity.loadAlbumCover()` |
+| APIs externas (extra) | `network/DeezerApi.kt`, `ReccoBeatsApi.kt` e `ITunesApi.kt`, usadas por `network/DiscoveryRepository.kt`, `UserProfileActivity.searchArtist()` e `SoundQuizActivity.discover()` |
 | Banco relacional | `backend/models.py` (`ForeignKey("users.id")` + `relationship`) |
 | Organização | pacotes `ui`, `adapter`, `network`, `model`, `logic` |
 
 Onde está cada tipo de View:
 - `TextView`, `ImageView` e `Button`: `activity_main.xml`;
 - `EditText` (`TextInputEditText`), `Chip` (subclasse de `CheckBox`), `CardView` e `ProgressBar`: `activity_user_profile.xml`;
-- `RadioButton` (criados no Kotlin a partir de `item_quiz_option.xml`), `CheckBox` e `Switch`: `activity_sound_quiz.xml`;
+- `RadioButton` (criados no Kotlin a partir de `item_quiz_option.xml`), `Chip` com foto (`item_artist_chip.xml`), `CheckBox` e `Switch`: `activity_sound_quiz.xml`;
 - `RecyclerView`: `activity_history.xml`.
 
 ---
@@ -95,10 +94,10 @@ Onde está cada tipo de View:
 
 ```
 [Tela] ResultActivity (Curti / Não curti)
-   │  RecommendationRequest.from(result, liked)     → objeto Kotlin
+   │  RecommendationRequest.from(result, liked, cardTitle, cardDetail)   → objeto Kotlin
    ▼
 [Retrofit] SoundMatchApi.createRecommendation()      → Gson converte em JSON
-   │  POST http://localhost:8000/recommendations   (adb reverse leva até o PC)
+   │  POST https://soundmatch-api-dnh5.onrender.com/recommendations
    ▼
 [FastAPI] main.py create_recommendation()
    │  schemas.RecommendationCreate valida o JSON (ex.: score 10–100)
@@ -112,6 +111,22 @@ Resposta 201 com o JSON salvo → Retrofit converte em RecommendationResponse �
 
 ---
 
+E o caminho da recomendação, antes disso:
+
+```
+[Perfil] searchArtist()            → Deezer: search/artist + artist/{id}/related   (iTunes: estilo)
+   ▼  UserProfile (com relatedArtists) vai para o quiz pelo putExtra
+[Quiz] discover(answers)
+   │  DiscoveryRepository.candidatesFor()  → Deezer: artist/{id}/top + track/{id} (ISRC)
+   │                                       → ReccoBeats: audio-features?ids=<ISRCs>
+   ▼  lista de Candidate (música + características)
+[Motor] DiscoveryEngine.recommend() → SoundResult   (null → SoundMatchEngine, o reserva)
+   ▼  putExtra
+[Resultado] ResultActivity
+```
+
+---
+
 ## 5. Papel de cada arquivo
 
 ### Android – `com.example.soundmatch`
@@ -119,26 +134,34 @@ Resposta 201 com o JSON salvo → Retrofit converte em RecommendationResponse �
 | Pacote / arquivo | Papel |
 |---|---|
 | `ui/MainActivity` | Tela inicial: animações e navegação para o Perfil e o Histórico |
-| `ui/UserProfileActivity` | Perfil em 4 passos na mesma tela (troca a visibilidade dos blocos), busca o artista no iTunes e envia o `UserProfile` para o quiz |
-| `ui/SoundQuizActivity` | Lê as respostas, controla a ProgressBar e chama o `SoundMatchEngine` |
-| `ui/ResultActivity` | Exibe o resultado, busca a capa no iTunes, faz o POST na API e dispara as Intents implícitas |
+| `ui/UserProfileActivity` | Perfil em 3 passos na mesma tela (troca a visibilidade dos blocos), busca o artista no Deezer e no iTunes e envia o `UserProfile` para o quiz |
+| `ui/SoundQuizActivity` | Monta os chips dos parecidos, lê as respostas, busca as candidatas e chama o `DiscoveryEngine` (ou o motor reserva) |
+| `ui/ResultActivity` | Exibe o resultado e a capa, faz o POST na API e dispara as Intents implícitas |
 | `ui/HistoryActivity` | GET, PUT (muda a avaliação) e DELETE (com confirmação em AlertDialog) |
 | `adapter/HistoryAdapter` | Transforma cada registro da API em um card do RecyclerView (`ListAdapter` + `DiffUtil`) |
-| `network/SoundMatchApi` | Interface Retrofit: um método por endpoint |
-| `network/ITunesApi` | Busca na iTunes Search API (gênero e músicas do artista, capa) |
-| `network/RetrofitClient` | Instâncias do Retrofit: a nossa API (`BASE_URL`) e o iTunes |
-| `network/ImageLoader` | Baixa a capa em `Dispatchers.IO` e devolve o `Bitmap` |
+| `network/SoundMatchApi` | Interface Retrofit da nossa API: um método por endpoint |
+| `network/DeezerApi` | Interface Retrofit do Deezer: busca do artista, parecidos, mais tocadas e a música pelo id |
+| `network/ReccoBeatsApi` | Interface Retrofit do ReccoBeats: características do som, por ISRC |
+| `network/ITunesApi` | Busca na iTunes Search API (estilo do artista e capa das músicas do catálogo fixo) |
+| `network/DiscoveryRepository` | Junta Deezer e ReccoBeats: acha o artista, os parecidos e as músicas candidatas, em paralelo com `async` |
+| `network/NetworkCall` | `networkOrNull`: uma falha de rede vira `null`, sem repetir `try/catch` em todo lugar |
+| `network/RetrofitClient` | Instâncias do Retrofit: a nossa API (`BASE_URL`), Deezer, ReccoBeats e iTunes |
+| `network/ImageLoader` | Baixa uma imagem em `Dispatchers.IO` e devolve o `Bitmap` |
 | `network/CoverRepository` | Busca a capa de cada música do histórico no iTunes e guarda num cache, para não baixar de novo ao rolar a lista |
-| `model/Genre` | Os 5 perfis: título, descrição, cor e palavras-chave para traduzir o gênero do iTunes |
-| `model/Energy` | As 6 energias do quiz, cada uma com o nome, a frase de critério e o trecho da explicação |
-| `model/Situation`, `Instrument` | Situação e instrumento do perfil (o instrumento sabe "em que prestar atenção") |
+| `model/Energy` | Os 6 climas do quiz, cada um com o nome, a frase de critério e o trecho da explicação |
+| `model/Popularity` | Hit do momento ou pérola escondida |
+| `model/Situation` | Quando a pessoa mais ouve música |
+| `model/Genre` | Os 5 estilos: título, cor e palavras-chave para traduzir o gênero do iTunes |
 | `model/UserProfile`, `SoundResult` | Dados que passam entre as telas (`Serializable`) |
-| `model/QuizAnswers`, `Song`, `ArtistSong` | Respostas do quiz, música do catálogo e música do artista favorito |
-| `model/ApiModels`, `ITunesModels` | Espelho do JSON das APIs (`@SerializedName`) |
-| `logic/SoundMatchEngine` | **Regra de negócio**: votos, perfil, Me surpreenda, % de match, escolha da música pela energia e explicação |
-| `logic/SongCatalog` | 60 músicas: 12 por perfil, 2 de cada energia, cada uma destacando um instrumento |
-| `logic/TrackPicker` | Filtra os resultados do iTunes: as músicas do artista para o quiz (sem versões ao vivo, remix ou repetidas) e a faixa certa para a capa |
-| `logic/ArtistName` | Acerta o nome do artista vindo do iTunes: usa a grafia oficial ("bts" vira "BTS") e separa parcerias ("LUDMILLA & Caio Luccas") |
+| `model/QuizAnswers`, `Song` | Respostas do quiz e a música recomendada |
+| `model/DeezerModels`, `AudioFeatures`, `Candidate` | Respostas do Deezer e do ReccoBeats; `Candidate` é uma música do Deezer com as características (ou `null`) |
+| `model/ApiModels`, `ITunesModels` | Espelho do JSON da nossa API e do iTunes (`@SerializedName`) |
+| `logic/DiscoveryEngine` | **Regra de negócio**: quem entra na disputa, hit ou pérola, alvo de cada clima, % de match e explicação |
+| `logic/DiscoveryRules` | Regras menores: escolher o artista certo entre homônimos, tirar os conhecidos, decidir quando ir aos parecidos dos parecidos, ligar música e características pelo ISRC |
+| `logic/SoundMatchEngine` | Motor reserva: votação por estilo e música do catálogo fixo |
+| `logic/SongCatalog` | Catálogo reserva: 60 músicas, 12 por estilo, 2 de cada clima |
+| `logic/TrackPicker` | Escolhe a faixa certa entre os resultados do iTunes (artista certo, versão de estúdio) |
+| `logic/ArtistName` | Acerta o nome do artista vindo do iTunes, quando o Deezer não respondeu |
 
 ### Recursos (`res/`)
 
@@ -165,39 +188,51 @@ Resposta 201 com o JSON salvo → Retrofit converte em RecommendationResponse �
 
 ## 6. Perguntas prováveis (e respostas)
 
-**Como o perfil é escolhido?**
-Por votação entre 5 perfis:
-- o gênero do artista favorito vale 3 votos;
-- a música escolhida na 1ª pergunta vale 1, no gênero dela no iTunes;
-- cada estilo marcado vale 1.
+**Como a música é escolhida?**
+Em quatro passos, todos em `DiscoveryEngine.recommend`:
+1. entram as 4 músicas mais tocadas de cada artista parecido que a pessoa não marcou como conhecido (`newToUser` tira o favorito, os conhecidos e as repetidas);
+2. só ficam as que têm as características do som;
+3. `popularityHalf` ordena pela popularidade e corta no meio: hit fica com a metade de cima, pérola com a de baixo;
+4. ganha a mais perto do alvo do clima (`closeness`), com a situação desempatando (`situationBonus`).
 
-Ganha o mais votado. No empate, ganha o gênero do artista favorito, porque é a informação mais forte sobre o gosto da pessoa.
+**De onde vêm os artistas parecidos?**
+Do Deezer (`artist/{id}/related`). A busca acontece no passo do artista, no perfil, e a lista vai para o quiz dentro do `UserProfile`.
 
-**Se a 1ª pergunta é sobre músicas do próprio artista, por que ela vota?**
-Porque o iTunes informa o gênero de cada música, não só do artista. Para BTS dá sempre K-pop, mas para quem varia, como Anitta (Pop, Brasileira, Latina), a música escolhida mostra qual lado a pessoa curte. Ela também aparece na explicação ("você colocaria Dynamite pra tocar numa festa").
+**Como o app sabe se uma música é calma ou pesada?**
+Pelo ReccoBeats, que devolve números de 0 a 1 para cada gravação: `energy` (energia), `valence` (alegria), `danceability` (o quanto é dançante) e `acousticness` (o quanto é acústica). O app pede esses números pelo ISRC, o código internacional da gravação, que vem do Deezer.
 
-**O que a energia faz?**
-Escolhe a música dentro do estilo. Cada estilo tem 2 músicas de cada uma das 6 energias, então sempre existe uma música da energia pedida. Cada energia tem uma frase de critério (`Energy.hint`, ex.: "triste, de dor de cotovelo"), que é a mesma que aparece no quiz e a que usei para classificar as músicas.
-
-**Como funciona o Me surpreenda?**
-Entre os estilos marcados, o motor pega o mais votado que não seja o de sempre (`surpriseGenre`). Como esse estilo não foi o mais votado, o % não faz sentido, e o resultado mostra "Fora da sua zona de conforto". A API guarda `surprise = true`, e o histórico mostra "· surpresa" no lugar do %.
+**O que é o alvo de um clima?**
+É o que o clima procura nesses números (`targetFor`). Porradeira quer energia 0,95 e som acústico 0,05; Sofrência quer alegria 0,15; Viajada quer música pouco dançante e longa. O que não está no alvo não conta (para Sofrência, tanto faz a energia).
 
 **O que é o % de match?**
-É a parte dos votos que foi para o perfil: votos do perfil ÷ total × 100, limitado entre 10 e 100. Se tudo apontou para Pop, dá 100%. Se a pessoa marcou vários outros estilos, o gosto está mais espalhado e o número cai.
+É o quanto a música chega perto do alvo. O app mede a distância em cada número do alvo, tira a média e faz 100 menos isso (`closeness` e `matchPercent`). Se a música está em cima do alvo, dá 100%. Quem pede Sofrência entre artistas de forró recebe por volta de 60%, porque a música mais triste que existe ali ainda é alegre.
 
-**Por que o artista favorito vale 3 votos?**
-Porque é o dado mais concreto que a pessoa dá: é o que ela realmente ouve. Com peso 3, quem coloca BTS recebe uma recomendação do universo do pop e do K-pop, a não ser que a música escolhida e os estilos marcados apontem para outro lado.
+**Para que serve a situação (academia, festa...)?**
+Só para desempatar (`situationBonus`, com peso 0,1): na academia ganha a mais enérgica, na festa a mais dançante, estudando ou relaxando a mais calma. Ela não entra no % de match.
 
-**E se o iTunes não achar o artista ou não houver internet?**
-O `artistGenre` fica `null`, o artista não vota e a lista de músicas dele vem vazia. A 1ª pergunta vira a pergunta reserva (5 músicas de 5 estilos, a opção N vota no perfil N), e o app continua funcionando (isso também está nos testes).
+**Como funciona o hit ou pérola?**
+O Deezer dá um `rank` de popularidade para cada música. As candidatas são ordenadas por ele e cortadas no meio (`popularityHalf`).
 
-**Como o gênero do iTunes vira um dos 5 perfis?**
-`Genre.fromITunes` procura palavras-chave no nome do gênero. Exemplos: "K-pop" → Pop; "Hip-Hop/Rap" → Hip-hop; "Sertanejo" → Brasileira.
+**Como funciona o Quero me arriscar?**
+A busca vai um passo além: em vez dos parecidos com o artista, entram os parecidos dos 3 primeiros da lista, fora os que já eram parecidos diretos (`DiscoveryRepository.fartherArtists`). O mesmo acontece se a pessoa marcar todos como conhecidos (`DiscoveryRules.goesFarther`).
 
-A busca começa pela Música Brasileira e deixa o Pop por último, porque "pop" aparece em muitos nomes (ex.: "Pop Brasileiro").
+**Por que só 8 artistas e 4 músicas de cada?**
+O Deezer aceita 50 chamadas a cada 5 segundos. Cada artista custa 1 chamada (as mais tocadas) e cada música mais 1 (para trazer o ISRC): 8 + 32 = 40. Se o limite estourar mesmo assim, a música segue sem ISRC e fica fora da disputa, sem derrubar o app (`withIsrc`).
+
+**Por que as chamadas usam `async` e `awaitAll`?**
+Para pedir as músicas de todos os artistas ao mesmo tempo, em vez de uma depois da outra. O `coroutineScope` espera todas terminarem antes de seguir.
+
+**E se o Deezer não achar o artista ou não houver internet?**
+A lista de parecidos vem vazia e o quiz muda para o modo reserva: só o clima, os "outros estilos" e o switch. A música sai do catálogo fixo pelo `SoundMatchEngine`: o estilo do artista vale 3 votos, cada estilo marcado vale 1, e o clima escolhe a música dentro do estilo vencedor.
+
+**E se o ReccoBeats estiver fora do ar?**
+Nenhuma candidata terá as características, o `DiscoveryEngine.recommend` devolve `null` e a tela usa o motor reserva. Preferi isso a mostrar um % inventado.
 
 **Como garante que a música é uma "descoberta"?**
-O `pickSong` fica com as músicas da energia pedida e tira as do artista favorito. Quem toca recebe a música em que o seu instrumento se destaca. Os outros recebem uma escolha fixa pelo nome, de modo que pessoas diferentes ganham músicas diferentes, mas a mesma pessoa sempre recebe a mesma.
+O `newToUser` tira as músicas do artista favorito e dos artistas marcados como conhecidos. No motor reserva, o `pickSong` também tira o artista favorito.
+
+**Tem vários artistas com o mesmo nome no Deezer. Como escolhe?**
+`DiscoveryRules.pickArtist` compara o nome sem acento e sem maiúscula e, entre os iguais ao digitado, fica com o de mais fãs. Há vários "BTS", por exemplo.
 
 **Onde a API está rodando?**
 No Render, um serviço de hospedagem na nuvem. Ele baixa o código do GitHub (pasta `backend`), instala o `requirements.txt` e roda o `uvicorn` na porta que ele escolhe (`$PORT`). O app acessa por HTTPS. No plano grátis, o disco não é permanente, então o SQLite volta vazio quando a API reinicia. Para guardar os dados para sempre, eu trocaria por um PostgreSQL gerenciado, mudando só a `DATABASE_URL` no `database.py`.
@@ -206,20 +241,21 @@ No Render, um serviço de hospedagem na nuvem. Ele baixa o código do GitHub (pa
 No celular, `localhost` é o próprio celular. O `adb reverse tcp:8000 tcp:8000` cria um túnel pelo cabo USB: o que chega na porta 8000 do celular vai para a porta 8000 do PC, onde a API está. No emulador daria para usar `10.0.2.2`, um endereço especial que aponta para o computador.
 
 **De onde vem a capa do álbum?**
-Da iTunes Search API, uma API pública da Apple. Uso o mesmo Retrofit com outra `baseUrl` (`RetrofitClient.itunes`). A imagem é baixada em `Dispatchers.IO`, porque o Android não permite usar a rede na thread da tela. Se der erro (sem internet), o app mantém o disco de vinil.
+Do próprio Deezer, que manda o endereço da capa junto com a música. Para as músicas do catálogo fixo e para o histórico, a capa vem da iTunes Search API. Uso o mesmo Retrofit com outra `baseUrl` para cada serviço (`RetrofitClient`). A imagem é baixada em `Dispatchers.IO`, porque o Android não permite usar a rede na thread da tela. Se der erro (sem internet), o app mantém o disco de vinil.
 
 **Como o botão do Spotify funciona?**
 Ele tenta abrir `spotify:search:<música>`, que só o app do Spotify entende. Se o app não estiver instalado, o Android lança `ActivityNotFoundException`, e eu abro a versão web (`open.spotify.com/search/...`).
 
-**Por que o perfil é uma tela só com 4 passos, e não 4 Activities?**
-São 4 perguntas curtas do mesmo formulário. Os 4 blocos ficam no mesmo XML, e o Kotlin mostra só o passo atual (`showStep`). Assim os dados ficam numa Activity só, e o voltar do celular volta um passo (`OnBackPressedCallback`).
+**Por que o perfil é uma tela só com 3 passos, e não 3 Activities?**
+São 3 perguntas curtas do mesmo formulário. Os 3 blocos ficam no mesmo XML, e o Kotlin mostra só o passo atual (`showStep`). Assim os dados ficam numa Activity só, e o voltar do celular volta um passo (`OnBackPressedCallback`).
 
 **Por que as colunas se chamam `score`, `archetype` e `subgenres`?**
 Os nomes vêm da primeira versão do projeto. Hoje:
 - `score` guarda o % de match;
-- `archetype` guarda o perfil;
-- `subgenres` guarda os outros estilos marcados.
-- `surprise` (a mais nova) diz se a música veio do Me surpreenda.
+- `archetype` guarda o título do card ("Parecido com Metallica");
+- `subgenres` guarda a linha de detalhe do card ("Porradeira · Pérola escondida");
+- `surprise` diz se a música saiu do estilo de sempre no motor reserva;
+- `plays_instrument` ficou da época em que o perfil perguntava sobre instrumento e hoje vai sempre `false`.
 
 Mantive os nomes para não quebrar a API. Isso está comentado em `model/ApiModels.kt`.
 

@@ -18,10 +18,11 @@ interface DeezerApi {
         @Query("limit") limit: Int = 5
     ): DeezerList<DeezerArtist>
 
+    // 8 parecidos: é quantos artistas a busca das músicas consegue percorrer de uma vez.
     @GET("artist/{id}/related")
     suspend fun relatedArtists(
         @Path("id") artistId: Long,
-        @Query("limit") limit: Int = 10
+        @Query("limit") limit: Int = 8
     ): DeezerList<DeezerArtist>
 
     @GET("artist/{id}/top")

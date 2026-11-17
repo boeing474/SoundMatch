@@ -17,6 +17,7 @@ import com.example.soundmatch.model.RecommendationRequest
 import com.example.soundmatch.model.SoundResult
 import com.example.soundmatch.network.ImageLoader
 import com.example.soundmatch.network.RetrofitClient
+import com.example.soundmatch.network.networkOrNull
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -44,8 +45,26 @@ class ResultActivity : AppCompatActivity() {
         binding.btnShare.setOnClickListener { shareProfile() }
     }
 
+    // O título e a linha de detalhe do card. Também vão para a API e para o texto de compartilhar.
+    // Descoberta: "Parecido com BTS" e "Dançante · Hit do momento".
+    // Quiz reserva: o estilo vencedor e os outros estilos marcados.
+    private val cardTitle: String
+        get() = if (result.fromSimilarArtists) {
+            getString(R.string.result_similar_to, result.profile.favoriteArtist)
+        } else {
+            result.genre?.title.orEmpty()
+        }
+
+    private val cardDetail: String
+        get() = if (result.fromSimilarArtists) {
+            listOfNotNull(result.song.energy.label, result.popularity?.label).joinToString(" · ")
+        } else {
+            result.likedGenresLabel
+        }
+
     private fun showResult() {
-        val genreColor = ContextCompat.getColor(this, result.genre.colorRes)
+        // Sem estilo conhecido (o iTunes não soube dizer), o card fica na cor principal do app.
+        val genreColor = ContextCompat.getColor(this, result.genre?.colorRes ?: R.color.neon_magenta)
 
         with(binding) {
             cardCover.strokeColor = genreColor
@@ -53,18 +72,25 @@ class ResultActivity : AppCompatActivity() {
             layoutGenreHeader.setBackgroundColor(genreColor)
             tvMatch.setTextColor(genreColor)
 
-            tvGenre.text = result.genre.title
             tvMatch.text = result.match.toString()
             tvSongTitle.text = result.song.title
             tvSongArtist.text = result.song.artist
-            tvHighlight.text = result.genre.highlight
             tvReason.text = result.reason
-            tvLikedGenres.text = result.likedGenresLabel.ifEmpty { getString(R.string.result_no_styles) }
 
-            // Na descoberta por artistas parecidos, o % mede outra coisa: o clima.
-            if (result.fromSimilarArtists) tvMatchHint.setText(R.string.result_match_hint_mood)
+            if (result.fromSimilarArtists) {
+                // "PARECIDO COM / Wesley Safadão", o % do clima e o que a pessoa pediu.
+                tvHeaderLabel.setText(R.string.result_header_similar)
+                tvGenre.text = result.profile.favoriteArtist
+                tvMatchHint.setText(R.string.result_match_hint_mood)
+                tvHighlight.text = cardDetail
+                tvLikedGenres.visibility = View.GONE
+            } else {
+                tvGenre.text = cardTitle
+                tvHighlight.text = result.genre?.highlight
+                tvLikedGenres.text = cardDetail.ifEmpty { getString(R.string.result_no_styles) }
+            }
 
-            // Na surpresa o % não faz sentido (o estilo não foi o mais votado): mostra uma frase.
+            // Quem se arriscou no quiz reserva saiu do estilo mais votado: o % não faz sentido, entra uma frase.
             if (result.surprise) {
                 layoutMatch.visibility = View.GONE
                 tvSurpriseTitle.visibility = View.VISIBLE
@@ -74,27 +100,26 @@ class ResultActivity : AppCompatActivity() {
         }
     }
 
-    // Busca o álbum no iTunes e baixa a capa. Se falhar (sem internet, por exemplo),
-    // a tela continua com o vinil, porque a capa é só um complemento.
+    // A música do Deezer já vem com a capa. A do catálogo fixo é procurada no iTunes.
+    // Se falhar (sem internet, por exemplo), a tela continua com o vinil: a capa é só um complemento.
     private fun loadAlbumCover() {
         lifecycleScope.launch {
-            try {
-                val results = RetrofitClient.itunes
-                    .search("${result.song.title} ${result.song.artist}", limit = COVER_SEARCH_LIMIT)
-                    .results
-                val track = TrackPicker.bestMatch(results, result.song.artist) ?: return@launch
+            val song = result.song
+            val (album, coverUrl) = if (song.coverUrl != null) {
+                song.album to song.coverUrl
+            } else {
+                val track = networkOrNull {
+                    RetrofitClient.itunes.search("${song.title} ${song.artist}", limit = COVER_SEARCH_LIMIT).results
+                }?.let { TrackPicker.bestMatch(it, song.artist) }
+                track?.collectionName to track?.artworkUrl100?.let { ImageLoader.bigCover(it) }
+            }
 
-                track.collectionName?.let {
-                    binding.tvAlbum.text = getString(R.string.result_album, it)
-                    binding.tvAlbum.visibility = View.VISIBLE
-                }
-
-                val artwork = track.artworkUrl100 ?: return@launch
-                ImageLoader.load(ImageLoader.bigCover(artwork))?.let { binding.imgAlbumCover.setImageBitmap(it) }
-            } catch (e: IOException) {
-                // sem conexão: mantém o vinil
-            } catch (e: HttpException) {
-                // o iTunes respondeu com erro: mantém o vinil
+            album?.let {
+                binding.tvAlbum.text = getString(R.string.result_album, it)
+                binding.tvAlbum.visibility = View.VISIBLE
+            }
+            coverUrl?.let { url ->
+                networkOrNull { ImageLoader.load(url) }?.let { binding.imgAlbumCover.setImageBitmap(it) }
             }
         }
     }
@@ -104,7 +129,7 @@ class ResultActivity : AppCompatActivity() {
         lifecycleScope.launch {
             setSaving(true)
             try {
-                RetrofitClient.api.createRecommendation(RecommendationRequest.from(result, liked))
+                RetrofitClient.api.createRecommendation(RecommendationRequest.from(result, liked, cardTitle, cardDetail))
                 isSaved = true   // trava os botões para não salvar a mesma música duas vezes
                 binding.tvSaved.setText(if (liked) R.string.result_saved_liked else R.string.result_saved_disliked)
                 binding.tvSaved.visibility = View.VISIBLE
@@ -146,10 +171,13 @@ class ResultActivity : AppCompatActivity() {
 
     // Intent implícita: o usuário escolhe por onde compartilhar (WhatsApp, e-mail...).
     private fun shareProfile() {
-        val text = if (result.surprise) {
-            getString(R.string.share_text_surprise, result.profile.name, result.genre.title, result.song.displayName)
-        } else {
-            getString(R.string.share_text, result.profile.name, result.genre.title, result.match, result.song.displayName)
+        val name = result.profile.name
+        val song = result.song.displayName
+        val text = when {
+            result.fromSimilarArtists ->
+                getString(R.string.share_text_similar, name, result.profile.favoriteArtist, song, result.match)
+            result.surprise -> getString(R.string.share_text_surprise, name, cardTitle, song)
+            else -> getString(R.string.share_text, name, cardTitle, result.match, song)
         }
         val sendIntent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"

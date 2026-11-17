@@ -4,7 +4,6 @@ import com.example.soundmatch.model.AudioFeatures
 import com.example.soundmatch.model.Candidate
 import com.example.soundmatch.model.DeezerTrack
 import com.example.soundmatch.model.Energy
-import com.example.soundmatch.model.Genre
 import com.example.soundmatch.model.Popularity
 import com.example.soundmatch.model.QuizAnswers
 import com.example.soundmatch.model.Situation
@@ -59,17 +58,18 @@ object DiscoveryEngine {
         val (track, features) = popularityHalf(measured, answers.popularity).maxBy { (track, features) ->
             closeness(track, features, target) + SITUATION_WEIGHT * situationBonus(profile.situation, features)
         }
-        val song = Song(track.title, track.artist.name, answers.energy)
+        val song = Song(track.title, track.artist.name, answers.energy, track.album?.title, track.album?.cover)
 
         return SoundResult(
             profile = profile,
             match = matchPercent(closeness(track, features, target)),
-            genre = profile.artistGenre ?: Genre.POP,
+            genre = profile.artistGenre,
             song = song,
             reason = buildReason(profile, answers, song),
             likedGenres = emptyList(),
             surprise = false,
-            fromSimilarArtists = true
+            fromSimilarArtists = true,
+            popularity = answers.popularity
         )
     }
 

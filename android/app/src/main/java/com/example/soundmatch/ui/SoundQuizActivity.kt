@@ -178,7 +178,7 @@ class SoundQuizActivity : AppCompatActivity() {
 
         // Quem quer se arriscar precisa marcar um estilo além do de sempre.
         if (answers.surprise && !result.surprise) {
-            val message = getString(R.string.toast_surprise_needs_style, result.genre.title)
+            val message = getString(R.string.toast_surprise_needs_style, result.genre?.title)
             Toast.makeText(this, message, Toast.LENGTH_LONG).show()
             return
         }

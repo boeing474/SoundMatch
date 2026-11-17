@@ -126,6 +126,7 @@
                     android:padding="16dp">
 
                     <TextView
+                        android:id="@+id/tvHeaderLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:letterSpacing="0.1"
@@ -150,7 +151,7 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <!-- Com o Me surpreenda ligado, o % some e entra esta frase -->
+                    <!-- Para quem se arriscou no quiz reserva, o % some e entra esta frase -->
                     <TextView
                         android:id="@+id/tvSurpriseTitle"
                         android:layout_width="wrap_content"

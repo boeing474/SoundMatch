@@ -2,19 +2,18 @@
 
 Aplicativo Android nativo (Kotlin + XML Views) integrado a uma **API REST em FastAPI** com **banco de dados relacional SQLite**.
 
-A ideia é recomendar **uma música nova, do estilo que é a cara da pessoa**. Funciona assim:
-- A pessoa conta o nome, o artista que mais ouve, quando mais ouve música e se toca algum instrumento.
-- O app busca o artista no iTunes para descobrir o gênero dele e as músicas mais conhecidas.
-- No quiz, a pessoa escolhe qual música desse artista colocaria pra tocar na situação dela, a **energia** que quer ouvir agora (Porradeira, Dançante, Pra cantar junto, Sofrência, Viajada ou De boa) e outros estilos que curte.
-- O artista e as respostas votam em um de **5 perfis** (Pop & K-pop, Rock & Alternativo, Hip-hop & R&B, Eletrônica e Música Brasileira), e a energia escolhe a música dentro do perfil.
-- Com o **Me surpreenda** ligado, a descoberta vem de um dos estilos marcados, fora do de sempre.
+A ideia é recomendar **uma música nova, de um artista parecido com o que a pessoa já ouve e no clima que ela pediu**. Funciona assim:
+- A pessoa conta o nome, o artista que mais ouve e quando mais ouve música.
+- O app busca o artista no Deezer e traz os **artistas parecidos** com ele.
+- No quiz, a pessoa marca quais desses parecidos já conhece (a descoberta vem dos outros), escolhe o **clima** que quer agora (Porradeira, Dançante, Pra cantar junto, Sofrência, Viajada ou De boa) e se prefere um **hit do momento** ou uma **pérola escondida**.
+- O app pega as músicas mais tocadas dos parecidos que ela não conhece, consulta as características do som de cada uma (energia, alegria, o quanto é dançante e acústica) e escolhe a que chega mais perto do clima pedido.
+- Com o **Quero me arriscar** ligado, a busca vai um passo além: os parecidos dos parecidos.
 - O app mostra:
-  - o **% de match**, que é quanto das respostas apontou para esse perfil (na surpresa, a frase "Fora da sua zona de conforto");
-  - uma **música recomendada**, sempre de um artista diferente do favorito;
-  - a capa do álbum;
+  - a **música recomendada**, com a capa do álbum;
+  - o **% de match**, que é o quanto a música chega perto do clima pedido;
   - uma explicação do porquê da escolha.
 
-Quem coloca BTS, por exemplo, recebe uma descoberta do universo do pop e do K-pop, e não um rock aleatório.
+Quem coloca Wesley Safadão e pede uma música dançante recebe um forró dançante de um artista que ainda não conhece. Quem coloca Metallica e pede uma porradeira recebe um metal pesado.
 
 A pessoa responde "Curti" ou "Não curti", e a descoberta é salva no banco pela API. Em "Minhas Descobertas" dá para consultar, mudar a avaliação ou excluir.
 
@@ -28,7 +27,7 @@ A pessoa responde "Curti" ou "Não curti", e a descoberta é salva no banco pela
 
 Prints tirados no celular físico (Galaxy S23 FE).
 
-| Início | Perfil (passo 2 de 4) | Quiz |
+| Início | Perfil (passo 2 de 3) | Quiz |
 |---|---|---|
 | <img src="docs/screenshots/01_inicio.png" width="230"> | <img src="docs/screenshots/02_perfil.png" width="230"> | <img src="docs/screenshots/03_quiz.png" width="230"> |
 
@@ -42,18 +41,18 @@ Prints tirados no celular físico (Galaxy S23 FE).
 
 ```
 MainActivity ──► UserProfileActivity ──► SoundQuizActivity ──► ResultActivity ──► (POST na API)
-     │              (busca o artista                                ├─► capa do álbum (iTunes)
-     │               no iTunes)                                     ├─► YouTube / Spotify (Intent implícita)
-     └──────────────► HistoryActivity (GET / PUT / DELETE)          └─► Compartilhar (Intent implícita)
+     │              (busca o artista        (busca as músicas       ├─► YouTube / Spotify (Intent implícita)
+     │               e os parecidos)         e as características)  └─► Compartilhar (Intent implícita)
+     └──────────────► HistoryActivity (GET / PUT / DELETE)
 ```
 
 | # | Activity | O que faz | Views principais |
 |---|---|---|---|
 | 1 | `MainActivity` | Tela inicial: o disco de vinil nasce no horizonte e gira, e o título neon pulsa | ImageView, TextView, Button |
-| 2 | `UserProfileActivity` | Perfil em formato de conversa, uma pergunta por vez, em 4 passos: nome, artista favorito (buscado no iTunes e mostrado num card com capa e gênero), quando mais ouve música e instrumento. Uma frase usa a resposta anterior ("Prazer, Pedro."), e no rodapé o sol sobe a cada passo. Tem "Passo X de 4", barra de progresso e Voltar / Continuar | EditText, Button, CheckBox (Chip), CardView, ImageView, ProgressBar |
-| 3 | `SoundQuizActivity` | 1ª pergunta com músicas reais do artista favorito, para a situação escolhida ("Qual dessas de BTS você colocaria pra tocar numa festa com amigos?"); 2ª pergunta com as 6 energias; outros estilos que você curte e o Switch "Me surpreenda". A barra avança a cada resposta | RadioButton, CheckBox, Switch, CardView, ProgressBar |
-| 4 | `ResultActivity` | Estilo "tocando agora": capa do álbum, música, perfil com a cor do gênero, % de match e explicação. Curti / Não curti salva na API; abre no Spotify ou no YouTube e compartilha | ImageView, CardView, ProgressBar, Button |
-| 5 | `HistoryActivity` | Lista de músicas salvas, cada uma com a capa (buscada no iTunes) contornada na cor do perfil. O coração muda a avaliação (PUT) e a lixeira exclui, com confirmação em AlertDialog (DELETE) | RecyclerView, CardView, ProgressBar |
+| 2 | `UserProfileActivity` | Perfil em formato de conversa, uma pergunta por vez, em 3 passos: nome, artista favorito (buscado no Deezer e mostrado num card com foto e estilo) e quando mais ouve música. Uma frase usa a resposta anterior ("Prazer, Pedro."), e no rodapé o sol sobe a cada passo. Tem "Passo X de 3", barra de progresso e Voltar / Continuar | EditText, Button, CheckBox (Chip), CardView, ImageView, ProgressBar |
+| 3 | `SoundQuizActivity` | "Desses parecidos com Metallica, quais você já conhece?" (um chip com foto para cada artista), o clima da música, hit ou pérola e o Switch "Quero me arriscar". Ao pedir o resultado, busca as músicas candidatas e mostra uma barra de progresso | RadioButton, CheckBox (Chip), Switch, CardView, ProgressBar |
+| 4 | `ResultActivity` | Estilo "tocando agora": capa do álbum, música, card "Parecido com Metallica" com o % de match e explicação. Curti / Não curti salva na API; abre no Spotify ou no YouTube e compartilha | ImageView, CardView, ProgressBar, Button |
+| 5 | `HistoryActivity` | Lista de músicas salvas, cada uma com a capa. O coração muda a avaliação (PUT) e a lixeira exclui, com confirmação em AlertDialog (DELETE) | RecyclerView, CardView, ProgressBar |
 
 **10 tipos de Views usados** (o edital exige 6): TextView, EditText, Button, ImageView, CheckBox (e Chip, que é um CheckBox), RadioButton, Switch, RecyclerView, ProgressBar e CardView.
 
@@ -67,7 +66,7 @@ MainActivity ──► UserProfileActivity ──► SoundQuizActivity ──►
 | **Backend** | Python 3, FastAPI, SQLAlchemy 2.0, Pydantic 2, Uvicorn, publicado no Render |
 | **Banco** | SQLite (relacional, com chave estrangeira) |
 | **Documentação da API** | Swagger / OpenAPI, gerado automaticamente pelo FastAPI |
-| **API externa** | iTunes Search API (gênero do artista e capa do álbum) |
+| **APIs externas** | Deezer (artistas parecidos e músicas mais tocadas), ReccoBeats (características do som) e iTunes Search (estilo do artista e reserva) |
 | **Testes** | JUnit 4 (regra de negócio do app) |
 
 **Build Android:** AGP 8.7.3, Kotlin 2.0.21, Gradle 8.9, Java 17, `compileSdk`/`targetSdk` 35, `minSdk` 24.
@@ -76,7 +75,7 @@ MainActivity ──► UserProfileActivity ──► SoundQuizActivity ──►
 - Tema escuro, com magenta `#FF2A6D` e ciano `#05D9E8`.
 - Fonte retrô **Monoton** (licença OFL) no título da tela inicial; nas outras telas, títulos limpos com uma linha em degradê magenta → ciano.
 - Sol listrado, grade e disco de vinil desenhados em Vector Drawable.
-- Cada perfil tem a sua cor: pop magenta, rock laranja, hip-hop amarelo, eletrônica ciano e brasileira verde.
+- Cada estilo tem a sua cor: pop magenta, rock laranja, hip-hop amarelo, eletrônica ciano e brasileira verde. O card do artista e o do resultado usam a cor do estilo do artista favorito.
 
 ---
 
@@ -93,9 +92,9 @@ SoundMatch/
 └── android/app/src/main/java/com/example/soundmatch/
     ├── ui/                      as 5 Activities
     ├── adapter/                 HistoryAdapter (RecyclerView)
-    ├── network/                 Retrofit (SoundMatchApi, ITunesApi, RetrofitClient) e ImageLoader
-    ├── model/                   dados (Genre, Instrument, Situation, UserProfile, SoundResult, JSON da API)
-    └── logic/                   regra de negócio (SoundMatchEngine, SongCatalog, ArtistName)
+    ├── network/                 Retrofit (SoundMatchApi, DeezerApi, ReccoBeatsApi, ITunesApi), DiscoveryRepository e ImageLoader
+    ├── model/                   dados (UserProfile, QuizAnswers, SoundResult, Energy, Popularity, respostas das APIs)
+    └── logic/                   regra de negócio (DiscoveryEngine, DiscoveryRules, SoundMatchEngine, SongCatalog)
 ```
 
 ---
@@ -126,9 +125,9 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --reload
    Para usar a API local:
    - troque o `BASE_URL` para `http://localhost:8000/` e rode `adb reverse tcp:8000 tcp:8000`;
    - no emulador, use `http://10.0.2.2:8000/`.
-3. Execute o app (Run). A busca do artista e a capa do álbum precisam de internet no celular. Sem internet, o app segue só com o nome digitado e mostra um disco de vinil no lugar da capa.
+3. Execute o app (Run). A busca do artista e das músicas precisa de internet no celular. Sem internet, o app segue só com o nome digitado e recomenda pelo catálogo fixo (ver "Reserva" abaixo).
 
-**Testes da regra de negócio:** abra `app/src/test/.../logic/SoundMatchEngineTest.kt` e clique em Run. Pelo terminal, use `./gradlew test`.
+**Testes da regra de negócio:** abra `app/src/test/.../logic/DiscoveryEngineTest.kt` e clique em Run. Pelo terminal, use `./gradlew test`.
 
 ---
 
@@ -149,34 +148,38 @@ Base: `https://soundmatch-api-dnh5.onrender.com` (ou `http://localhost:8000` rod
 ```json
 {
   "name": "Pedro",
-  "favorite_artist": "BTS",
+  "favorite_artist": "Metallica",
   "listening_mode": "Academia",
-  "plays_instrument": true,
-  "score": 86,
-  "archetype": "Pop & K-pop",
-  "recommended_song": "Espresso",
-  "song_artist": "Sabrina Carpenter",
-  "subgenres": "Eletrônica",
-  "liked": true
+  "plays_instrument": false,
+  "score": 98,
+  "archetype": "Parecido com Metallica",
+  "recommended_song": "Wasted Years (2015 Remaster)",
+  "song_artist": "Iron Maiden",
+  "subgenres": "Porradeira · Pérola escondida",
+  "liked": true,
+  "surprise": false
 }
 ```
 
 A resposta traz o registro salvo, com `id`, `created_at` e o objeto `user` aninhado. O `score` (o % de match) é validado entre 10 e 100. Um valor fora dessa faixa retorna 422.
 
 > Os nomes das colunas vêm da primeira versão do projeto:
-> - `archetype` guarda o perfil (ex.: "Pop & K-pop");
+> - `archetype` guarda o título do card do resultado (ex.: "Parecido com Metallica");
 > - `score` guarda o % de match;
-> - `subgenres` guarda os outros estilos marcados.
+> - `subgenres` guarda a linha de detalhe do card (o clima e hit ou pérola);
+> - `plays_instrument` ficou da época em que o perfil perguntava sobre instrumento e hoje vai sempre `false`.
 
-### API externa: iTunes Search
+### APIs externas
 
-O app consulta a [iTunes Search API](https://performance-partners.apple.com/search-api), que é pública e não precisa de chave, em dois momentos:
-- **no perfil**, para achar o artista favorito, o nome oficial e o gênero (ex.: BTS → "K-pop");
-- **no resultado**, para buscar o álbum e a capa da música recomendada.
+As três são públicas e não precisam de chave.
 
-`GET https://itunes.apple.com/search?term=<busca>&entity=song&limit=1&country=BR`
+| API | Para que serve | Chamadas |
+|---|---|---|
+| [Deezer](https://developers.deezer.com/api) | Achar o artista, os parecidos e as músicas mais tocadas de cada um | `search/artist`, `artist/{id}/related`, `artist/{id}/top`, `track/{id}` |
+| [ReccoBeats](https://reccobeats.com/docs) | Características do som de cada música: energia, alegria (`valence`), o quanto é dançante e acústica, de 0 a 1 | `v1/audio-features?ids=<ISRC,ISRC...>` |
+| [iTunes Search](https://performance-partners.apple.com/search-api) | Estilo do artista (a cor do card) e capa das músicas do catálogo fixo | `search?term=<busca>&entity=song&country=BR` |
 
-A loja do Brasil (`country=BR`) acerta mais os gêneros brasileiros, como MPB, sertanejo e pagode.
+O Deezer identifica cada gravação por um código internacional, o ISRC, e é por ele que o app pede as características ao ReccoBeats.
 
 ### Banco de dados relacional
 
@@ -184,9 +187,9 @@ A loja do Brasil (`country=BR`) acerta mais os gêneros brasileiros, como MPB, s
 users (1) ────────< (N) recommendations
   id PK                   id PK
   name                    user_id FK → users.id
-  favorite_artist         score (% de match), archetype (perfil)
+  favorite_artist         score (% de match), archetype (título do card)
   listening_mode          recommended_song, song_artist
-  plays_instrument        subgenres (outros estilos), liked
+  plays_instrument        subgenres (detalhe do card), liked, surprise
   created_at              created_at
 ```
 
@@ -194,30 +197,32 @@ users (1) ────────< (N) recommendations
 
 ## Lógica de recomendação
 
-O código fica em `logic/SoundMatchEngine.kt`, sem nada de Android, e é coberto por testes unitários (`SoundMatchEngineTest` e `TrackPickerTest`, 20 no total). Em uma frase: **o artista e as respostas votam no estilo, o "Me surpreenda" decide se a pessoa fica nele, e a energia escolhe a música.**
+O código fica em `logic/DiscoveryEngine.kt`, sem nada de Android, e é coberto por testes unitários (37 no total, em `DiscoveryEngineTest`, `DiscoveryRulesTest`, `SoundMatchEngineTest` e `TrackPickerTest`). Em uma frase: **das músicas mais tocadas dos artistas parecidos que a pessoa não conhece, fica a metade pedida (hits ou pérolas) e ganha a que chega mais perto do clima.**
 
-1. **Votos.** Cada um vale votos em um dos 5 perfis:
-   - o gênero do artista favorito (vindo do iTunes) vale **3 votos**;
-   - a música escolhida na 1ª pergunta vale 1 voto, no gênero dela no iTunes (para quem varia de estilo, como Anitta, isso faz diferença);
-   - cada estilo marcado em "outros estilos que você curte" vale 1 voto.
-2. **Perfil.** Ganha o mais votado. No empate, ganha o gênero do artista; depois, o da música da 1ª pergunta.
-3. **% de match** = votos do perfil ÷ total de votos × 100, arredondado e limitado entre 10 e 100. Exemplo: BTS (3 votos Pop) + Dynamite (1 voto Pop) + marcar Eletrônica (1 voto) = Pop com 4 de 5 votos, **80%**. Quem marca muitos estilos tem um gosto mais espalhado, e o % cai.
-4. **Me surpreenda.** Entre os estilos marcados, pega o mais votado que não seja o de sempre. No resultado, o % dá lugar à frase "Fora da sua zona de conforto". Se nenhum outro estilo foi marcado, o quiz pede para marcar.
-5. **Música.** O catálogo (`logic/SongCatalog.kt`) tem 12 músicas por perfil, 60 no total: **2 de cada energia**, e os 5 instrumentos aparecem em todo perfil. O app:
-   - fica com as 2 músicas da energia pedida;
-   - **tira o artista favorito**, para ser sempre uma descoberta;
-   - para quem toca, escolhe a música em que o seu instrumento se destaca;
-   - para os outros, faz uma escolha fixa pelo nome da pessoa (a mesma pessoa sempre recebe a mesma música).
-6. **Explicação.** Cita o nome, o artista, a música escolhida, a energia e a descoberta. Exemplo: "Pedro, você ouve BTS e colocaria Dynamite pra tocar numa festa com amigos: seu perfil é Pop & K-pop. Você pediu uma música dançante, então a descoberta é Espresso, de Sabrina Carpenter. Você toca baixo: repare na linha de baixo de Espresso."
+1. **Quem entra.** As 4 músicas mais tocadas de cada parecido que a pessoa não marcou como conhecido (até 8 artistas). O artista favorito e os conhecidos ficam de fora.
+2. **Quero me arriscar.** Em vez dos parecidos, entram os parecidos deles (fora os que já eram parecidos diretos). O mesmo acontece se a pessoa marcar todos como conhecidos.
+3. **Hit ou pérola.** As candidatas são ordenadas pela popularidade no Deezer e cortadas no meio: hit fica com a metade mais tocada, pérola com a outra.
+4. **Clima.** Cada clima tem um alvo nos números do som, e ganha a música mais perto dele:
 
-O gênero do iTunes vira um dos 5 perfis por palavras-chave (`Genre.fromITunes`). Alguns exemplos:
-- "K-pop" → Pop;
-- "Metal" → Rock;
-- "Hip-Hop/Rap" → Hip-hop;
-- "Dance" → Eletrônica;
-- "Sertanejo" → Brasileira.
+   | Clima | Alvo |
+   |---|---|
+   | Porradeira | energia 0,95 e som acústico 0,05 |
+   | Dançante | dançante 0,85 e energia 0,8 |
+   | Pra cantar junto | alegria 0,9 e energia 0,75 |
+   | Sofrência | alegria 0,15 |
+   | Viajada | dançante 0,3, energia 0,45 e música longa (6 minutos ou mais) |
+   | De boa | energia 0,3 e alegria 0,6 |
 
-Se o artista não for encontrado, ou não houver internet, o artista não vota e a 1ª pergunta vira uma pergunta reserva, com 5 músicas de 5 estilos.
+5. **Situação.** Só desempata: na academia ganha a mais enérgica, na festa a mais dançante, estudando ou relaxando a mais calma.
+6. **% de match** = 100 menos a distância média até o alvo. Exemplo: quem pede Sofrência entre artistas de forró recebe por volta de 60%, porque quase não há música triste ali, e o número mostra isso.
+7. **Explicação.** Exemplo: "Pedro, você ouve Metallica e ainda não conhece Iron Maiden, que tem um som parecido. Você pediu uma música porradeira pra ouvir na academia, entre as menos conhecidas: Wasted Years (2015 Remaster) foi a que chegou mais perto."
+
+### Reserva
+
+Se o artista não for encontrado, se não houver internet ou se nenhuma música candidata tiver as características do som, entra o motor reserva (`logic/SoundMatchEngine.kt`):
+- o estilo do artista (vindo do iTunes) vale 3 votos e cada estilo marcado em "outros estilos" vale 1; ganha o mais votado entre 5 estilos (Pop & K-pop, Rock & Alternativo, Hip-hop & R&B, Eletrônica e Música Brasileira);
+- a música sai de um catálogo fixo (`logic/SongCatalog.kt`, 12 por estilo, 2 de cada clima), sem o artista favorito;
+- o % de match é a parte dos votos que foi para o estilo vencedor.
 
 ---
 

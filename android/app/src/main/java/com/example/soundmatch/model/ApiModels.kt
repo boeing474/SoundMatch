@@ -3,8 +3,9 @@ package com.example.soundmatch.model
 import com.google.gson.annotations.SerializedName
 
 // JSON da nossa API. @SerializedName liga o snake_case do Python ao camelCase do Kotlin.
-// Os nomes das colunas ficaram da primeira versão: "archetype" guarda o perfil (ex.: "Pop & K-pop"),
-// "score" guarda o % de match e "subgenres" os outros estilos marcados.
+// Os nomes das colunas ficaram da primeira versão: "archetype" guarda o título do card do resultado
+// (ex.: "Parecido com BTS" ou "Pop & K-pop"), "score" guarda o % de match e "subgenres" a linha
+// de detalhe do card (ex.: "Dançante · Hit do momento" ou os outros estilos marcados).
 // "surprise" diz se a música saiu do estilo de sempre no "Quero me arriscar" (aí o histórico não mostra o %).
 
 data class RecommendationRequest(
@@ -21,16 +22,16 @@ data class RecommendationRequest(
     val surprise: Boolean
 ) {
     companion object {
-        fun from(result: SoundResult, liked: Boolean) = RecommendationRequest(
+        fun from(result: SoundResult, liked: Boolean, cardTitle: String, cardDetail: String) = RecommendationRequest(
             name = result.profile.name,
             favoriteArtist = result.profile.favoriteArtist,
             listeningMode = result.profile.situation.label,
             playsInstrument = false,   // o app não pergunta mais; a coluna continua na API
             score = result.match,
-            archetype = result.genre.title,
+            archetype = cardTitle,
             recommendedSong = result.song.title,
             songArtist = result.song.artist,
-            subgenres = result.likedGenresLabel,
+            subgenres = cardDetail,
             liked = liked,
             surprise = result.surprise
         )
