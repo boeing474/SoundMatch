@@ -53,10 +53,11 @@
                 android:layout_marginTop="6dp"
                 android:gravity="end"
                 android:textSize="12sp"
-                tools:text="0 de 2 respondidas" />
+                tools:text="Respondidas: 0 de 2" />
 
-            <!-- 1ª pergunta: músicas do artista favorito (ou a pergunta reserva). Opções criadas no Kotlin. -->
+            <!-- Artistas parecidos com o favorito (só quando o Deezer achou). Chips criados no Kotlin. -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardKnown"
                 style="@style/Widget.SoundMatch.Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -68,20 +69,38 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/tvQuestion1"
+                        android:id="@+id/tvKnownTitle"
                         style="@style/Widget.SoundMatch.QuestionTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        tools:text="@string/q1_title_artist" />
+                        tools:text="@string/known_title" />
 
-                    <RadioGroup
-                        android:id="@+id/rgFirstPick"
+                    <TextView
+                        style="@style/Widget.SoundMatch.Caption"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:text="@string/known_hint"
+                        android:textSize="13sp" />
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chipsKnown"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp" />
+
+                    <TextView
+                        android:id="@+id/tvKnownCount"
+                        style="@style/Widget.SoundMatch.Caption"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textColor="@color/neon_cyan"
+                        android:textSize="13sp"
+                        tools:text="@string/known_none" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- 2ª pergunta: a energia. Uma opção por item do enum Energy. -->
+            <!-- O clima: uma opção por item do enum Energy. -->
             <com.google.android.material.card.MaterialCardView
                 style="@style/Widget.SoundMatch.Card"
                 android:layout_width="match_parent"
@@ -97,7 +116,7 @@
                         style="@style/Widget.SoundMatch.QuestionTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/q2_title" />
+                        android:text="@string/energy_title" />
 
                     <RadioGroup
                         android:id="@+id/rgEnergy"
@@ -106,8 +125,35 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Outros estilos + Me surpreenda -->
+            <!-- Hit ou pérola (só com artistas parecidos): uma opção por item do enum Popularity. -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardPopularity"
+                style="@style/Widget.SoundMatch.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/Widget.SoundMatch.QuestionTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/popularity_title" />
+
+                    <RadioGroup
+                        android:id="@+id/rgPopularity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Outros estilos: só no quiz reserva, quando não há artistas parecidos. -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardStyles"
                 style="@style/Widget.SoundMatch.Card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -158,19 +204,27 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/style_brazilian" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginVertical="12dp"
-                        android:background="@color/stroke_subtle" />
+            <!-- Quero me arriscar -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.SoundMatch.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/switchSurprise"
+                        android:id="@+id/switchRisk"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:minHeight="48dp"
-                        android:text="@string/surprise_label"
+                        android:text="@string/risk_label"
                         android:textColor="@color/text_primary"
                         android:textSize="16sp"
                         android:textStyle="bold"
@@ -178,11 +232,12 @@
                         app:trackTint="@color/switch_track" />
 
                     <TextView
+                        android:id="@+id/tvRiskHint"
                         style="@style/Widget.SoundMatch.Caption"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/surprise_hint"
-                        android:textSize="13sp" />
+                        android:textSize="13sp"
+                        tools:text="@string/risk_hint" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -202,7 +257,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:gravity="center"
-                android:text="@string/quiz_hint_answer_all" />
+                tools:text="@string/quiz_hint_discovery" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

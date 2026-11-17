@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Um artista parecido na 1ª pergunta do quiz. Os chips são criados no Kotlin
+     (dependem do artista favorito); o vinil aparece enquanto a foto não chega. -->
+<com.google.android.material.chip.Chip xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Widget.SoundMatch.Chip"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:chipIcon="@drawable/ic_vinyl"
+    app:chipIconSize="32dp"
+    app:chipIconVisible="true"
+    app:chipStartPadding="8dp" />

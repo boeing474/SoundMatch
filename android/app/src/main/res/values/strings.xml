@@ -37,31 +37,35 @@
     <string name="quiz_title">Quiz Sonoro</string>
     <string name="quiz_step">Última parte</string>
 
-    <string name="q1_title_artist">1. Qual dessas de %1$s você colocaria pra tocar %2$s?</string>
-    <!-- Pergunta reserva (artista não encontrado): a opção N é do gênero N do enum Genre -->
-    <string name="q1_title">1. Qual destas você colocaria pra tocar %1$s?</string>
-    <string name="q1_opt_0">Blinding Lights – The Weeknd</string>
-    <string name="q1_opt_1">Smells Like Teen Spirit – Nirvana</string>
-    <string name="q1_opt_2">HUMBLE. – Kendrick Lamar</string>
-    <string name="q1_opt_3">Titanium – David Guetta ft. Sia</string>
-    <string name="q1_opt_4">Vai Malandra – Anitta</string>
+    <string name="known_title">Desses parecidos com %1$s, quais você já conhece?</string>
+    <string name="known_hint">Marque quem você já ouve. A descoberta vem dos outros.</string>
+    <string name="known_none">Nenhum marcado: todos entram na disputa</string>
+    <string name="known_all">Você conhece todos: a descoberta vai buscar um pouco mais longe</string>
+    <plurals name="known_count">
+        <item quantity="one">%1$d conhecido · %2$d na disputa</item>
+        <item quantity="other">%1$d conhecidos · %2$d na disputa</item>
+    </plurals>
 
-    <string name="q2_title">2. Qual a energia da música que você quer ouvir agora?</string>
+    <string name="energy_title">Que clima você quer agora?</string>
+    <string name="popularity_title">Hit do momento ou pérola escondida?</string>
 
-    <string name="styles_title">3. Outros estilos que você curte</string>
+    <!-- Só no quiz reserva (sem artistas parecidos) -->
+    <string name="styles_title">Outros estilos que você curte</string>
     <string name="style_pop">Pop e K-pop</string>
     <string name="style_rock">Rock e alternativo</string>
     <string name="style_hiphop">Hip-hop e R&amp;B</string>
     <string name="style_electronic">Eletrônica</string>
     <string name="style_brazilian">Música brasileira</string>
 
-    <string name="surprise_label">Me surpreenda</string>
-    <string name="surprise_hint">A música vem de um dos estilos que você marcou, fora do seu de sempre.</string>
+    <string name="risk_label">Quero me arriscar</string>
+    <string name="risk_hint">A música vem de artistas um passo mais longe dos que você já ouve.</string>
+    <string name="risk_hint_reserve">A música vem de um dos estilos que você marcou, fora do seu de sempre.</string>
     <string name="toast_surprise_needs_style">Marque outro estilo além de %1$s</string>
 
     <string name="btn_see_result">Ver Minha Música</string>
-    <string name="quiz_hint_answer_all">Responda às 2 perguntas para continuar</string>
-    <string name="quiz_progress">%1$d de %2$d respondidas</string>
+    <string name="quiz_hint_discovery">Escolha o clima e hit ou pérola para continuar</string>
+    <string name="quiz_hint_reserve">Escolha o clima para continuar</string>
+    <string name="quiz_progress">Respondidas: %1$d de %2$d</string>
 
     <!-- ===== ResultActivity ===== -->
     <string name="result_title">Sua Descoberta</string>
@@ -69,7 +73,7 @@
     <string name="result_match_suffix" formatted="false">% de match</string>
     <string name="result_match_hint">É quanto das suas respostas apontou para esse estilo, contando o seu artista favorito.</string>
     <string name="result_surprise_title">Fora da sua zona de conforto</string>
-    <string name="result_surprise_hint" formatted="false">Você ligou o Me surpreenda, então aqui não tem %: a música vem de um estilo que você marcou, fora do seu de sempre.</string>
+    <string name="result_surprise_hint" formatted="false">Você quis se arriscar, então aqui não tem %: a música vem de um estilo que você marcou, fora do seu de sempre.</string>
     <string name="result_reason_label">Por que essa música?</string>
     <string name="result_no_styles">Nenhum outro estilo marcado</string>
     <string name="result_rate_question">Curtiu a descoberta?</string>
