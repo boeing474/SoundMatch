@@ -67,7 +67,8 @@ object DiscoveryRepository {
     private suspend fun withIsrc(top: DeezerTrack): DeezerTrack =
         networkOrNull { deezer.track(top.id) }?.takeIf { it.isrc != null } ?: top
 
-    // Se o ReccoBeats falhar, segue sem as características (a escolha fica pela popularidade).
+    // Se o ReccoBeats falhar, segue sem as características: o DiscoveryEngine devolve null
+    // e a tela usa o motor reserva (SoundMatchEngine).
     private suspend fun audioFeatures(tracks: List<DeezerTrack>): List<AudioFeatures> {
         val isrcs = tracks.mapNotNull { it.isrc }
         if (isrcs.isEmpty()) return emptyList()

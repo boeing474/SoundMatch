@@ -24,8 +24,6 @@ object DiscoveryRules {
         Normalizer.normalize(name.trim().lowercase(), Normalizer.Form.NFD)
             .replace(Regex("\\p{M}"), "")
 
-    // Junta cada música com as características do som, ligando as duas pelo ISRC.
-    // Música sem ISRC ou que o ReccoBeats não conhece fica com features = null.
     // Tira da lista o artista favorito, os que a pessoa já conhece e os repetidos.
     fun newArtists(artists: List<DeezerArtist>, favorite: String, known: List<DeezerArtist>): List<DeezerArtist> {
         val knownIds = known.map { it.id }.toSet()
@@ -39,6 +37,8 @@ object DiscoveryRules {
     fun goesFarther(related: List<DeezerArtist>, answers: QuizAnswers): Boolean =
         answers.surprise || answers.knownArtists.size >= related.size
 
+    // Junta cada música com as características do som, ligando as duas pelo ISRC.
+    // Música sem ISRC ou que o ReccoBeats não conhece fica com features = null.
     fun attachFeatures(tracks: List<DeezerTrack>, features: List<AudioFeatures>): List<Candidate> {
         val byIsrc = features
             .filter { it.isrc != null }
